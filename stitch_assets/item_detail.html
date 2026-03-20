@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&amp;family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error-container": "#ffdad6",
+              "on-tertiary": "#68000f",
+              "secondary-container": "#00d1a7",
+              "surface": "#0a0a0f",
+              "surface-container-lowest": "#050508",
+              "on-surface": "#e5e0ee",
+              "surface-container": "#15141f",
+              "outline": "#918fa1",
+              "surface-container-high": "#1c1b26",
+              "surface-container-highest": "#252433",
+              "error-container": "#93000a",
+              "secondary": "#41eec2",
+              "tertiary-container": "#f16161",
+              "on-secondary": "#00382b",
+              "primary-container": "#8781ff",
+              "tertiary-fixed": "#ffdad8",
+              "primary-fixed": "#e3dfff",
+              "on-surface-variant": "#c7c4d8",
+              "on-background": "#e5e0ee",
+              "on-primary-fixed": "#100069",
+              "surface-container-low": "#111018",
+              "primary-fixed-dim": "#c4c0ff",
+              "surface-dim": "#0a0a0f",
+              "error": "#ffb4ab",
+              "inverse-on-surface": "#312f39",
+              "secondary-fixed-dim": "#28dfb5",
+              "on-tertiary-container": "#5c000c",
+              "surface-variant": "#252433",
+              "tertiary-fixed-dim": "#ffb3b0",
+              "on-primary-container": "#1b0091",
+              "on-secondary-fixed": "#002118",
+              "secondary-fixed": "#55fcd0",
+              "background": "#0a0a0f",
+              "tertiary": "#ffb3b0",
+              "on-primary-fixed-variant": "#3622ca",
+              "on-tertiary-fixed-variant": "#8c1520",
+              "inverse-primary": "#4f44e2",
+              "primary": "#c4c0ff",
+              "surface-tint": "#c4c0ff",
+              "outline-variant": "#464555",
+              "on-secondary-container": "#005441",
+              "surface-bright": "#2d2b38",
+              "inverse-surface": "#e5e0ee",
+              "on-primary": "#2000a4",
+              "on-tertiary-fixed": "#410006",
+              "on-secondary-fixed-variant": "#00513f",
+              "on-error": "#690005"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "mono": ["JetBrains Mono", "monospace"]
+            },
+            borderRadius: {"DEFAULT": "0.125rem", "lg": "0.25rem", "xl": "0.5rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scan-line {
+            background: linear-gradient(to bottom, transparent 0%, #41eec2 50%, transparent 100%);
+            height: 2px;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            opacity: 0.2;
+        }
+        .fab-container:focus-within .fab-options {
+            display: flex;
+            transform: scale(1) translateY(0);
+            opacity: 1;
+        }
+        .fab-options {
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-secondary/30">
+<header class="fixed top-0 left-0 w-full z-50 bg-surface/90 backdrop-blur-md border-b border-white/5 h-14 flex items-center px-4 justify-between">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-secondary text-xl">terminal</span>
+<span class="text-xs font-mono font-bold tracking-widest text-secondary">SECURITY_VAULT // GITHUB</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-2 h-2 rounded-full bg-secondary animate-pulse"></span>
+<span class="text-[10px] font-mono text-secondary/60">ENCRYPTED_LINK_ESTABLISHED</span>
+</div>
+</header>
+<main class="pt-14 pb-24 h-screen flex flex-col overflow-hidden">
+<section class="flex-none bg-surface-container-low border-b border-white/5 p-4 space-y-4">
+<div class="flex items-center justify-between">
+<h2 class="text-[10px] font-bold tracking-widest text-outline uppercase">Master_Keys_Vault</h2>
+<div class="px-2 py-0.5 rounded bg-secondary/10 border border-secondary/20">
+<span class="text-[9px] font-mono text-secondary">LEVEL_4_AUTH</span>
+</div>
+</div>
+<div class="flex gap-3 overflow-x-auto hide-scrollbar pb-2">
+<div class="flex-none w-64 bg-surface-container-high rounded-xl p-4 border border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-10">
+<span class="material-symbols-outlined text-4xl">alternate_email</span>
+</div>
+<div class="space-y-1 mb-3">
+<p class="text-[9px] font-mono text-outline uppercase tracking-tighter">Identity_Primary</p>
+<p class="text-sm font-mono text-on-surface truncate">alex.v@nexus-design.io</p>
+</div>
+<button class="w-full flex items-center justify-center gap-2 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors border border-white/10 active:scale-95 duration-75">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Copy_Identity</span>
+</button>
+</div>
+<div class="flex-none w-64 bg-surface-container-high rounded-xl p-4 border border-white/5 relative overflow-hidden group">
+<div class="absolute top-0 right-0 p-2 opacity-10 text-secondary">
+<span class="material-symbols-outlined text-4xl">lock_open</span>
+</div>
+<div class="space-y-1 mb-3">
+<div class="flex items-center gap-2">
+<p class="text-[9px] font-mono text-outline uppercase tracking-tighter">Access_Token</p>
+<span class="text-[8px] text-secondary font-bold">SECURE_98%</span>
+</div>
+<p class="text-sm font-mono text-secondary">••••••••••••••</p>
+</div>
+<button class="w-full flex items-center justify-center gap-2 py-2 bg-secondary/10 hover:bg-secondary/20 text-secondary rounded-lg transition-colors border border-secondary/30 active:scale-95 duration-75">
+<span class="material-symbols-outlined text-sm">key</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Copy_Password</span>
+</button>
+</div>
+<div class="flex-none w-48 bg-secondary rounded-xl p-4 border border-secondary/20 relative overflow-hidden text-on-secondary">
+<div class="absolute top-0 right-0 p-2 opacity-20">
+<span class="material-symbols-outlined text-4xl">shield_lock</span>
+</div>
+<div class="space-y-1 mb-3">
+<p class="text-[9px] font-mono text-on-secondary/60 uppercase tracking-tighter">Time_Token</p>
+<p class="text-2xl font-mono font-bold tracking-widest">482 910</p>
+</div>
+<button class="w-full flex items-center justify-center gap-2 py-2 bg-on-secondary/10 hover:bg-on-secondary/20 rounded-lg transition-colors active:scale-95 duration-75">
+<span class="material-symbols-outlined text-sm">content_copy</span>
+<span class="text-[10px] font-bold uppercase tracking-widest">Sync_Copy</span>
+</button>
+</div>
+</div>
+</section>
+<section class="flex-1 overflow-y-auto p-4 space-y-6">
+<div class="grid grid-cols-2 gap-4">
+<div class="col-span-2 flex items-center justify-between p-4 bg-surface-container-lowest border border-white/5 rounded-2xl">
+<div class="flex items-center gap-4">
+<div class="w-10 h-10 rounded bg-surface-container flex items-center justify-center border border-white/10">
+<img alt="Brand Icon" class="w-6 h-6 opacity-80" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxZciE7wBlJSGYNaKoGRuDcu6jDX_E5093RvGMxtve6WlCoOmPxNFY8ZMDmHt3O29anzv8rKifWI30JW8FbXO1LR5R-HYVhuD0fWFzNk9l-KZtjLYRadEU-FnKIKYROYOz5jAltRDMW6DUS9KP53RwE2ZitsVaBW33ovx_uIZ7zizaQAaYipgG8_kvYt-ThPZwJc6q7d-Xj2hij7QetpL6zBqIIzgP2TpLyCWW6lMu5DELvtXd1xkl0nWaEfpLwT53H91_FKgZ-xml"/>
+</div>
+<div>
+<h3 class="text-xs font-bold text-outline uppercase tracking-wider">Target_URL</h3>
+<p class="text-sm font-medium text-on-surface">github.com/login</p>
+</div>
+</div>
+<button class="w-10 h-10 flex items-center justify-center text-primary bg-primary/10 rounded-xl">
+<span class="material-symbols-outlined text-lg">launch</span>
+</button>
+</div>
+<div class="col-span-2 p-4 bg-surface-container-lowest border border-white/5 rounded-2xl space-y-2">
+<h3 class="text-[10px] font-bold text-outline uppercase tracking-widest">Meta_Data</h3>
+<p class="text-xs text-on-surface-variant leading-relaxed">Primary development repository access. MFA required for all push operations. Registered with work email.</p>
+</div>
+<div class="p-4 bg-surface-container-lowest border border-white/5 rounded-2xl">
+<h3 class="text-[10px] font-bold text-outline uppercase tracking-widest">Last_Access</h3>
+<p class="text-xs text-on-surface mt-1">14h ago</p>
+</div>
+<div class="p-4 bg-surface-container-lowest border border-white/5 rounded-2xl">
+<h3 class="text-[10px] font-bold text-outline uppercase tracking-widest">Health</h3>
+<p class="text-xs text-secondary mt-1 font-bold">OPTIMAL</p>
+</div>
+</div>
+<div class="opacity-10 pointer-events-none select-none py-4">
+<div class="text-[8px] font-mono leading-tight space-y-1">
+<p>01001000 01000101 01001100 01001100 01001111</p>
+<p>SECURITY_PROTOCOL_ACTIVE_VER_4.0.2</p>
+<p>BUFFER_STATUS_CLEAN // CACHE_EMPTY</p>
+</div>
+</div>
+</section>
+</main>
+<div class="fixed bottom-8 right-8 z-50 fab-container group" tabindex="0">
+<div class="fab-options hidden flex-col-reverse items-end gap-3 mb-4 origin-bottom scale-0 opacity-0 transition-all duration-300">
+<button class="flex items-center gap-3 group/opt">
+<span class="px-3 py-1 bg-surface-container-highest border border-white/10 rounded-lg text-[10px] font-bold tracking-widest uppercase text-primary opacity-0 group-hover/opt:opacity-100 transition-opacity">Autofill</span>
+<div class="w-12 h-12 rounded-full bg-primary flex items-center justify-center text-on-primary shadow-lg shadow-primary/20 hover:scale-110 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">bolt</span>
+</div>
+</button>
+<button class="flex items-center gap-3 group/opt">
+<span class="px-3 py-1 bg-surface-container-highest border border-white/10 rounded-lg text-[10px] font-bold tracking-widest uppercase text-on-surface opacity-0 group-hover/opt:opacity-100 transition-opacity">Share</span>
+<div class="w-12 h-12 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center text-on-surface shadow-lg hover:scale-110 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">share</span>
+</div>
+</button>
+<button class="flex items-center gap-3 group/opt">
+<span class="px-3 py-1 bg-surface-container-highest border border-white/10 rounded-lg text-[10px] font-bold tracking-widest uppercase text-on-surface opacity-0 group-hover/opt:opacity-100 transition-opacity">Edit</span>
+<div class="w-12 h-12 rounded-full bg-surface-container-highest border border-white/10 flex items-center justify-center text-on-surface shadow-lg hover:scale-110 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">edit</span>
+</div>
+</button>
+<button class="flex items-center gap-3 group/opt">
+<span class="px-3 py-1 bg-error/10 border border-error/20 rounded-lg text-[10px] font-bold tracking-widest uppercase text-error opacity-0 group-hover/opt:opacity-100 transition-opacity">Destroy</span>
+<div class="w-12 h-12 rounded-full bg-error-container text-on-error-container flex items-center justify-center shadow-lg hover:scale-110 active:scale-90 transition-transform">
+<span class="material-symbols-outlined">delete_forever</span>
+</div>
+</button>
+</div>
+<button class="w-16 h-16 rounded-2xl bg-secondary flex items-center justify-center text-on-secondary shadow-xl shadow-secondary/20 group-focus-within:rotate-45 transition-transform duration-300">
+<span class="material-symbols-outlined text-3xl">add</span>
+</button>
+</div>
+<nav class="fixed bottom-0 left-0 w-full z-40 flex justify-around items-center h-14 bg-surface-container-low border-t border-white/5 px-6">
+<button class="p-2 text-outline hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">grid_view</span>
+</button>
+<button class="p-2 text-outline hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">shield</span>
+</button>
+<div class="w-12"></div> 
+<button class="p-2 text-outline hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">troubleshoot</span>
+</button>
+<button class="p-2 text-outline hover:text-secondary transition-colors">
+<span class="material-symbols-outlined">settings</span>
+</button>
+</nav>
+
+</body></html>

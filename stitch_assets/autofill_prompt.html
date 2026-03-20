@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error-container": "#ffdad6",
+              "on-tertiary": "#68000f",
+              "secondary-container": "#00d1a7",
+              "surface": "#13121b",
+              "surface-container-lowest": "#0e0d16",
+              "on-surface": "#e5e0ee",
+              "surface-container": "#201e28",
+              "outline": "#918fa1",
+              "surface-container-high": "#2a2933",
+              "surface-container-highest": "#35333e",
+              "error-container": "#93000a",
+              "secondary": "#41eec2",
+              "tertiary-container": "#f16161",
+              "on-secondary": "#00382b",
+              "primary-container": "#8781ff",
+              "tertiary-fixed": "#ffdad8",
+              "primary-fixed": "#e3dfff",
+              "on-surface-variant": "#c7c4d8",
+              "on-background": "#e5e0ee",
+              "on-primary-fixed": "#100069",
+              "surface-container-low": "#1c1a24",
+              "primary-fixed-dim": "#c4c0ff",
+              "surface-dim": "#13121b",
+              "error": "#ffb4ab",
+              "inverse-on-surface": "#312f39",
+              "secondary-fixed-dim": "#28dfb5",
+              "on-tertiary-container": "#5c000c",
+              "surface-variant": "#35333e",
+              "tertiary-fixed-dim": "#ffb3b0",
+              "on-primary-container": "#1b0091",
+              "on-secondary-fixed": "#002118",
+              "secondary-fixed": "#55fcd0",
+              "background": "#13121b",
+              "tertiary": "#ffb3b0",
+              "on-primary-fixed-variant": "#3622ca",
+              "on-tertiary-fixed-variant": "#8c1520",
+              "inverse-primary": "#4f44e2",
+              "primary": "#c4c0ff",
+              "surface-tint": "#c4c0ff",
+              "outline-variant": "#464555",
+              "on-secondary-container": "#005441",
+              "surface-bright": "#3a3842",
+              "inverse-surface": "#e5e0ee",
+              "on-primary": "#2000a4",
+              "on-tertiary-fixed": "#410006",
+              "on-secondary-fixed-variant": "#00513f",
+              "on-error": "#690005"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .glass-sheet {
+            background: rgba(42, 41, 51, 0.85);
+            backdrop-filter: blur(24px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body min-h-screen flex items-end justify-center">
+<!-- Background App Simulation (Gmail Login) -->
+<div class="fixed inset-0 z-0 flex flex-col items-center justify-center p-8 opacity-40">
+<div class="w-16 h-16 mb-8 rounded-2xl bg-white flex items-center justify-center overflow-hidden">
+<img alt="Gmail" data-alt="Gmail logo on white background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBNal698CReF3Dt-j5Bpr9qj8XH1pz11Pp6Weh3vo-McOJy7QxmdpiG3d12DiYCxmSXaTEIR-_oeq5RMA3ZMyJ78TvxMLW5m0zCIYDFmieiU_YgjF9WyozxLN7iBCvI4s_IAuXihINDbdgxwvTiAI7FIQOwx7nhZevScsORFZHkD1tYeFf3YQ3-lb1a1mC2eQGuSIEEHAQ0G-1X5OW7VJHRaSQEwyGdAttdyvaYOXCKefX3bpR2LD37G5E_EIMwNkCD37aypwjcmHkz"/>
+</div>
+<h1 class="text-2xl font-bold mb-8 text-on-surface">Sign in</h1>
+<div class="w-full max-w-sm space-y-4">
+<div class="h-14 w-full bg-surface-container rounded-xl border border-outline-variant/30 px-4 flex items-center text-outline">
+                Email or phone
+            </div>
+<div class="h-14 w-full bg-surface-container rounded-xl border border-outline-variant/30 px-4 flex items-center text-outline">
+                Password
+            </div>
+<div class="h-12 w-32 bg-primary-container/20 rounded-full flex items-center justify-center text-primary-container font-semibold ml-auto">
+                Next
+            </div>
+</div>
+</div>
+<!-- Scrim/Overlay -->
+<div class="fixed inset-0 bg-surface-container-lowest/60 backdrop-blur-sm z-10"></div>
+<!-- Bottom Sheet: VaultKey Autofill Prompt -->
+<div class="relative z-20 w-full max-w-md glass-sheet rounded-t-[32px] shadow-[0_-12px_40px_rgba(0,0,0,0.5)] border-t border-white/5 pb-10 overflow-hidden">
+<!-- Drag Handle -->
+<div class="w-full flex justify-center pt-3 pb-6">
+<div class="w-10 h-1 rounded-full bg-outline-variant/50"></div>
+</div>
+<div class="px-8">
+<!-- Header Group -->
+<div class="flex items-center gap-3 mb-8">
+<div class="w-10 h-10 bg-gradient-to-br from-primary to-primary-container rounded-xl flex items-center justify-center shadow-[0_4px_12px_rgba(196,192,255,0.3)]">
+<span class="material-symbols-outlined text-on-primary-fixed text-2xl" data-icon="key" style="font-variation-settings: 'FILL' 1;">key</span>
+</div>
+<span class="text-xl font-bold tracking-tighter text-primary">VaultKey</span>
+</div>
+<!-- Main Question -->
+<h2 class="text-3xl font-headline font-semibold tracking-tight text-on-surface mb-8 leading-tight">
+                Sign in to <span class="text-primary-fixed-dim">Gmail</span>?
+            </h2>
+<!-- Credential Row -->
+<div class="bg-surface-container-high rounded-2xl p-5 mb-8 flex items-center justify-between group cursor-pointer transition-colors hover:bg-surface-bright">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-white flex items-center justify-center shadow-lg">
+<img alt="Account" data-alt="Gmail colorful icon" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCWs2W-qAgLeSrh8rpaHKcIFkzHB0az-E-vVmA8gAFiKGsLf4IanzKVFW_X9-5LPsoJJ24b_t_8iJrFiW9qlEErScvo7vdXTdQ-OJT7fec3i5Cct_YHWGiYi7sPeUYEp3Jap_lszLNbI4-sAsmr0tNDbBfBmAu7RezCPXCk5rFUrlY1oqSMasqE8S0_xDWfBjg9PiptXRWvbJXY0QjT_bU09y5ijP4ipFe4iLMsRbZyaTIeGM6oWnyLx_p4oDaPfKGpjKB62M3NfGnI"/>
+</div>
+<div>
+<div class="text-on-surface font-semibold text-lg leading-none mb-1">Gmail</div>
+<div class="text-outline text-sm font-medium">a@gmail.com</div>
+</div>
+</div>
+<div class="flex gap-1.5 items-center pr-2">
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
+<div class="w-1.5 h-1.5 rounded-full bg-outline-variant"></div>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full bg-gradient-to-r from-primary to-primary-container text-on-primary-fixed font-bold py-4 rounded-[14dp] text-lg shadow-[0_8px_24px_rgba(196,192,255,0.2)] active:scale-95 transition-transform duration-200 flex items-center justify-center gap-2">
+                Use This
+            </button>
+<!-- Secondary Action -->
+<button class="w-full mt-6 py-2 text-primary-fixed-dim font-semibold text-sm tracking-wide flex items-center justify-center gap-2 hover:text-white transition-colors">
+                Other accounts...
+            </button>
+</div>
+<!-- Biometric Simulation Overlay (Triggered automatically UI representation) -->
+<div class="absolute inset-x-0 bottom-0 bg-surface-container-lowest/90 backdrop-blur-md pt-8 pb-12 flex flex-col items-center border-t border-white/5">
+<div class="mb-4 relative">
+<!-- Glowing effect -->
+<div class="absolute inset-0 bg-secondary/20 blur-2xl rounded-full"></div>
+<span class="material-symbols-outlined text-secondary text-5xl relative z-10" data-icon="fingerprint">fingerprint</span>
+</div>
+<p class="text-on-surface font-semibold tracking-wide">Confirm Identity</p>
+<p class="text-outline text-sm mt-1">Touch the fingerprint sensor</p>
+<!-- Cancel Biometric -->
+<button class="mt-8 px-6 py-2 rounded-full border border-outline-variant/30 text-outline text-xs font-bold uppercase tracking-widest hover:bg-white/5 transition-colors">
+                Cancel
+            </button>
+</div>
+</div>
+<!-- Hidden NavBar logic as per instructions (Suppressing nav for focused transactional screens) -->
+</body></html>

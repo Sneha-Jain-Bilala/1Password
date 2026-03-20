@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error-container": "#ffdad6",
+              "on-tertiary": "#68000f",
+              "secondary-container": "#00d1a7",
+              "surface": "#13121b",
+              "surface-container-lowest": "#0e0d16",
+              "on-surface": "#e5e0ee",
+              "surface-container": "#201e28",
+              "outline": "#918fa1",
+              "surface-container-high": "#2a2933",
+              "surface-container-highest": "#35333e",
+              "error-container": "#93000a",
+              "secondary": "#41eec2",
+              "tertiary-container": "#f16161",
+              "on-secondary": "#00382b",
+              "primary-container": "#8781ff",
+              "tertiary-fixed": "#ffdad8",
+              "primary-fixed": "#e3dfff",
+              "on-surface-variant": "#c7c4d8",
+              "on-background": "#e5e0ee",
+              "on-primary-fixed": "#100069",
+              "surface-container-low": "#1c1a24",
+              "primary-fixed-dim": "#c4c0ff",
+              "surface-dim": "#13121b",
+              "error": "#ffb4ab",
+              "inverse-on-surface": "#312f39",
+              "secondary-fixed-dim": "#28dfb5",
+              "on-tertiary-container": "#5c000c",
+              "surface-variant": "#35333e",
+              "tertiary-fixed-dim": "#ffb3b0",
+              "on-primary-container": "#1b0091",
+              "on-secondary-fixed": "#002118",
+              "secondary-fixed": "#55fcd0",
+              "background": "#13121b",
+              "tertiary": "#ffb3b0",
+              "on-primary-fixed-variant": "#3622ca",
+              "on-tertiary-fixed-variant": "#8c1520",
+              "inverse-primary": "#4f44e2",
+              "primary": "#c4c0ff",
+              "surface-tint": "#c4c0ff",
+              "outline-variant": "#464555",
+              "on-secondary-container": "#005441",
+              "surface-bright": "#3a3842",
+              "inverse-surface": "#e5e0ee",
+              "on-primary": "#2000a4",
+              "on-tertiary-fixed": "#410006",
+              "on-secondary-fixed-variant": "#00513f",
+              "on-error": "#690005"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #13121b;
+        }
+        .hide-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .hide-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full flex justify-between items-center px-6 h-16 bg-[#13121b]/80 backdrop-blur-xl z-50 shadow-[0_8px_32px_rgba(196,192,255,0.08)]">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 rounded-full overflow-hidden bg-surface-container-high border-2 border-primary/20">
+<img alt="User profile photo" class="w-full h-full object-cover" data-alt="Close up professional male avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeu-P_z6fdfJFXbxRBwevA-Kj8CffQ2MaYE5UWwYyi8djMaubaa98gymYwTPbFPsDiFGFN7m7LHxtfp1hNfsW7_wrzeKlPECUgRXrJaFFzw-ajky2ZtCAE-MAd1BIaqltIgQ0HAki8zh9f5_PJ08ZKXSCmje8EiM8utoFHN71p-CsAfFdhlKatZ9f9H2uRsWoHS8oZ-rl0pUk5uyo4mumGE0jRK3uDEbGzIEgfua0ac_0HwqbaiuKvKR4K-5cmMrfXy-i5gzldeGj0"/>
+</div>
+<div class="flex flex-col">
+<span class="text-xs text-slate-500 font-medium tracking-wide">Good morning,</span>
+<span class="font-['Inter'] font-semibold tracking-tight text-lg text-[#c4c0ff]">Alex 👋</span>
+</div>
+</div>
+<div class="flex items-center gap-2">
+<button class="w-10 h-10 flex items-center justify-center rounded-xl hover:bg-white/5 transition-colors text-[#c4c0ff] active:scale-95 duration-200">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-24 px-6 space-y-8 max-w-2xl mx-auto">
+<!-- Health Score Card (Hero) -->
+<section>
+<div class="relative overflow-hidden rounded-[28px] p-8 bg-gradient-to-br from-primary to-secondary-container shadow-[0_20px_50px_rgba(196,192,255,0.15)] group">
+<!-- Decorative element -->
+<div class="absolute -right-12 -top-12 w-48 h-48 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-all duration-700"></div>
+<div class="relative flex items-center justify-between">
+<div class="space-y-1">
+<p class="text-on-primary-fixed text-sm font-bold tracking-widest uppercase opacity-80">Vault Status</p>
+<h2 class="text-on-primary-fixed text-2xl font-extrabold tracking-tight">Password Health Score</h2>
+<p class="text-on-primary-fixed/70 text-sm font-medium mt-2 max-w-[180px]">Your security is exceptional this month.</p>
+</div>
+<!-- Circular Progress -->
+<div class="relative flex items-center justify-center w-32 h-32">
+<svg class="w-full h-full transform -rotate-90">
+<circle class="text-white/20" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-white shadow-lg" cx="64" cy="64" fill="transparent" r="58" stroke="currentColor" stroke-dasharray="364.4" stroke-dashoffset="29.1" stroke-linecap="round" stroke-width="10"></circle>
+</svg>
+<div class="absolute inset-0 flex flex-col items-center justify-center">
+<span class="text-4xl font-black text-white tracking-tighter">92</span>
+<span class="text-[10px] font-bold text-white/80 uppercase">Solid</span>
+</div>
+</div>
+</div>
+<div class="mt-6 pt-4 border-t border-white/10 flex justify-between items-center">
+<span class="text-xs font-bold text-on-primary-fixed/90 flex items-center gap-1">
+<span class="material-symbols-outlined text-sm" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+                        248 Passwords Encrypted
+                    </span>
+<button class="bg-white/20 backdrop-blur-md px-4 py-1.5 rounded-full text-xs font-bold text-white hover:bg-white/30 transition-all">Details</button>
+</div>
+</div>
+</section>
+<!-- Quick Access Section -->
+<section class="space-y-4">
+<h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest pl-1">Quick Access</h3>
+<div class="flex gap-3 overflow-x-auto hide-scrollbar -mx-6 px-6">
+<button class="flex-shrink-0 bg-primary/10 border border-primary/20 text-primary px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-2 transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">history</span>
+                    Recent
+                </button>
+<button class="flex-shrink-0 bg-surface-container-high text-on-surface-variant px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-2 hover:bg-surface-bright transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">star</span>
+                    Favourites
+                </button>
+<button class="flex-shrink-0 bg-surface-container-high text-on-surface-variant px-5 py-2.5 rounded-2xl font-bold text-sm flex items-center gap-2 hover:bg-surface-bright transition-all active:scale-95">
+<span class="material-symbols-outlined text-lg">gpp_maybe</span>
+                    Weak Passwords
+                </button>
+</div>
+</section>
+<!-- Recent Items List -->
+<section class="space-y-4">
+<div class="flex justify-between items-end pl-1">
+<h3 class="text-sm font-bold text-slate-500 uppercase tracking-widest">Recent Activity</h3>
+<span class="text-xs font-bold text-primary cursor-pointer hover:underline">View All</span>
+</div>
+<div class="space-y-3">
+<!-- Item 1 -->
+<div class="group flex items-center justify-between p-4 bg-surface-container rounded-[20px] transition-all hover:bg-surface-container-high active:scale-[0.99]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-surface-container-lowest flex items-center justify-center overflow-hidden border border-outline-variant/10">
+<img alt="Netflix Icon" class="w-6 h-6" data-alt="Netflix red logo icon on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDrImlctGy0kgZacyeqcspuJ29piyHUVR7gQ9F0_aY0xblMX8VT5_6ya3i1xFNlJ_gzFvYGIEWkMqDnNoKvlgei3CgyLupqHtZc8fCL5PGm8cd470zFjBYLh6XkWP2MfJAwmMXClz1H2__7ObbhQpObbPIwJqNQ4E8T1dtE03EV0KOIuuOlBAuZ6lUKhmilgAUsGYYYPGZOy_lfZRXyK-4VTUnr584p3Gip8_ddGNeRY3lm6RhCicf0nFuGeS8XE0obbN35Vd7C6s-7"/>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface tracking-tight">Netflix</span>
+<div class="flex items-center gap-2">
+<span class="text-sm text-slate-500 font-medium">alex.v•••••••••</span>
+<div class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(65,238,194,0.5)]" title="2FA Enabled"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">content_copy</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Item 2 -->
+<div class="group flex items-center justify-between p-4 bg-surface-container rounded-[20px] transition-all hover:bg-surface-container-high active:scale-[0.99]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-surface-container-lowest flex items-center justify-center overflow-hidden border border-outline-variant/10">
+<img alt="GitHub Icon" class="w-6 h-6" data-alt="GitHub white octocat logo icon on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCP_Y8-oi6Do7qW1AEOiSYPtQrpDxU-BRP966qLlnvsZfGqY8lEga5jK6-NQ72ZACYPY2XXbToFnZNbZXuYsXyeMyQHt-gje5Y64-8SNWjnMcZ2NwaLQDe5g7y54DkkB-nnKnQNyz1VXsyHW6ACT40TNozrbrdrhDmn-ztHNMg1r9Uco1C7jf_m7la-09mMvQyCCqHXkwPBBE-jGxDeJ3FPcJTH3WQGb0R-kRn-6mTrwN4h-dhvOxOj7L8Co9MQSXzRj27QCgZx3yMj"/>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface tracking-tight">GitHub</span>
+<div class="flex items-center gap-2">
+<span class="text-sm text-slate-500 font-medium">dev_alex••••••••</span>
+<div class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(65,238,194,0.5)]" title="2FA Enabled"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">content_copy</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Item 3 -->
+<div class="group flex items-center justify-between p-4 bg-surface-container rounded-[20px] transition-all hover:bg-surface-container-high active:scale-[0.99]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-surface-container-lowest flex items-center justify-center overflow-hidden border border-outline-variant/10">
+<img alt="Binance Icon" class="w-6 h-6" data-alt="Binance yellow logo icon on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTBh_cizI0PXL0SXzVGhcAqSOH90EbI8k7JvblAisGUWmVM5oazrdQrf2E0z7l_k6BHAFAbgt33xlafE3Z9WWAFD9D3KmGBFp4c6MhxeB2EkLSPAO7J4RcaaL8ZgLLmj3S78xJ_2lmjT48R2x40a4v3GFcMaoMSuNsjkcS11Fk5-yyfpUF2lMP-Op3oxHQ9rOVpM7Zyr02lFycWtL88N3GHClH30MKnUjUB6RkQLGF2kWqibMAMGJKFqmdLmE-5V7-RASQCS6gMvlV"/>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface tracking-tight">Binance Vault</span>
+<div class="flex items-center gap-2">
+<span class="text-sm text-slate-500 font-medium">crypto_h••••••••</span>
+<div class="w-1.5 h-1.5 rounded-full bg-slate-600" title="2FA Disabled"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">content_copy</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+<!-- Item 4 -->
+<div class="group flex items-center justify-between p-4 bg-surface-container rounded-[20px] transition-all hover:bg-surface-container-high active:scale-[0.99]">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-2xl bg-surface-container-lowest flex items-center justify-center overflow-hidden border border-outline-variant/10">
+<img alt="Dribbble Icon" class="w-6 h-6" data-alt="Dribbble pink basketball logo icon on dark background" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAZh5L0fZ1sjQAkQMsgYUjMsvni9hZa-b7RovnrKlBuTdv5LUIIOhDZmO_QZT_JrRwi5jO77Qfze4gHn1WvVq90CLAbdlO2_u970ILhwRFqEET2SY9wzLrZ0--oLvwqotZZJPBPbGlpjt_vpswbc4qRkrxgILBNSFvmidw-B7R8Zc4wc1SxFHM3VjuVjDRBvV149lOZLr7rtqlJ03rK6TNVxCUN8oy1KZrU2Mxks2dCgP06q2adyw2wb4Otv4vYfSkG2IDSABuMEqxN"/>
+</div>
+<div class="flex flex-col">
+<span class="font-bold text-on-surface tracking-tight">Dribbble Pro</span>
+<div class="flex items-center gap-2">
+<span class="text-sm text-slate-500 font-medium">pixel_per••••••••</span>
+<div class="w-1.5 h-1.5 rounded-full bg-secondary shadow-[0_0_8px_rgba(65,238,194,0.5)]" title="2FA Enabled"></div>
+</div>
+</div>
+</div>
+<div class="flex items-center gap-1">
+<button class="p-2 text-slate-500 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">content_copy</span>
+</button>
+<button class="p-2 text-slate-500 hover:text-on-surface transition-colors">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</section>
+</main>
+<!-- FAB -->
+<button class="fixed bottom-28 right-6 w-14 h-14 rounded-full bg-gradient-to-tr from-primary to-secondary shadow-[0_12px_24px_rgba(65,238,194,0.3)] flex items-center justify-center text-on-primary-fixed active:scale-90 transition-transform z-40">
+<span class="material-symbols-outlined text-3xl font-bold">add</span>
+</button>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#2a2933]/70 backdrop-blur-lg rounded-t-[28px] shadow-[0_-8px_32px_rgba(196,192,255,0.05)]">
+<!-- Home Active -->
+<a class="flex flex-col items-center justify-center bg-[#c4c0ff]/10 text-[#c4c0ff] rounded-2xl px-5 py-1.5 active:translate-y-[-2px] duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">home_max</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Home</span>
+</a>
+<!-- Browse Inactive -->
+<a class="flex flex-col items-center justify-center text-slate-500 px-5 py-1.5 hover:text-white transition-all active:translate-y-[-2px] duration-300" href="#">
+<span class="material-symbols-outlined">grid_view</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Browse</span>
+</a>
+<!-- Tools Inactive -->
+<a class="flex flex-col items-center justify-center text-slate-500 px-5 py-1.5 hover:text-white transition-all active:translate-y-[-2px] duration-300" href="#">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Tools</span>
+</a>
+<!-- Settings Inactive -->
+<a class="flex flex-col items-center justify-center text-slate-500 px-5 py-1.5 hover:text-white transition-all active:translate-y-[-2px] duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Settings</span>
+</a>
+</nav>
+</body></html>

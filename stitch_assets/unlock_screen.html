@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VaultKey - Unlock</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "on-error-container": "#ffdad6",
+              "on-tertiary": "#68000f",
+              "secondary-container": "#00d1a7",
+              "surface": "#13121b",
+              "surface-container-lowest": "#0e0d16",
+              "on-surface": "#e5e0ee",
+              "surface-container": "#201e28",
+              "outline": "#918fa1",
+              "surface-container-high": "#2a2933",
+              "surface-container-highest": "#35333e",
+              "error-container": "#93000a",
+              "secondary": "#41eec2",
+              "tertiary-container": "#f16161",
+              "on-secondary": "#00382b",
+              "primary-container": "#8781ff",
+              "tertiary-fixed": "#ffdad8",
+              "primary-fixed": "#e3dfff",
+              "on-surface-variant": "#c7c4d8",
+              "on-background": "#e5e0ee",
+              "on-primary-fixed": "#100069",
+              "surface-container-low": "#1c1a24",
+              "primary-fixed-dim": "#c4c0ff",
+              "surface-dim": "#13121b",
+              "error": "#ffb4ab",
+              "inverse-on-surface": "#312f39",
+              "secondary-fixed-dim": "#28dfb5",
+              "on-tertiary-container": "#5c000c",
+              "surface-variant": "#35333e",
+              "tertiary-fixed-dim": "#ffb3b0",
+              "on-primary-container": "#1b0091",
+              "on-secondary-fixed": "#002118",
+              "secondary-fixed": "#55fcd0",
+              "background": "#13121b",
+              "tertiary": "#ffb3b0",
+              "on-primary-fixed-variant": "#3622ca",
+              "on-tertiary-fixed-variant": "#8c1520",
+              "inverse-primary": "#4f44e2",
+              "primary": "#c4c0ff",
+              "surface-tint": "#c4c0ff",
+              "outline-variant": "#464555",
+              "on-secondary-container": "#005441",
+              "surface-bright": "#3a3842",
+              "inverse-surface": "#e5e0ee",
+              "on-primary": "#2000a4",
+              "on-tertiary-fixed": "#410006",
+              "on-secondary-fixed-variant": "#00513f",
+              "on-error": "#690005"
+            },
+            fontFamily: {
+              "headline": ["Inter"],
+              "body": ["Inter"],
+              "label": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .liquid-bg {
+            background: radial-gradient(circle at 50% 50%, rgba(196, 192, 255, 0.05) 0%, rgba(19, 18, 27, 0) 70%);
+        }
+        .glowing-ring {
+            box-shadow: 0 0 20px rgba(196, 192, 255, 0.15), inset 0 0 15px rgba(196, 192, 255, 0.1);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-surface text-on-surface font-body selection:bg-primary/30 min-h-screen flex flex-col items-center justify-between overflow-hidden">
+<!-- Subtle Background Elements -->
+<div class="fixed inset-0 pointer-events-none overflow-hidden z-0">
+<div class="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] rounded-full bg-primary/5 blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-secondary/5 blur-[150px]"></div>
+</div>
+<!-- Top Navigation Anchor (Manual suppression of full shell as per transactional rule) -->
+<header class="fixed top-0 left-0 w-full flex justify-between items-center px-6 h-20 z-50">
+<div class="flex items-center gap-2">
+<div class="w-8 h-8 rounded-lg bg-gradient-to-br from-primary to-primary-container flex items-center justify-center">
+<span class="material-symbols-outlined text-on-primary-fixed text-lg" style="font-variation-settings: 'FILL' 1;">lock</span>
+</div>
+<span class="text-xl font-bold tracking-tighter text-primary bg-clip-text">VaultKey</span>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="relative z-10 flex flex-col items-center justify-center flex-1 w-full max-w-md px-8 text-center">
+<!-- User Identity Section -->
+<div class="mb-16 space-y-2">
+<h1 class="text-display-sm font-headline font-semibold tracking-tight text-on-surface">Welcome back</h1>
+<p class="text-on-surface-variant font-medium body-md">user@gmail.com</p>
+</div>
+<!-- Biometric Interaction Zone -->
+<div class="relative flex flex-col items-center group">
+<!-- Pulsing Ring Background -->
+<div class="absolute inset-0 rounded-full bg-primary/10 blur-2xl group-hover:bg-primary/20 transition-all duration-700 scale-150"></div>
+<!-- Fingerprint Button -->
+<button class="relative w-32 h-32 rounded-full bg-surface-container-high glowing-ring flex items-center justify-center border border-white/5 transition-transform active:scale-95 duration-200">
+<div class="absolute inset-2 border border-primary/20 rounded-full"></div>
+<span class="material-symbols-outlined text-5xl text-primary" style="font-variation-settings: 'wght' 300;">fingerprint</span>
+</button>
+<!-- Label -->
+<p class="mt-8 text-label-sm font-semibold uppercase tracking-[0.2em] text-on-surface-variant/80">
+                Touch the fingerprint sensor
+            </p>
+</div>
+<!-- Divider & Alternative Action -->
+<div class="mt-20 w-full max-w-[240px] flex flex-col items-center gap-8">
+<div class="w-full flex items-center gap-4">
+<div class="h-[1px] flex-1 bg-gradient-to-r from-transparent to-outline-variant/30"></div>
+<span class="text-on-surface-variant/40 text-xs font-bold uppercase tracking-widest">or</span>
+<div class="h-[1px] flex-1 bg-gradient-to-l from-transparent to-outline-variant/30"></div>
+</div>
+<button class="text-primary font-semibold tracking-wide hover:text-primary-fixed transition-colors active:scale-95 duration-200 py-2 px-6 rounded-xl hover:bg-primary/5">
+                Use Master Password
+            </button>
+</div>
+</main>
+<!-- Footer Security Indicator -->
+<footer class="p-8 text-center z-10">
+<div class="flex items-center justify-center gap-2 px-4 py-2 bg-surface-container-lowest rounded-full border border-outline-variant/10">
+<span class="material-symbols-outlined text-secondary text-sm" style="font-variation-settings: 'FILL' 1;">verified_user</span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-on-surface-variant/60">End-to-End Encrypted</span>
+</div>
+</footer>
+<!-- Image Data Descriptions (Placeholder for backgrounds/textures) -->
+<div class="hidden">
+<img data-alt="Deep purple and black liquid gradient background with subtle light particles" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAx2hN0XpkxgugOKQWAXvHWfi774jE_ZrIT7lyk5xjsRHiT9z9HmT0MgAWm-ymnbpBoMc15Vuc7I2Qr-D5FJK60xOwJCVVjcUq9xIVxH4S2LSfRSyYJkIyucJxyAw1stw8AccxG5Z_ceO42n66qsXnpfGLYKGeztTiu6xlyMpYUZi53oUg1vVEySCNy8DEZ4AnRfU4481afoFnjVWGKgGOYUOppdm4Z2imkRLyqiZ6R-6xOKXfaMtKRL43C-6rVqjKMTjOMs0UGgey_"/>
+<img data-alt="Abstract glowing circle with fingerprint icon inside a dark high-tech interface" src="https://lh3.googleusercontent.com/aida-public/AB6AXuAO9Bskhl_wNbRVbkeNz5lQjZ0P7S0wr8nV7yzcGkUBIKs4Tivd2vfyRafOjxfzkuGugUgTqKOS-s5EIXEZBgixU6kQz9Nh98UCHHmxL8zz776zyJ4XNeasc5-aRrZlx9PcDN3My_ox9BVTdVaNeU_zIrdMHStPj2JcDrmhH7IrIY0veX82i-Env3dQ4ykAhg_E8T7KEevDZ2nHxtqbCx4mDMaaV77xumaBsOl379BUxHYnf6iz7X4Kvv27GOJkLpGlj8n1YJmVmEH6"/>
+</div>
+</body></html>

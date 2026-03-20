@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>VaultKey - Browse</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "on-error-container": "#ffdad6",
+                        "on-tertiary": "#68000f",
+                        "secondary-container": "#00d1a7",
+                        "surface": "#13121b",
+                        "surface-container-lowest": "#0e0d16",
+                        "on-surface": "#e5e0ee",
+                        "surface-container": "#201e28",
+                        "outline": "#918fa1",
+                        "surface-container-high": "#2a2933",
+                        "surface-container-highest": "#35333e",
+                        "error-container": "#93000a",
+                        "secondary": "#41eec2",
+                        "tertiary-container": "#f16161",
+                        "on-secondary": "#00382b",
+                        "primary-container": "#8781ff",
+                        "tertiary-fixed": "#ffdad8",
+                        "primary-fixed": "#e3dfff",
+                        "on-surface-variant": "#c7c4d8",
+                        "on-background": "#e5e0ee",
+                        "on-primary-fixed": "#100069",
+                        "surface-container-low": "#1c1a24",
+                        "primary-fixed-dim": "#c4c0ff",
+                        "surface-dim": "#13121b",
+                        "error": "#ffb4ab",
+                        "inverse-on-surface": "#312f39",
+                        "secondary-fixed-dim": "#28dfb5",
+                        "on-tertiary-container": "#5c000c",
+                        "surface-variant": "#35333e",
+                        "tertiary-fixed-dim": "#ffb3b0",
+                        "on-primary-container": "#1b0091",
+                        "on-secondary-fixed": "#002118",
+                        "secondary-fixed": "#55fcd0",
+                        "background": "#13121b",
+                        "tertiary": "#ffb3b0",
+                        "on-primary-fixed-variant": "#3622ca",
+                        "on-tertiary-fixed-variant": "#8c1520",
+                        "inverse-primary": "#4f44e2",
+                        "primary": "#c4c0ff",
+                        "surface-tint": "#c4c0ff",
+                        "outline-variant": "#464555",
+                        "on-secondary-container": "#005441",
+                        "surface-bright": "#3a3842",
+                        "inverse-surface": "#e5e0ee",
+                        "on-primary": "#2000a4",
+                        "on-tertiary-fixed": "#410006",
+                        "on-secondary-fixed-variant": "#00513f",
+                        "on-error": "#690005"
+                    },
+                    fontFamily: {
+                        "headline": ["Inter"],
+                        "body": ["Inter"],
+                        "label": ["Inter"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.25rem",
+                        "lg": "0.5rem",
+                        "xl": "0.75rem",
+                        "20": "20px",
+                        "28": "28px",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        body {
+            background-color: #13121b;
+            color: #e5e0ee;
+            font-family: 'Inter', sans-serif;
+        }
+        .liquid-gradient {
+            background: linear-gradient(135deg, #c4c0ff 0%, #8781ff 100%);
+        }
+        .recessed-input {
+            background-color: #0e0d16;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="min-h-screen pb-32">
+<!-- TopAppBar -->
+<header class="fixed top-0 left-0 w-full flex justify-between items-center px-6 h-16 bg-[#13121b]/80 backdrop-blur-xl z-50 shadow-[0_8px_32px_rgba(196,192,255,0.08)]">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-surface-container-high overflow-hidden">
+<img alt="User profile photo" data-alt="User profile avatar portrait minimalist circle" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC6Ly-iJczLqb8thPD2TpzjoEsvsI36AbiFZlyLJ07bJvMvYTwWQ8JVa_f3N7Zf9EpHVWRQZZbqV_Kpww07XWBfnJTLEL3lboPquDZAcnx3SvmENNN4x7hIWajllhRHSEsX7hU7nyAtXyjyyOKW_gaaWKY8GXNtTljokED6CfspOCneZKAetyXgqIrIx1mmOB9XdnojyamlttFIq4QfONsSR7qLZh9fDrle-eZJEee7GV9kk-Q7XKV-rkx5EyR9NTM8y1GPxfRTU9QN"/>
+</div>
+<span class="text-xl font-bold tracking-tighter text-[#c4c0ff] bg-clip-text">VaultKey</span>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-white/5 transition-colors active:scale-95 duration-200">
+<span class="material-symbols-outlined text-[#c4c0ff]">notifications</span>
+</button>
+</div>
+</header>
+<main class="pt-24 px-6 max-w-5xl mx-auto">
+<!-- Title Section -->
+<div class="mb-10">
+<h1 class="text-5xl font-extrabold tracking-tight text-on-surface mb-2">Browse</h1>
+<p class="text-on-surface-variant body-md opacity-70">Manage your encrypted vault assets.</p>
+</div>
+<!-- Category Grid -->
+<div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4">
+<!-- Passwords -->
+<div class="bg-surface-container-high p-5 rounded-20 flex flex-col justify-between h-44 hover:bg-surface-bright transition-all cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-[#c4c0ff]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#c4c0ff] text-2xl" style="font-variation-settings: 'FILL' 1;">key</span>
+</div>
+<span class="bg-surface-container-highest text-[#c4c0ff] text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">142</span>
+</div>
+<div class="mt-4">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-primary transition-colors">Passwords</h3>
+<p class="text-xs text-on-surface-variant opacity-60">Logins &amp; accounts</p>
+</div>
+</div>
+<!-- Secure Notes -->
+<div class="bg-surface-container-high p-5 rounded-20 flex flex-col justify-between h-44 hover:bg-surface-bright transition-all cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-[#41eec2]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#41eec2] text-2xl" style="font-variation-settings: 'FILL' 1;">description</span>
+</div>
+<span class="bg-surface-container-highest text-[#41eec2] text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">28</span>
+</div>
+<div class="mt-4">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-secondary transition-colors">Secure Notes</h3>
+<p class="text-xs text-on-surface-variant opacity-60">Encrypted memos</p>
+</div>
+</div>
+<!-- Credit Cards -->
+<div class="bg-surface-container-high p-5 rounded-20 flex flex-col justify-between h-44 hover:bg-surface-bright transition-all cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-[#ffb3b0]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#ffb3b0] text-2xl" style="font-variation-settings: 'FILL' 1;">credit_card</span>
+</div>
+<span class="bg-surface-container-highest text-[#ffb3b0] text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">6</span>
+</div>
+<div class="mt-4">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-tertiary transition-colors">Credit Cards</h3>
+<p class="text-xs text-on-surface-variant opacity-60">Payment methods</p>
+</div>
+</div>
+<!-- Contact Info -->
+<div class="bg-surface-container-high p-5 rounded-20 flex flex-col justify-between h-44 hover:bg-surface-bright transition-all cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-primary-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-primary-container text-2xl" style="font-variation-settings: 'FILL' 1;">person</span>
+</div>
+<span class="bg-surface-container-highest text-primary-container text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">12</span>
+</div>
+<div class="mt-4">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-primary-container transition-colors">Contact Info</h3>
+<p class="text-xs text-on-surface-variant opacity-60">Personal profiles</p>
+</div>
+</div>
+<!-- Documents -->
+<div class="bg-surface-container-high p-5 rounded-20 flex flex-col justify-between h-44 hover:bg-surface-bright transition-all cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-[#8781ff]/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[#8781ff] text-2xl" style="font-variation-settings: 'FILL' 1;">folder_open</span>
+</div>
+<span class="bg-surface-container-highest text-[#8781ff] text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">45</span>
+</div>
+<div class="mt-4">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-[#8781ff] transition-colors">Documents</h3>
+<p class="text-xs text-on-surface-variant opacity-60">Identity &amp; files</p>
+</div>
+</div>
+<!-- Shared Items -->
+<div class="bg-surface-container-high p-5 rounded-20 flex flex-col justify-between h-44 hover:bg-surface-bright transition-all cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-secondary-container/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-secondary-container text-2xl" style="font-variation-settings: 'FILL' 1;">group</span>
+</div>
+<span class="bg-surface-container-highest text-secondary-container text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">8</span>
+</div>
+<div class="mt-4">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-secondary-container transition-colors">Shared Items</h3>
+<p class="text-xs text-on-surface-variant opacity-60">Team passwords</p>
+</div>
+</div>
+<!-- Folders -->
+<div class="bg-surface-container-high p-5 rounded-20 flex flex-col justify-between h-44 hover:bg-surface-bright transition-all cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-outline/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-outline text-2xl" style="font-variation-settings: 'FILL' 1;">folder_special</span>
+</div>
+<span class="bg-surface-container-highest text-outline text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">15</span>
+</div>
+<div class="mt-4">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-white transition-colors">Folders</h3>
+<p class="text-xs text-on-surface-variant opacity-60">Custom groups</p>
+</div>
+</div>
+<!-- Trash -->
+<div class="bg-surface-container-high p-5 rounded-20 flex flex-col justify-between h-44 hover:bg-surface-bright transition-all cursor-pointer group">
+<div class="flex justify-between items-start">
+<div class="w-12 h-12 rounded-full bg-error-container/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-error text-2xl" style="font-variation-settings: 'FILL' 1;">delete</span>
+</div>
+<span class="bg-surface-container-highest text-error text-[10px] font-bold px-2 py-0.5 rounded-full tracking-widest uppercase">3</span>
+</div>
+<div class="mt-4">
+<h3 class="text-lg font-semibold text-on-surface group-hover:text-error transition-colors">Trash</h3>
+<p class="text-xs text-on-surface-variant opacity-60">Deleted items</p>
+</div>
+</div>
+</div>
+<!-- Featured Section (Bento Style) -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+<div class="md:col-span-2 bg-surface-container-low p-8 rounded-28 flex flex-col justify-center relative overflow-hidden group">
+<div class="absolute -right-8 -bottom-8 w-64 h-64 bg-primary/10 rounded-full blur-3xl group-hover:bg-primary/20 transition-all"></div>
+<h4 class="text-2xl font-bold mb-4 z-10">Security Audit</h4>
+<p class="text-on-surface-variant z-10 mb-6 max-w-sm">34 passwords haven't been changed in over a year. Strengthen your digital fortress now.</p>
+<button class="w-fit liquid-gradient text-on-primary-fixed font-bold py-3 px-8 rounded-xl z-10 active:scale-95 transition-transform shadow-lg shadow-primary/20">Run Deep Scan</button>
+</div>
+<div class="bg-surface-container-lowest p-8 rounded-28 border border-outline-variant/15 flex flex-col items-center text-center">
+<div class="w-16 h-16 rounded-full bg-secondary/10 flex items-center justify-center mb-4">
+<span class="material-symbols-outlined text-secondary text-3xl">verified_user</span>
+</div>
+<h4 class="text-xl font-bold mb-2">Health Score</h4>
+<div class="text-4xl font-black text-secondary mb-1">94%</div>
+<p class="text-xs text-on-surface-variant uppercase tracking-widest font-bold">Impenetrable</p>
+</div>
+</div>
+</main>
+<!-- BottomNavBar -->
+<nav class="fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 pb-6 pt-3 bg-[#2a2933]/70 backdrop-blur-lg rounded-t-[28px] shadow-[0_-8px_32px_rgba(196,192,255,0.05)]">
+<!-- Home -->
+<a class="flex flex-col items-center justify-center text-slate-500 px-5 py-1.5 hover:text-white transition-all active:translate-y-[-2px] duration-300" href="#">
+<span class="material-symbols-outlined">home_max</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Home</span>
+</a>
+<!-- Browse (Active) -->
+<a class="flex flex-col items-center justify-center bg-[#c4c0ff]/10 text-[#c4c0ff] rounded-2xl px-5 py-1.5 active:translate-y-[-2px] duration-300" href="#">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">grid_view</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Browse</span>
+</a>
+<!-- Tools -->
+<a class="flex flex-col items-center justify-center text-slate-500 px-5 py-1.5 hover:text-white transition-all active:translate-y-[-2px] duration-300" href="#">
+<span class="material-symbols-outlined">construction</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Tools</span>
+</a>
+<!-- Settings -->
+<a class="flex flex-col items-center justify-center text-slate-500 px-5 py-1.5 hover:text-white transition-all active:translate-y-[-2px] duration-300" href="#">
+<span class="material-symbols-outlined">settings</span>
+<span class="font-['Inter'] text-[10px] font-bold uppercase tracking-widest mt-1">Settings</span>
+</a>
+</nav>
+</body></html>
