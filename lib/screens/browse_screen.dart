@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../data/vault_item.dart';
-import '../domain/vault_notifier.dart';
+import '../backend/vault_item.dart';
+import '../backend/vault_notifier.dart';
 
 // Each category uses colors drawn from the app's design system:
 // Primary family: #C4C0FF (lavender), #8781FF (purple), #4D41DF (indigo)
@@ -203,14 +203,14 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withOpacity(0.07)
-                    : const Color(0xFFC7C4D8).withOpacity(0.4),
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : const Color(0xFFC7C4D8).withValues(alpha: 0.4),
               ),
               boxShadow: [
                 BoxShadow(
                   color: isDark
-                      ? const Color(0xFFC4C0FF).withOpacity(0.05)
-                      : Colors.black.withOpacity(0.04),
+                      ? const Color(0xFFC4C0FF).withValues(alpha: 0.05)
+                      : Colors.black.withValues(alpha: 0.04),
                   blurRadius: 12,
                   offset: const Offset(0, 3),
                 ),
@@ -227,15 +227,15 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                 hintText: 'Search your vault...',
                 hintStyle: TextStyle(
                   color: isDark
-                      ? const Color(0xFFC7C4D8).withOpacity(0.4)
-                      : const Color(0xFF464555).withOpacity(0.45),
+                      ? const Color(0xFFC7C4D8).withValues(alpha: 0.4)
+                      : const Color(0xFF464555).withValues(alpha: 0.45),
                   fontSize: 15,
                 ),
                 prefixIcon: Icon(
                   Icons.search,
                   color: isDark
-                      ? const Color(0xFFC4C0FF).withOpacity(0.5)
-                      : const Color(0xFF4D41DF).withOpacity(0.5),
+                      ? const Color(0xFFC4C0FF).withValues(alpha: 0.5)
+                      : const Color(0xFF4D41DF).withValues(alpha: 0.5),
                 ),
                 border: InputBorder.none,
                 contentPadding: const EdgeInsets.symmetric(vertical: 16),
@@ -274,8 +274,8 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
               fontWeight: FontWeight.bold,
               letterSpacing: 2,
               color: isDark
-                  ? const Color(0xFFC7C4D8).withOpacity(0.5)
-                  : const Color(0xFF464555).withOpacity(0.55),
+                  ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                  : const Color(0xFF464555).withValues(alpha: 0.55),
             ),
           ),
           const SizedBox(height: 12),
@@ -296,8 +296,8 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
     final iconColor = isDark ? cat.darkIconColor : cat.lightIconColor;
     // Icon bg sits on a slightly lighter/darker shade within the card
     final iconBg = isDark
-        ? iconColor.withOpacity(0.15)
-        : iconColor.withOpacity(0.12);
+        ? iconColor.withValues(alpha: 0.15)
+        : iconColor.withValues(alpha: 0.12);
 
     return Material(
       color: cardColor,
@@ -305,8 +305,8 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
       child: InkWell(
         onTap: () {},
         borderRadius: BorderRadius.circular(22),
-        splashColor: iconColor.withOpacity(0.08),
-        highlightColor: iconColor.withOpacity(0.04),
+        splashColor: iconColor.withValues(alpha: 0.08),
+        highlightColor: iconColor.withValues(alpha: 0.04),
         child: Padding(
           padding: const EdgeInsets.all(18),
           child: Column(
@@ -344,7 +344,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                       vertical: 3,
                     ),
                     decoration: BoxDecoration(
-                      color: iconColor.withOpacity(isDark ? 0.2 : 0.14),
+                      color: iconColor.withValues(alpha: isDark ? 0.2 : 0.14),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -382,13 +382,13 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.06)
-              : const Color(0xFFC7C4D8).withOpacity(0.3),
+              ? Colors.white.withValues(alpha: 0.06)
+              : const Color(0xFFC7C4D8).withValues(alpha: 0.3),
         ),
         boxShadow: [
           if (!isDark)
             BoxShadow(
-              color: Colors.black.withOpacity(0.05),
+              color: Colors.black.withValues(alpha: 0.05),
               blurRadius: 10,
               offset: const Offset(0, 2),
             ),
@@ -400,7 +400,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
           width: 44,
           height: 44,
           decoration: BoxDecoration(
-            color: iconColor.withOpacity(isDark ? 0.15 : 0.1),
+            color: iconColor.withValues(alpha: isDark ? 0.15 : 0.1),
             borderRadius: BorderRadius.circular(13),
           ),
           child: Icon(r.icon, color: iconColor, size: 22),
@@ -417,15 +417,15 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
           r.subtitle,
           style: theme.textTheme.bodySmall?.copyWith(
             color: isDark
-                ? const Color(0xFFC7C4D8).withOpacity(0.5)
-                : const Color(0xFF464555).withOpacity(0.55),
+                ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                : const Color(0xFF464555).withValues(alpha: 0.55),
           ),
         ),
         trailing: Icon(
           Icons.chevron_right,
           color: isDark
-              ? const Color(0xFFC7C4D8).withOpacity(0.3)
-              : const Color(0xFF464555).withOpacity(0.3),
+              ? const Color(0xFFC7C4D8).withValues(alpha: 0.3)
+              : const Color(0xFF464555).withValues(alpha: 0.3),
         ),
         onTap: () {},
       ),

@@ -1,24 +1,25 @@
 import 'package:go_router/go_router.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-import '../../features/onboarding/presentation/splash_screen.dart';
-import '../../features/onboarding/presentation/onboarding_screen.dart';
-import '../../features/auth/presentation/unlock_screen.dart';
+import 'splash_screen.dart';
+import 'onboarding_screen.dart';
+import 'unlock_screen.dart';
 import 'main_shell.dart';
-import '../../features/dashboard/presentation/dashboard_screen.dart';
-import '../../features/settings/presentation/settings_screen.dart';
-import '../../features/tools/presentation/tools_screen.dart';
-import '../../features/tools/presentation/password_generator_screen.dart';
-import '../../features/tools/presentation/password_health_screen.dart';
-import '../../features/vault/presentation/item_detail_screen.dart';
-import '../../features/vault/presentation/add_password_screen.dart';
-import '../../features/vault/presentation/browse_screen.dart';
-import '../../features/autofill/presentation/autofill_prompt_screen.dart';
+import 'dashboard_screen.dart';
+import 'settings_screen.dart';
+import 'tools_screen.dart';
+import 'password_generator_screen.dart';
+import 'password_health_screen.dart';
+import 'item_detail_screen.dart';
+import 'add_password_screen.dart';
+import 'browse_screen.dart';
+import 'autofill_prompt_screen.dart';
 
 part 'app_router.g.dart';
 
 @riverpod
-GoRouter appRouter(AppRouterRef ref) {
+GoRouter appRouter(Ref ref) {
   return GoRouter(
     initialLocation: '/',
     routes: [

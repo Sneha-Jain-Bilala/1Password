@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
+import '../backend/app_theme.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -50,9 +50,7 @@ class _SplashScreenState extends State<SplashScreen>
                 height: 300,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppTheme.darkTheme.colorScheme.primary.withOpacity(
-                    0.2,
-                  ),
+                  color: AppTheme.darkTheme.colorScheme.primary.withValues(alpha: 0.2,),
                 ),
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
@@ -68,9 +66,7 @@ class _SplashScreenState extends State<SplashScreen>
                 height: 300,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color: AppTheme.darkTheme.colorScheme.secondary.withOpacity(
-                    0.1,
-                  ),
+                  color: AppTheme.darkTheme.colorScheme.secondary.withValues(alpha: 0.1,),
                 ),
                 child: BackdropFilter(
                   filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
@@ -96,7 +92,7 @@ class _SplashScreenState extends State<SplashScreen>
                         boxShadow: [
                           BoxShadow(
                             color: AppTheme.darkTheme.colorScheme.primary
-                                .withOpacity(0.15),
+                                .withValues(alpha: 0.15),
                             blurRadius: 60,
                             spreadRadius: 10,
                           ),
@@ -124,7 +120,7 @@ class _SplashScreenState extends State<SplashScreen>
                       'Your secrets, sealed.',
                       style: AppTheme.darkTheme.textTheme.titleMedium?.copyWith(
                         color: AppTheme.darkTheme.colorScheme.onSurfaceVariant
-                            .withOpacity(0.8),
+                            .withValues(alpha: 0.8),
                         letterSpacing: 0.5,
                       ),
                     ),
@@ -182,7 +178,7 @@ class _SplashScreenState extends State<SplashScreen>
                         Icons.lock_outline,
                         size: 14,
                         color: AppTheme.darkTheme.colorScheme.onSurfaceVariant
-                            .withOpacity(0.4),
+                            .withValues(alpha: 0.4),
                       ),
                       const SizedBox(width: 8),
                       Text(
@@ -193,7 +189,7 @@ class _SplashScreenState extends State<SplashScreen>
                                   .darkTheme
                                   .colorScheme
                                   .onSurfaceVariant
-                                  .withOpacity(0.4),
+                                  .withValues(alpha: 0.4),
                               letterSpacing: 2.0,
                             ),
                       ),
@@ -204,7 +200,7 @@ class _SplashScreenState extends State<SplashScreen>
                     'v1.0.0-STABLE',
                     style: AppTheme.darkTheme.textTheme.labelSmall?.copyWith(
                       color: AppTheme.darkTheme.colorScheme.onSurfaceVariant
-                          .withOpacity(0.4),
+                          .withValues(alpha: 0.4),
                     ),
                   ),
                 ],

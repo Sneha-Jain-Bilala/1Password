@@ -12,7 +12,7 @@ class ToolsScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
+        backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.8),
         elevation: 0,
         title: Row(
           children: [
@@ -45,7 +45,7 @@ class ToolsScreen extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               'Advanced configuration and security analysis.',
-              style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant.withOpacity(0.7)),
+              style: theme.textTheme.bodyLarge?.copyWith(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.7)),
             ),
             const SizedBox(height: 32),
             
@@ -69,14 +69,14 @@ class ToolsScreen extends StatelessWidget {
         decoration: BoxDecoration(
           color: theme.colorScheme.surfaceContainerLow,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.1)),
+          border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.1)),
         ),
         child: Row(
           children: [
             Container(
               width: 64, height: 64,
               decoration: BoxDecoration(
-                color: theme.colorScheme.primaryContainer.withOpacity(0.2),
+                color: theme.colorScheme.primaryContainer.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
               child: Icon(icon, color: theme.colorScheme.primary, size: 32),

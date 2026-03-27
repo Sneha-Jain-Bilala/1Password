@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
+import '../backend/app_theme.dart';
 
 class UnlockScreen extends StatelessWidget {
   const UnlockScreen({super.key});
@@ -57,7 +57,7 @@ class UnlockScreen extends StatelessWidget {
               child: Container(
                 width: 200,
                 height: 200,
-                decoration: BoxDecoration(shape: BoxShape.circle, color: AppTheme.darkTheme.colorScheme.primary.withOpacity(0.05)),
+                decoration: BoxDecoration(shape: BoxShape.circle, color: AppTheme.darkTheme.colorScheme.primary.withValues(alpha: 0.05)),
                 child: BackdropFilter(filter: ImageFilter.blur(sigmaX: 120, sigmaY: 120), child: const SizedBox()),
               ),
             ),
@@ -92,11 +92,11 @@ class UnlockScreen extends StatelessWidget {
                             color: AppTheme.darkTheme.colorScheme.surfaceContainerHigh,
                             boxShadow: [
                               BoxShadow(
-                                color: AppTheme.darkTheme.colorScheme.primary.withOpacity(0.15),
+                                color: AppTheme.darkTheme.colorScheme.primary.withValues(alpha: 0.15),
                                 blurRadius: 20,
                               ),
                             ],
-                            border: Border.all(color: Colors.white.withOpacity(0.05)),
+                            border: Border.all(color: Colors.white.withValues(alpha: 0.05)),
                           ),
                           child: Material(
                             color: Colors.transparent,
@@ -112,7 +112,7 @@ class UnlockScreen extends StatelessWidget {
                                   height: 112,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
-                                    border: Border.all(color: AppTheme.darkTheme.colorScheme.primary.withOpacity(0.2)),
+                                    border: Border.all(color: AppTheme.darkTheme.colorScheme.primary.withValues(alpha: 0.2)),
                                   ),
                                   child: Icon(
                                     Icons.fingerprint,
@@ -128,7 +128,7 @@ class UnlockScreen extends StatelessWidget {
                         Text(
                           'TOUCH THE FINGERPRINT SENSOR',
                           style: AppTheme.darkTheme.textTheme.labelSmall?.copyWith(
-                            color: AppTheme.darkTheme.colorScheme.onSurfaceVariant.withOpacity(0.8),
+                            color: AppTheme.darkTheme.colorScheme.onSurfaceVariant.withValues(alpha: 0.8),
                             letterSpacing: 2.0,
                           ),
                         ),
@@ -139,7 +139,7 @@ class UnlockScreen extends StatelessWidget {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Container(width: 60, height: 1, color: AppTheme.darkTheme.colorScheme.outlineVariant.withOpacity(0.3)),
+                            Container(width: 60, height: 1, color: AppTheme.darkTheme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 16.0),
                               child: Text(
@@ -148,11 +148,11 @@ class UnlockScreen extends StatelessWidget {
                                   fontSize: 10,
                                   fontWeight: FontWeight.bold,
                                   letterSpacing: 2,
-                                  color: AppTheme.darkTheme.colorScheme.onSurfaceVariant.withOpacity(0.4),
+                                  color: AppTheme.darkTheme.colorScheme.onSurfaceVariant.withValues(alpha: 0.4),
                                 ),
                               ),
                             ),
-                            Container(width: 60, height: 1, color: AppTheme.darkTheme.colorScheme.outlineVariant.withOpacity(0.3)),
+                            Container(width: 60, height: 1, color: AppTheme.darkTheme.colorScheme.outlineVariant.withValues(alpha: 0.3)),
                           ],
                         ),
                         const SizedBox(height: 24),
@@ -160,7 +160,7 @@ class UnlockScreen extends StatelessWidget {
                           onPressed: () => context.go('/dashboard'),
                           style: TextButton.styleFrom(
                             foregroundColor: AppTheme.darkTheme.colorScheme.primary,
-                            backgroundColor: AppTheme.darkTheme.colorScheme.primary.withOpacity(0.05),
+                            backgroundColor: AppTheme.darkTheme.colorScheme.primary.withValues(alpha: 0.05),
                             padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
@@ -179,7 +179,7 @@ class UnlockScreen extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: AppTheme.darkTheme.colorScheme.surfaceContainerLowest,
                       borderRadius: BorderRadius.circular(32),
-                      border: Border.all(color: AppTheme.darkTheme.colorScheme.outlineVariant.withOpacity(0.1)),
+                      border: Border.all(color: AppTheme.darkTheme.colorScheme.outlineVariant.withValues(alpha: 0.1)),
                     ),
                     child: Row(
                       mainAxisSize: MainAxisSize.min,
@@ -192,7 +192,7 @@ class UnlockScreen extends StatelessWidget {
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                             letterSpacing: 2,
-                            color: AppTheme.darkTheme.colorScheme.onSurfaceVariant.withOpacity(0.6),
+                            color: AppTheme.darkTheme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6),
                           ),
                         ),
                       ],

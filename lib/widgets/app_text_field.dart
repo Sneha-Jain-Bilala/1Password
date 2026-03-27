@@ -29,7 +29,7 @@ class AppTextField extends StatelessWidget {
           child: Text(
             label.toUpperCase(),
             style: theme.textTheme.labelMedium?.copyWith(
-              color: theme.colorScheme.primary.withOpacity(0.7),
+              color: theme.colorScheme.primary.withValues(alpha: 0.7),
             ),
           ),
         ),
@@ -39,7 +39,7 @@ class AppTextField extends StatelessWidget {
           style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.w500),
           decoration: InputDecoration(
             hintText: placeholder,
-            hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withOpacity(0.5)),
+            hintStyle: TextStyle(color: theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.5)),
             filled: true,
             fillColor: theme.colorScheme.surfaceContainerLowest,
             contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '../../../shared/widgets/app_card.dart';
+import '../widgets/app_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
@@ -12,7 +12,7 @@ class DashboardScreen extends StatelessWidget {
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: theme.colorScheme.surface.withOpacity(0.8),
+        backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.8),
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
         title: Row(
@@ -23,7 +23,7 @@ class DashboardScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: theme.colorScheme.surfaceContainerHigh,
-                border: Border.all(color: theme.colorScheme.primary.withOpacity(0.2), width: 2),
+                border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2), width: 2),
               ),
               child: const Icon(Icons.person, size: 24),
             ),
@@ -39,7 +39,7 @@ class DashboardScreen extends StatelessWidget {
                 Text(
                   'Alex 👋',
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: isDark ? const Color(0xFFC4C0FF) : theme.colorScheme.primary, // primary
+                    color: isDark ? const Color(0xFFC4C0FF) : theme.colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -76,7 +76,7 @@ class DashboardScreen extends StatelessWidget {
                 ),
                 boxShadow: [
                   BoxShadow(
-                    color: theme.colorScheme.primary.withOpacity(0.15),
+                    color: theme.colorScheme.primary.withValues(alpha: 0.15),
                     blurRadius: 50,
                     offset: const Offset(0, 20),
                   ),
@@ -93,7 +93,7 @@ class DashboardScreen extends StatelessWidget {
                       height: 192,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: Colors.white.withOpacity(0.1),
+                        color: Colors.white.withValues(alpha: 0.1),
                       ),
                     ),
                   ),
@@ -116,7 +116,7 @@ class DashboardScreen extends StatelessWidget {
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 2,
-                                      color: theme.colorScheme.onPrimary.withOpacity(0.8),
+                                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
@@ -132,7 +132,7 @@ class DashboardScreen extends StatelessWidget {
                                   Text(
                                     'Your security is exceptional this month.',
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onPrimary.withOpacity(0.7),
+                                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -153,7 +153,7 @@ class DashboardScreen extends StatelessWidget {
                                         value: 0.92,
                                         strokeWidth: 8,
                                         color: Colors.white,
-                                        backgroundColor: Colors.white.withOpacity(0.2),
+                                        backgroundColor: Colors.white.withValues(alpha: 0.2),
                                       ),
                                     ),
                                   ),
@@ -167,7 +167,7 @@ class DashboardScreen extends StatelessWidget {
                                         ),
                                         Text(
                                           'SOLID',
-                                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white.withOpacity(0.8), letterSpacing: 1),
+                                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white.withValues(alpha: 0.8), letterSpacing: 1),
                                         ),
                                       ],
                                     ),
@@ -185,18 +185,18 @@ class DashboardScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.verified_user, size: 16, color: theme.colorScheme.onPrimary.withOpacity(0.9)),
+                                Icon(Icons.verified_user, size: 16, color: theme.colorScheme.onPrimary.withValues(alpha: 0.9)),
                                 const SizedBox(width: 4),
                                 Text(
                                   '248 Passwords Encrypted',
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onPrimary.withOpacity(0.9)),
+                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onPrimary.withValues(alpha: 0.9)),
                                 ),
                               ],
                             ),
                             Container(
                               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
                               decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
+                                color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               child: const Text('Details', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
@@ -270,9 +270,9 @@ class DashboardScreen extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: isPrimary ? theme.colorScheme.primary.withOpacity(0.1) : theme.colorScheme.surfaceContainerHigh,
+        color: isPrimary ? theme.colorScheme.primary.withValues(alpha: 0.1) : theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(16),
-        border: isPrimary ? Border.all(color: theme.colorScheme.primary.withOpacity(0.2)) : null,
+        border: isPrimary ? Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)) : null,
       ),
       child: Row(
         children: [
@@ -302,9 +302,9 @@ class DashboardScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: theme.colorScheme.outlineVariant.withOpacity(0.1)),
+              border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.1)),
             ),
-            child: Icon(Icons.language, color: theme.colorScheme.primary), // Placeholder for site favicon
+            child: Icon(Icons.language, color: theme.colorScheme.primary),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -329,7 +329,7 @@ class DashboardScreen extends StatelessWidget {
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
                         color: is2FA ? theme.colorScheme.secondary : theme.colorScheme.outlineVariant,
-                        boxShadow: is2FA ? [BoxShadow(color: theme.colorScheme.secondary.withOpacity(0.5), blurRadius: 8)] : null,
+                        boxShadow: is2FA ? [BoxShadow(color: theme.colorScheme.secondary.withValues(alpha: 0.5), blurRadius: 8)] : null,
                       ),
                     ),
                   ],

@@ -17,7 +17,7 @@ class AppBottomNav extends StatelessWidget {
     final isDark = theme.brightness == Brightness.dark;
     
     // Background color mapping for glassmorphism
-    final bgColor = isDark ? const Color(0xFF2A2933).withOpacity(0.7) : Colors.white.withOpacity(0.85);
+    final bgColor = isDark ? const Color(0xFF2A2933).withValues(alpha: 0.7) : Colors.white.withValues(alpha: 0.85);
 
     return ClipRRect(
       borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
@@ -29,7 +29,7 @@ class AppBottomNav extends StatelessWidget {
             color: bgColor,
             boxShadow: [
               BoxShadow(
-                color: theme.colorScheme.primary.withOpacity(isDark ? 0.05 : 0.1),
+                color: theme.colorScheme.primary.withValues(alpha: isDark ? 0.05 : 0.1),
                 blurRadius: 32,
                 offset: const Offset(0, -8),
               ),
@@ -54,7 +54,7 @@ class AppBottomNav extends StatelessWidget {
     final theme = Theme.of(context);
     final isActive = currentIndex == index;
     final activeColor = theme.colorScheme.primary;
-    final inactiveColor = theme.colorScheme.onSurfaceVariant.withOpacity(0.6);
+    final inactiveColor = theme.colorScheme.onSurfaceVariant.withValues(alpha: 0.6);
 
     return InkWell(
       onTap: () => onTabSelected(index),
@@ -62,7 +62,7 @@ class AppBottomNav extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? activeColor.withOpacity(0.1) : Colors.transparent,
+          color: isActive ? activeColor.withValues(alpha: 0.1) : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
         child: Column(

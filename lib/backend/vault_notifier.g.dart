@@ -6,7 +6,7 @@ part of 'vault_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$vaultRepositoryHash() => r'50df50540f2ec7edee74a2e92d98f575f257ec66';
+String _$vaultRepositoryHash() => r'1294445df6e203e9dd1c1c83b20c07a4e59a14e3';
 
 /// See also [vaultRepository].
 @ProviderFor(vaultRepository)

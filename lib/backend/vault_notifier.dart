@@ -1,13 +1,14 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import '../data/vault_item.dart';
-import '../data/vault_repository.dart';
-import '../data/in_memory_vault_repository.dart';
+import 'vault_item.dart';
+import 'vault_repository.dart';
+import 'in_memory_vault_repository.dart';
 
 part 'vault_notifier.g.dart';
 
 // ─── Repository provider (injectable / swappable) ───────────────────
 @riverpod
-VaultRepository vaultRepository(VaultRepositoryRef ref) {
+VaultRepository vaultRepository(Ref ref) {
   return InMemoryVaultRepository();
   // Future: return SupabaseVaultRepository(ref.read(supabaseClientProvider));
 }

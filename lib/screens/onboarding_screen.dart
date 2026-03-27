@@ -1,7 +1,7 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import '../../../core/theme/app_theme.dart';
+import '../backend/app_theme.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -60,9 +60,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   height: 250,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.darkTheme.colorScheme.primary.withOpacity(
-                      0.2,
-                    ),
+                    color: AppTheme.darkTheme.colorScheme.primary.withValues(alpha: 0.2,),
                   ),
                   child: BackdropFilter(
                     filter: ImageFilter.blur(sigmaX: 80, sigmaY: 80),
@@ -98,10 +96,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                         .darkTheme
                                         .colorScheme
                                         .surfaceContainerHighest
-                                        .withOpacity(0.3),
+                                        .withValues(alpha: 0.3),
                                     borderRadius: BorderRadius.circular(32),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.1),
+                                      color: Colors.white.withValues(alpha: 0.1),
                                       width: 2,
                                     ),
                                   ),
@@ -134,7 +132,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   textAlign: TextAlign.center,
                                   style: AppTheme.darkTheme.textTheme.bodyLarge
                                       ?.copyWith(
-                                        color: Colors.white.withOpacity(0.8),
+                                        color: Colors.white.withValues(alpha: 0.8),
                                         fontWeight: FontWeight.w500,
                                       ),
                                 ),
@@ -158,7 +156,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           decoration: BoxDecoration(
                             color: _currentIndex == index
                                 ? Colors.white
-                                : Colors.white.withOpacity(0.3),
+                                : Colors.white.withValues(alpha: 0.3),
                             borderRadius: BorderRadius.circular(8),
                           ),
                         ),
@@ -212,7 +210,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Text(
                                 "Already have an account? ",
                                 style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7),
+                                  color: Colors.white.withValues(alpha: 0.7),
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),

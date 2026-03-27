@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import '../data/vault_item.dart';
-import '../domain/vault_notifier.dart';
+import '../backend/vault_item.dart';
+import '../backend/vault_notifier.dart';
 
 // ─── State enum ─────────────────────────────────────────────────────
 enum _ServiceState { none, known, custom }
@@ -317,8 +317,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   Widget _buildPickerCard(BuildContext context, bool isDark) {
     final cardBg = isDark ? const Color(0xFF1C1A24) : Colors.white;
     final borderColor = isDark
-        ? _kViolet.withOpacity(0.35)
-        : _kViolet.withOpacity(0.28);
+        ? _kViolet.withValues(alpha: 0.35)
+        : _kViolet.withValues(alpha: 0.28);
 
     return Container(
       decoration: BoxDecoration(
@@ -335,7 +335,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             Container(
               width: 56, height: 56,
               decoration: BoxDecoration(
-                  color: _kViolet.withOpacity(0.1),
+                  color: _kViolet.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16)),
               child: const Icon(Icons.search, color: _kViolet, size: 28),
             ),
@@ -367,10 +367,10 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                   : BorderRadius.circular(12),
               border: Border.all(
                 color: _searchFocus.hasFocus
-                    ? _kViolet.withOpacity(0.6)
+                    ? _kViolet.withValues(alpha: 0.6)
                     : (isDark
-                        ? Colors.white.withOpacity(0.07)
-                        : const Color(0xFFC7C4D8).withOpacity(0.5)),
+                        ? Colors.white.withValues(alpha: 0.07)
+                        : const Color(0xFFC7C4D8).withValues(alpha: 0.5)),
                 width: _searchFocus.hasFocus ? 1.5 : 1.0,
               ),
             ),
@@ -388,23 +388,23 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                 hintStyle: TextStyle(
                   fontSize: 14,
                   color: isDark
-                      ? Colors.white.withOpacity(0.3)
-                      : const Color(0xFF464555).withOpacity(0.4),
+                      ? Colors.white.withValues(alpha: 0.3)
+                      : const Color(0xFF464555).withValues(alpha: 0.4),
                 ),
                 prefixIcon: Icon(Icons.search,
                     size: 20,
                     color: _searchFocus.hasFocus
-                        ? _kViolet.withOpacity(0.6)
+                        ? _kViolet.withValues(alpha: 0.6)
                         : (isDark
-                            ? Colors.white.withOpacity(0.3)
-                            : const Color(0xFF464555).withOpacity(0.4))),
+                            ? Colors.white.withValues(alpha: 0.3)
+                            : const Color(0xFF464555).withValues(alpha: 0.4))),
                 suffixIcon: _searchActive
                     ? IconButton(
                         icon: Icon(Icons.close,
                             size: 18,
                             color: isDark
-                                ? Colors.white.withOpacity(0.4)
-                                : const Color(0xFF464555).withOpacity(0.5)),
+                                ? Colors.white.withValues(alpha: 0.4)
+                                : const Color(0xFF464555).withValues(alpha: 0.5)),
                         onPressed: () {
                           _searchCtrl.clear();
                           _searchFocus.unfocus();
@@ -450,8 +450,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   Widget _buildSearchDropdown(BuildContext context, bool isDark) {
     final bg = isDark ? const Color(0xFF13121B) : const Color(0xFFF3F3FA);
     final divColor = isDark
-        ? Colors.white.withOpacity(0.07)
-        : const Color(0xFFC7C4D8).withOpacity(0.4);
+        ? Colors.white.withValues(alpha: 0.07)
+        : const Color(0xFFC7C4D8).withValues(alpha: 0.4);
 
     return Container(
       decoration: BoxDecoration(
@@ -460,11 +460,11 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             const BorderRadius.vertical(bottom: Radius.circular(14)),
         border: Border(
           left: BorderSide(
-              color: _kViolet.withOpacity(0.4), width: 1.5),
+              color: _kViolet.withValues(alpha: 0.4), width: 1.5),
           right: BorderSide(
-              color: _kViolet.withOpacity(0.4), width: 1.5),
+              color: _kViolet.withValues(alpha: 0.4), width: 1.5),
           bottom: BorderSide(
-              color: _kViolet.withOpacity(0.4), width: 1.5),
+              color: _kViolet.withValues(alpha: 0.4), width: 1.5),
         ),
       ),
       child: Column(
@@ -481,8 +481,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                       fontWeight: FontWeight.w700,
                       letterSpacing: 1.5,
                       color: isDark
-                          ? const Color(0xFFC7C4D8).withOpacity(0.5)
-                          : const Color(0xFF464555).withOpacity(0.55))),
+                          ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                          : const Color(0xFF464555).withValues(alpha: 0.55))),
             ),
             ...(_searchResults.take(4).map((s) =>
                 _buildDropdownItem(context, s, isDark))),
@@ -501,10 +501,10 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                   Container(
                     width: 38, height: 38,
                     decoration: BoxDecoration(
-                      color: _kViolet.withOpacity(0.1),
+                      color: _kViolet.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                          color: _kViolet.withOpacity(0.35),
+                          color: _kViolet.withValues(alpha: 0.35),
                           width: 1.2,
                           style: BorderStyle.solid),
                     ),
@@ -539,13 +539,13 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                             style: TextStyle(
                                 fontSize: 12,
                                 color: isDark
-                                    ? const Color(0xFFC7C4D8).withOpacity(0.5)
-                                    : const Color(0xFF464555).withOpacity(0.55))),
+                                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                                    : const Color(0xFF464555).withValues(alpha: 0.55))),
                       ],
                     ),
                   ),
                   Icon(Icons.chevron_right,
-                      color: _kViolet.withOpacity(0.5), size: 20),
+                      color: _kViolet.withValues(alpha: 0.5), size: 20),
                 ],
               ),
             ),
@@ -567,7 +567,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             Container(
               width: 38, height: 38,
               decoration: BoxDecoration(
-                color: s.color.withOpacity(isDark ? 0.18 : 0.1),
+                color: s.color.withValues(alpha: isDark ? 0.18 : 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
@@ -594,16 +594,16 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                       style: TextStyle(
                           fontSize: 12,
                           color: isDark
-                              ? const Color(0xFFC7C4D8).withOpacity(0.5)
-                              : const Color(0xFF464555).withOpacity(0.55))),
+                              ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                              : const Color(0xFF464555).withValues(alpha: 0.55))),
                 ],
               ),
             ),
             Icon(Icons.north_west,
                 size: 14,
                 color: isDark
-                    ? Colors.white.withOpacity(0.2)
-                    : const Color(0xFF464555).withOpacity(0.3)),
+                    ? Colors.white.withValues(alpha: 0.2)
+                    : const Color(0xFF464555).withValues(alpha: 0.3)),
           ],
         ),
       ),
@@ -624,7 +624,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           Container(
             width: 48, height: 48,
             decoration: BoxDecoration(
-              color: color.withOpacity(isDark ? 0.18 : 0.1),
+              color: color.withValues(alpha: isDark ? 0.18 : 0.1),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
@@ -641,8 +641,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
                   color: isDark
-                      ? const Color(0xFFC7C4D8).withOpacity(0.7)
-                      : const Color(0xFF464555).withOpacity(0.8))),
+                      ? const Color(0xFFC7C4D8).withValues(alpha: 0.7)
+                      : const Color(0xFF464555).withValues(alpha: 0.8))),
         ],
       ),
     );
@@ -659,7 +659,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                  color: _kViolet.withOpacity(0.5), width: 1.5),
+                  color: _kViolet.withValues(alpha: 0.5), width: 1.5),
             ),
             child: const Center(
               child: Icon(Icons.add, color: _kViolet, size: 22),
@@ -670,7 +670,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               style: TextStyle(
                   fontSize: 10,
                   fontWeight: FontWeight.w600,
-                  color: _kViolet.withOpacity(0.8))),
+                  color: _kViolet.withValues(alpha: 0.8))),
         ],
       ),
     );
@@ -697,14 +697,14 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isCustom
-              ? _kViolet.withOpacity(isDark ? 0.5 : 0.35)
-              : color.withOpacity(isDark ? 0.25 : 0.15),
+              ? _kViolet.withValues(alpha: isDark ? 0.5 : 0.35)
+              : color.withValues(alpha: isDark ? 0.25 : 0.15),
           width: isCustom ? 1.5 : 1.0,
         ),
         boxShadow: [
           if (!isDark)
             BoxShadow(
-                color: color.withOpacity(0.08),
+                color: color.withValues(alpha: 0.08),
                 blurRadius: 16,
                 offset: const Offset(0, 4)),
         ],
@@ -715,11 +715,11 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           Container(
             width: 52, height: 52,
             decoration: BoxDecoration(
-              color: color.withOpacity(isDark ? 0.18 : 0.1),
+              color: color.withValues(alpha: isDark ? 0.18 : 0.1),
               borderRadius: BorderRadius.circular(14),
               border: isCustom
                   ? Border.all(
-                      color: _kViolet.withOpacity(0.5),
+                      color: _kViolet.withValues(alpha: 0.5),
                       width: 1.5,
                       style: BorderStyle.solid)
                   : null,
@@ -752,10 +752,10 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                       fontSize: 12,
                       fontStyle: isNoUrl ? FontStyle.italic : FontStyle.normal,
                       color: isNoUrl
-                          ? _kViolet.withOpacity(0.6)
+                          ? _kViolet.withValues(alpha: 0.6)
                           : (isDark
-                              ? const Color(0xFFC7C4D8).withOpacity(0.55)
-                              : const Color(0xFF464555).withOpacity(0.6))),
+                              ? const Color(0xFFC7C4D8).withValues(alpha: 0.55)
+                              : const Color(0xFF464555).withValues(alpha: 0.6))),
                 ),
               ],
             ),
@@ -767,7 +767,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
               decoration: BoxDecoration(
                 color: isDark
-                    ? Colors.white.withOpacity(0.07)
+                    ? Colors.white.withValues(alpha: 0.07)
                     : const Color(0xFFF3F3FA),
                 borderRadius: BorderRadius.circular(10),
               ),
@@ -806,8 +806,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                     style: TextStyle(
                       fontSize: 12,
                       color: isDark
-                          ? const Color(0xFFC7C4D8).withOpacity(0.6)
-                          : const Color(0xFF464555).withOpacity(0.6),
+                          ? const Color(0xFFC7C4D8).withValues(alpha: 0.6)
+                          : const Color(0xFF464555).withValues(alpha: 0.6),
                       fontStyle: FontStyle.italic,
                     ),
                   ),
@@ -855,8 +855,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isDark
-                    ? Colors.white.withOpacity(0.07)
-                    : const Color(0xFFC7C4D8).withOpacity(0.5),
+                    ? Colors.white.withValues(alpha: 0.07)
+                    : const Color(0xFFC7C4D8).withValues(alpha: 0.5),
               ),
             ),
             child: Row(
@@ -879,8 +879,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                         fontSize: 14,
                         fontFamily: 'sans-serif',
                         color: isDark
-                            ? Colors.white.withOpacity(0.3)
-                            : const Color(0xFF464555).withOpacity(0.4),
+                            ? Colors.white.withValues(alpha: 0.3)
+                            : const Color(0xFF464555).withValues(alpha: 0.4),
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
@@ -893,15 +893,15 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                     _passVisible ? Icons.visibility : Icons.visibility_off,
                     size: 20,
                     color: isDark
-                        ? Colors.white.withOpacity(0.4)
-                        : const Color(0xFF464555).withOpacity(0.5),
+                        ? Colors.white.withValues(alpha: 0.4)
+                        : const Color(0xFF464555).withValues(alpha: 0.5),
                   ),
                   onPressed: () =>
                       setState(() => _passVisible = !_passVisible),
                 ),
                 IconButton(
                   icon: Icon(Icons.refresh,
-                      size: 20, color: _kViolet.withOpacity(0.7)),
+                      size: 20, color: _kViolet.withValues(alpha: 0.7)),
                   onPressed: () {
                     const chars =
                         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*';
@@ -930,8 +930,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                       color: active
                           ? _strengthColor
                           : (isDark
-                              ? Colors.white.withOpacity(0.1)
-                              : const Color(0xFFC7C4D8).withOpacity(0.4)),
+                              ? Colors.white.withValues(alpha: 0.1)
+                              : const Color(0xFFC7C4D8).withValues(alpha: 0.4)),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -957,9 +957,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 7),
                 decoration: BoxDecoration(
-                  color: _kViolet.withOpacity(isDark ? 0.15 : 0.08),
+                  color: _kViolet.withValues(alpha: isDark ? 0.15 : 0.08),
                   borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: _kViolet.withOpacity(0.3)),
+                  border: Border.all(color: _kViolet.withValues(alpha: 0.3)),
                 ),
                 child: const Text('Generate password',
                     style: TextStyle(
@@ -983,7 +983,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
         color: isDark ? const Color(0xFF0F2922) : const Color(0xFFE8FBF5),
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-            color: teal.withOpacity(isDark ? 0.25 : 0.35)),
+            color: teal.withValues(alpha: isDark ? 0.25 : 0.35)),
       ),
       child: Row(
         children: [
@@ -1003,7 +1003,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                     style: TextStyle(
                         fontSize: 13,
                         color: isDark
-                            ? teal.withOpacity(0.7)
+                            ? teal.withValues(alpha: 0.7)
                             : const Color(0xFF006B55))),
               ],
             ),
@@ -1011,7 +1011,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           Container(
             width: 36, height: 36,
             decoration: BoxDecoration(
-              color: teal.withOpacity(isDark ? 0.2 : 0.15),
+              color: teal.withValues(alpha: isDark ? 0.2 : 0.15),
               shape: BoxShape.circle,
             ),
             child: const Icon(Icons.add, color: teal, size: 20),
@@ -1044,8 +1044,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(
                       color: isDark
-                          ? Colors.white.withOpacity(0.07)
-                          : const Color(0xFFC7C4D8).withOpacity(0.5),
+                          ? Colors.white.withValues(alpha: 0.07)
+                          : const Color(0xFFC7C4D8).withValues(alpha: 0.5),
                     ),
                   ),
                   child: TextField(
@@ -1063,8 +1063,8 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                           : 'https://',
                       hintStyle: TextStyle(
                         color: isDark
-                            ? Colors.white.withOpacity(0.3)
-                            : const Color(0xFF464555).withOpacity(0.4),
+                            ? Colors.white.withValues(alpha: 0.3)
+                            : const Color(0xFF464555).withValues(alpha: 0.4),
                         fontSize: 14,
                       ),
                       border: InputBorder.none,
@@ -1092,24 +1092,24 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               style: TextStyle(
                   fontSize: 12,
                   color: isDark
-                      ? const Color(0xFFC7C4D8).withOpacity(0.5)
-                      : const Color(0xFF464555).withOpacity(0.55)),
+                      ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                      : const Color(0xFF464555).withValues(alpha: 0.55)),
             ),
           ],
           Padding(
             padding: const EdgeInsets.only(top: 14),
             child: Divider(
               color: isDark
-                  ? Colors.white.withOpacity(0.07)
-                  : const Color(0xFFC7C4D8).withOpacity(0.4),
+                  ? Colors.white.withValues(alpha: 0.07)
+                  : const Color(0xFFC7C4D8).withValues(alpha: 0.4),
             ),
           ),
           TextButton.icon(
             onPressed: () {},
-            icon: Icon(Icons.add, size: 16, color: _kViolet.withOpacity(0.8)),
+            icon: Icon(Icons.add, size: 16, color: _kViolet.withValues(alpha: 0.8)),
             label: Text('Add another URL',
                 style: TextStyle(
-                    color: _kViolet.withOpacity(0.85),
+                    color: _kViolet.withValues(alpha: 0.85),
                     fontSize: 13,
                     fontWeight: FontWeight.w600)),
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
@@ -1135,15 +1135,15 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                     style: TextStyle(
                         fontSize: 13,
                         color: isDark
-                            ? const Color(0xFFC7C4D8).withOpacity(0.6)
-                            : const Color(0xFF464555).withOpacity(0.65))),
+                            ? const Color(0xFFC7C4D8).withValues(alpha: 0.6)
+                            : const Color(0xFF464555).withValues(alpha: 0.65))),
               ],
             ),
           ),
           Icon(Icons.keyboard_arrow_down,
               color: isDark
-                  ? const Color(0xFFC7C4D8).withOpacity(0.5)
-                  : const Color(0xFF464555).withOpacity(0.5)),
+                  ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                  : const Color(0xFF464555).withValues(alpha: 0.5)),
         ],
       ),
     );
@@ -1167,13 +1167,13 @@ class _FormCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.06)
-              : const Color(0xFFC7C4D8).withOpacity(0.35),
+              ? Colors.white.withValues(alpha: 0.06)
+              : const Color(0xFFC7C4D8).withValues(alpha: 0.35),
         ),
         boxShadow: [
           if (!isDark)
             BoxShadow(
-                color: Colors.black.withOpacity(0.04),
+                color: Colors.black.withValues(alpha: 0.04),
                 blurRadius: 10,
                 offset: const Offset(0, 2)),
         ],
@@ -1198,8 +1198,8 @@ class _StyledField extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
           color: isDark
-              ? Colors.white.withOpacity(0.07)
-              : const Color(0xFFC7C4D8).withOpacity(0.5),
+              ? Colors.white.withValues(alpha: 0.07)
+              : const Color(0xFFC7C4D8).withValues(alpha: 0.5),
         ),
       ),
       child: TextField(
@@ -1215,8 +1215,8 @@ class _StyledField extends StatelessWidget {
           hintStyle: TextStyle(
             fontSize: 14,
             color: isDark
-                ? Colors.white.withOpacity(0.3)
-                : const Color(0xFF464555).withOpacity(0.4),
+                ? Colors.white.withValues(alpha: 0.3)
+                : const Color(0xFF464555).withValues(alpha: 0.4),
           ),
           border: InputBorder.none,
           contentPadding:
@@ -1240,8 +1240,8 @@ class _SectionLabel extends StatelessWidget {
             fontWeight: FontWeight.w700,
             letterSpacing: 1.5,
             color: isDark
-                ? const Color(0xFFC7C4D8).withOpacity(0.55)
-                : const Color(0xFF464555).withOpacity(0.6)));
+                ? const Color(0xFFC7C4D8).withValues(alpha: 0.55)
+                : const Color(0xFF464555).withValues(alpha: 0.6)));
   }
 }
 
@@ -1257,8 +1257,8 @@ class _FieldLabel extends StatelessWidget {
             fontSize: 13,
             fontWeight: FontWeight.w600,
             color: isDark
-                ? const Color(0xFFE5E0EE).withOpacity(0.85)
-                : const Color(0xFF1A1A2E).withOpacity(0.8)));
+                ? const Color(0xFFE5E0EE).withValues(alpha: 0.85)
+                : const Color(0xFF1A1A2E).withValues(alpha: 0.8)));
   }
 }
 
@@ -1319,8 +1319,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
                   color: isDark
-                      ? Colors.white.withOpacity(0.15)
-                      : const Color(0xFFC7C4D8).withOpacity(0.6),
+                      ? Colors.white.withValues(alpha: 0.15)
+                      : const Color(0xFFC7C4D8).withValues(alpha: 0.6),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -1338,8 +1338,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                 style: TextStyle(
                     fontSize: 13,
                     color: isDark
-                        ? const Color(0xFFC7C4D8).withOpacity(0.6)
-                        : const Color(0xFF464555).withOpacity(0.65))),
+                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.6)
+                        : const Color(0xFF464555).withValues(alpha: 0.65))),
             const SizedBox(height: 24),
 
             // Name field
@@ -1353,8 +1353,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                   color: hasName
                       ? _kViolet
                       : (isDark
-                          ? Colors.white.withOpacity(0.08)
-                          : const Color(0xFFC7C4D8).withOpacity(0.5)),
+                          ? Colors.white.withValues(alpha: 0.08)
+                          : const Color(0xFFC7C4D8).withValues(alpha: 0.5)),
                   width: hasName ? 1.5 : 1.0,
                 ),
               ),
@@ -1373,8 +1373,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                       fontSize: 15,
                       fontWeight: FontWeight.normal,
                       color: isDark
-                          ? Colors.white.withOpacity(0.3)
-                          : const Color(0xFF464555).withOpacity(0.4)),
+                          ? Colors.white.withValues(alpha: 0.3)
+                          : const Color(0xFF464555).withValues(alpha: 0.4)),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 14),
@@ -1389,19 +1389,19 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                 padding: const EdgeInsets.symmetric(
                     horizontal: 14, vertical: 10),
                 decoration: BoxDecoration(
-                  color: _kViolet.withOpacity(isDark ? 0.12 : 0.07),
+                  color: _kViolet.withValues(alpha: isDark ? 0.12 : 0.07),
                   borderRadius: BorderRadius.circular(12),
-                  border: Border.all(color: _kViolet.withOpacity(0.2)),
+                  border: Border.all(color: _kViolet.withValues(alpha: 0.2)),
                 ),
                 child: Row(
                   children: [
                     Container(
                       width: 36, height: 36,
                       decoration: BoxDecoration(
-                        color: _kViolet.withOpacity(isDark ? 0.2 : 0.12),
+                        color: _kViolet.withValues(alpha: isDark ? 0.2 : 0.12),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: _kViolet.withOpacity(0.4), width: 1.5),
+                            color: _kViolet.withValues(alpha: 0.4), width: 1.5),
                       ),
                       child: Center(
                         child: Text(initials,
@@ -1440,15 +1440,15 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                     fontWeight: FontWeight.w700,
                     letterSpacing: 1.5,
                     color: isDark
-                        ? const Color(0xFFC7C4D8).withOpacity(0.5)
-                        : const Color(0xFF464555).withOpacity(0.55))),
+                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                        : const Color(0xFF464555).withValues(alpha: 0.55))),
             const SizedBox(height: 4),
             Text('optional — needed for autofill',
                 style: TextStyle(
                     fontSize: 12,
                     color: isDark
-                        ? const Color(0xFFC7C4D8).withOpacity(0.4)
-                        : const Color(0xFF464555).withOpacity(0.45))),
+                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.4)
+                        : const Color(0xFF464555).withValues(alpha: 0.45))),
             const SizedBox(height: 8),
 
             Container(
@@ -1459,8 +1459,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                 borderRadius: BorderRadius.circular(14),
                 border: Border.all(
                   color: isDark
-                      ? Colors.white.withOpacity(0.08)
-                      : const Color(0xFFC7C4D8).withOpacity(0.5),
+                      ? Colors.white.withValues(alpha: 0.08)
+                      : const Color(0xFFC7C4D8).withValues(alpha: 0.5),
                 ),
               ),
               child: TextField(
@@ -1478,8 +1478,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                   hintStyle: TextStyle(
                       fontSize: 14,
                       color: isDark
-                          ? Colors.white.withOpacity(0.3)
-                          : const Color(0xFF464555).withOpacity(0.4)),
+                          ? Colors.white.withValues(alpha: 0.3)
+                          : const Color(0xFF464555).withValues(alpha: 0.4)),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
                       horizontal: 16, vertical: 14),
@@ -1518,8 +1518,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                     color: hasName
                         ? Colors.white
                         : (isDark
-                            ? const Color(0xFFC7C4D8).withOpacity(0.35)
-                            : const Color(0xFF464555).withOpacity(0.4)),
+                            ? const Color(0xFFC7C4D8).withValues(alpha: 0.35)
+                            : const Color(0xFF464555).withValues(alpha: 0.4)),
                   ),
                 ),
               ),
