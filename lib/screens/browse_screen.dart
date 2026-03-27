@@ -57,6 +57,15 @@ const _categories = [
     lightIconColor: Color(0xFFC1282A),
     lightCardColor: Color(0xFFFFF0F0),
   ),
+  _Category(
+    icon: Icons.place,
+    title: 'Addresses',
+    itemType: VaultItemType.address,
+    darkIconColor: Color(0xFFFFB74D),
+    darkCardColor: Color(0xFF2E241F),
+    lightIconColor: Color(0xFFF57C00),
+    lightCardColor: Color(0xFFFFF4E5),
+  ),
 ];
 
 class _RecentCollection {

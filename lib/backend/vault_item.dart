@@ -7,6 +7,7 @@ enum VaultItemType {
   card,        // → Cards
   contact,     // → Contacts
   document,    // → Docs
+  address,     // → Address
 }
 
 /// Maps a [VaultItemType] to the Browse grid label.
@@ -18,6 +19,7 @@ extension VaultItemTypeX on VaultItemType {
       case VaultItemType.card:       return 'Cards';
       case VaultItemType.contact:    return 'Contacts';
       case VaultItemType.document:   return 'Docs';
+      case VaultItemType.address:    return 'Address';
     }
   }
 }

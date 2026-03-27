@@ -15,6 +15,9 @@ import 'item_detail_screen.dart';
 import 'add_password_screen.dart';
 import 'browse_screen.dart';
 import 'autofill_prompt_screen.dart';
+import 'add_note_screen.dart';
+import 'add_card_screen.dart';
+import 'add_address_screen.dart';
 
 part 'app_router.g.dart';
 
@@ -38,6 +41,18 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/add_password',
         builder: (context, state) => const AddPasswordScreen(),
+      ),
+      GoRoute(
+        path: '/add_note',
+        builder: (context, state) => const AddNoteScreen(),
+      ),
+      GoRoute(
+        path: '/add_card',
+        builder: (context, state) => const AddCardScreen(),
+      ),
+      GoRoute(
+        path: '/add_address',
+        builder: (context, state) => const AddAddressScreen(),
       ),
       GoRoute(
         path: '/item_detail',
