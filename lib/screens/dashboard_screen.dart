@@ -23,7 +23,10 @@ class DashboardScreen extends StatelessWidget {
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 color: theme.colorScheme.surfaceContainerHigh,
-                border: Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2), width: 2),
+                border: Border.all(
+                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                  width: 2,
+                ),
               ),
               child: const Icon(Icons.person, size: 24),
             ),
@@ -34,12 +37,16 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Text(
                   'Good morning,',
-                  style: theme.textTheme.labelSmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
                 ),
                 Text(
                   'Alex 👋',
                   style: theme.textTheme.titleMedium?.copyWith(
-                    color: isDark ? const Color(0xFFC4C0FF) : theme.colorScheme.primary,
+                    color: isDark
+                        ? const Color(0xFFC4C0FF)
+                        : theme.colorScheme.primary,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -51,11 +58,13 @@ class DashboardScreen extends StatelessWidget {
           IconButton(
             onPressed: () {},
             icon: Icon(
-              Icons.notifications_outlined, 
-              color: isDark ? const Color(0xFFC4C0FF) : theme.colorScheme.primary
+              Icons.notifications_outlined,
+              color: isDark
+                  ? const Color(0xFFC4C0FF)
+                  : theme.colorScheme.primary,
             ),
           ),
-          const SizedBox(width: 8)
+          const SizedBox(width: 8),
         ],
       ),
       body: SafeArea(
@@ -116,23 +125,26 @@ class DashboardScreen extends StatelessWidget {
                                       fontSize: 10,
                                       fontWeight: FontWeight.bold,
                                       letterSpacing: 2,
-                                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.8),
+                                      color: theme.colorScheme.onPrimary
+                                          .withValues(alpha: 0.8),
                                     ),
                                   ),
                                   const SizedBox(height: 4),
                                   Text(
                                     'Password Health Score',
-                                    style: theme.textTheme.headlineMedium?.copyWith(
-                                      color: theme.colorScheme.onPrimary,
-                                      fontWeight: FontWeight.w800,
-                                      height: 1.1,
-                                    ),
+                                    style: theme.textTheme.headlineMedium
+                                        ?.copyWith(
+                                          color: theme.colorScheme.onPrimary,
+                                          fontWeight: FontWeight.w800,
+                                          height: 1.1,
+                                        ),
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
                                     'Your security is exceptional this month.',
                                     style: theme.textTheme.bodySmall?.copyWith(
-                                      color: theme.colorScheme.onPrimary.withValues(alpha: 0.7),
+                                      color: theme.colorScheme.onPrimary
+                                          .withValues(alpha: 0.7),
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
@@ -153,7 +165,8 @@ class DashboardScreen extends StatelessWidget {
                                         value: 0.92,
                                         strokeWidth: 8,
                                         color: Colors.white,
-                                        backgroundColor: Colors.white.withValues(alpha: 0.2),
+                                        backgroundColor: Colors.white
+                                            .withValues(alpha: 0.2),
                                       ),
                                     ),
                                   ),
@@ -163,11 +176,22 @@ class DashboardScreen extends StatelessWidget {
                                       children: [
                                         const Text(
                                           '92',
-                                          style: TextStyle(fontSize: 32, fontWeight: FontWeight.w900, color: Colors.white),
+                                          style: TextStyle(
+                                            fontSize: 32,
+                                            fontWeight: FontWeight.w900,
+                                            color: Colors.white,
+                                          ),
                                         ),
                                         Text(
                                           'SOLID',
-                                          style: TextStyle(fontSize: 10, fontWeight: FontWeight.bold, color: Colors.white.withValues(alpha: 0.8), letterSpacing: 1),
+                                          style: TextStyle(
+                                            fontSize: 10,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.white.withValues(
+                                              alpha: 0.8,
+                                            ),
+                                            letterSpacing: 1,
+                                          ),
                                         ),
                                       ],
                                     ),
@@ -185,21 +209,42 @@ class DashboardScreen extends StatelessWidget {
                           children: [
                             Row(
                               children: [
-                                Icon(Icons.verified_user, size: 16, color: theme.colorScheme.onPrimary.withValues(alpha: 0.9)),
+                                Icon(
+                                  Icons.verified_user,
+                                  size: 16,
+                                  color: theme.colorScheme.onPrimary.withValues(
+                                    alpha: 0.9,
+                                  ),
+                                ),
                                 const SizedBox(width: 4),
                                 Text(
                                   '248 Passwords Encrypted',
-                                  style: TextStyle(fontSize: 12, fontWeight: FontWeight.w600, color: theme.colorScheme.onPrimary.withValues(alpha: 0.9)),
+                                  style: TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                    color: theme.colorScheme.onPrimary
+                                        .withValues(alpha: 0.9),
+                                  ),
                                 ),
                               ],
                             ),
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 6,
+                              ),
                               decoration: BoxDecoration(
                                 color: Colors.white.withValues(alpha: 0.2),
                                 borderRadius: BorderRadius.circular(16),
                               ),
-                              child: const Text('Details', style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.white)),
+                              child: const Text(
+                                'Details',
+                                style: TextStyle(
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -215,19 +260,34 @@ class DashboardScreen extends StatelessWidget {
             // Quick Access
             Text(
               'QUICK ACCESS',
-              style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant, letterSpacing: 2),
+              style: theme.textTheme.labelMedium?.copyWith(
+                color: theme.colorScheme.onSurfaceVariant,
+                letterSpacing: 2,
+              ),
             ),
             const SizedBox(height: 16),
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
-              clipBehavior: Clip.none,
+              primary: false,
+              physics: AlwaysScrollableScrollPhysics(),
+              //clipBehavior: Clip.none,
               child: Row(
                 children: [
                   _buildQuickAccessPill(context, Icons.history, 'Recent', true),
                   const SizedBox(width: 12),
-                  _buildQuickAccessPill(context, Icons.star, 'Favourites', false),
+                  _buildQuickAccessPill(
+                    context,
+                    Icons.star,
+                    'Favourites',
+                    false,
+                  ),
                   const SizedBox(width: 12),
-                  _buildQuickAccessPill(context, Icons.gpp_maybe, 'Weak Passwords', false),
+                  _buildQuickAccessPill(
+                    context,
+                    Icons.gpp_maybe,
+                    'Weak Passwords',
+                    false,
+                  ),
                 ],
               ),
             ),
@@ -240,24 +300,49 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Text(
                   'RECENT ACTIVITY',
-                  style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.onSurfaceVariant, letterSpacing: 2),
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    letterSpacing: 2,
+                  ),
                 ),
                 Text(
                   'View All',
-                  style: theme.textTheme.labelMedium?.copyWith(color: theme.colorScheme.primary),
+                  style: theme.textTheme.labelMedium?.copyWith(
+                    color: theme.colorScheme.primary,
+                  ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
-            
-            _buildRecentActivityItem(context, 'Netflix', 'alex.v•••••••••', true),
+
+            _buildRecentActivityItem(
+              context,
+              'Netflix',
+              'alex.v•••••••••',
+              true,
+            ),
             const SizedBox(height: 12),
-            _buildRecentActivityItem(context, 'GitHub', 'dev_alex••••••••', true),
+            _buildRecentActivityItem(
+              context,
+              'GitHub',
+              'dev_alex••••••••',
+              true,
+            ),
             const SizedBox(height: 12),
-            _buildRecentActivityItem(context, 'Binance Vault', 'crypto_h••••••••', false),
+            _buildRecentActivityItem(
+              context,
+              'Binance Vault',
+              'crypto_h••••••••',
+              false,
+            ),
             const SizedBox(height: 12),
-            _buildRecentActivityItem(context, 'Dribbble Pro', 'pixel_per••••••••', true),
-            
+            _buildRecentActivityItem(
+              context,
+              'Dribbble Pro',
+              'pixel_per••••••••',
+              true,
+            ),
+
             const SizedBox(height: 80), // Padding for bottom navbar
           ],
         ),
@@ -265,32 +350,56 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildQuickAccessPill(BuildContext context, IconData icon, String label, bool isPrimary) {
+  Widget _buildQuickAccessPill(
+    BuildContext context,
+    IconData icon,
+    String label,
+    bool isPrimary,
+  ) {
     final theme = Theme.of(context);
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
       decoration: BoxDecoration(
-        color: isPrimary ? theme.colorScheme.primary.withValues(alpha: 0.1) : theme.colorScheme.surfaceContainerHigh,
+        color: isPrimary
+            ? theme.colorScheme.primary.withValues(alpha: 0.1)
+            : theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(16),
-        border: isPrimary ? Border.all(color: theme.colorScheme.primary.withValues(alpha: 0.2)) : null,
+        border: isPrimary
+            ? Border.all(
+                color: theme.colorScheme.primary.withValues(alpha: 0.2),
+              )
+            : null,
       ),
       child: Row(
         children: [
-          Icon(icon, size: 18, color: isPrimary ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant),
+          Icon(
+            icon,
+            size: 18,
+            color: isPrimary
+                ? theme.colorScheme.primary
+                : theme.colorScheme.onSurfaceVariant,
+          ),
           const SizedBox(width: 8),
           Text(
             label,
             style: theme.textTheme.bodyMedium?.copyWith(
               fontWeight: FontWeight.bold,
-              color: isPrimary ? theme.colorScheme.primary : theme.colorScheme.onSurfaceVariant,
+              color: isPrimary
+                  ? theme.colorScheme.primary
+                  : theme.colorScheme.onSurfaceVariant,
             ),
-          )
+          ),
         ],
       ),
     );
   }
 
-  Widget _buildRecentActivityItem(BuildContext context, String title, String subtitle, bool is2FA) {
+  Widget _buildRecentActivityItem(
+    BuildContext context,
+    String title,
+    String subtitle,
+    bool is2FA,
+  ) {
     final theme = Theme.of(context);
     return AppCard(
       padding: const EdgeInsets.all(16),
@@ -302,7 +411,9 @@ class DashboardScreen extends StatelessWidget {
             decoration: BoxDecoration(
               color: theme.colorScheme.surfaceContainerLowest,
               borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: theme.colorScheme.outlineVariant.withValues(alpha: 0.1)),
+              border: Border.all(
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.1),
+              ),
             ),
             child: Icon(Icons.language, color: theme.colorScheme.primary),
           ),
@@ -313,14 +424,19 @@ class DashboardScreen extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: theme.textTheme.bodyLarge?.copyWith(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface),
+                  style: theme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: theme.colorScheme.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 4),
                 Row(
                   children: [
                     Text(
                       subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
                     ),
                     const SizedBox(width: 8),
                     Container(
@@ -328,8 +444,19 @@ class DashboardScreen extends StatelessWidget {
                       height: 6,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: is2FA ? theme.colorScheme.secondary : theme.colorScheme.outlineVariant,
-                        boxShadow: is2FA ? [BoxShadow(color: theme.colorScheme.secondary.withValues(alpha: 0.5), blurRadius: 8)] : null,
+                        color: is2FA
+                            ? theme.colorScheme.secondary
+                            : theme.colorScheme.outlineVariant,
+                        boxShadow: is2FA
+                            ? [
+                                BoxShadow(
+                                  color: theme.colorScheme.secondary.withValues(
+                                    alpha: 0.5,
+                                  ),
+                                  blurRadius: 8,
+                                ),
+                              ]
+                            : null,
                       ),
                     ),
                   ],

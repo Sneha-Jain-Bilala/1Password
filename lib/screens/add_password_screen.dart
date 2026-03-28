@@ -55,9 +55,11 @@ List<_Service> _searchServices(String query) {
   if (query.trim().isEmpty) return [];
   final q = query.toLowerCase().trim();
   return _kServiceDb
-      .where((s) =>
-          s.name.toLowerCase().contains(q) ||
-          s.domain.toLowerCase().contains(q))
+      .where(
+        (s) =>
+            s.name.toLowerCase().contains(q) ||
+            s.domain.toLowerCase().contains(q),
+      )
       .toList();
 }
 
@@ -128,12 +130,12 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   String get _strengthLabel =>
       ['', 'Weak', 'Fair', 'Good', 'Strong'][_strength];
   Color get _strengthColor => const [
-        Colors.transparent,
-        Color(0xFFF16161),
-        Color(0xFFFFB3B0),
-        Color(0xFF41EEC2),
-        Color(0xFF28DFB5),
-      ][_strength];
+    Colors.transparent,
+    Color(0xFFF16161),
+    Color(0xFFFFB3B0),
+    Color(0xFF41EEC2),
+    Color(0xFF28DFB5),
+  ][_strength];
 
   // ── Selection helpers ──────────────────────────────────────────
   void _selectKnown(_Service s) {
@@ -151,10 +153,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   /// Carry typed text as custom name (Scenario C)
   void _useAsCustom(String typedName) {
     final name = typedName.trim();
-    final inferredUrl =
-        name.isEmpty ? '' : 'https://${name.toLowerCase()}.com';
+    final inferredUrl = name.isEmpty ? '' : 'https://${name.toLowerCase()}.com';
     _searchCtrl.clear();
-    _searchFocus.unfocus();
+    //_searchFocus.unfocus();
     setState(() {
       _customName = name;
       _customUrl = ''; // user hasn't confirmed URL yet
@@ -166,22 +167,21 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   }
 
   void _reset() => setState(() {
-        _state = _ServiceState.none;
-        _selected = null;
-        _customName = '';
-        _customUrl = '';
-        _urlCtrl.clear();
-        _emailCtrl.clear();
-        _passCtrl.clear();
-        _searchCtrl.clear();
-        _searchActive = false;
-        _searchResults = [];
-      });
+    _state = _ServiceState.none;
+    _selected = null;
+    _customName = '';
+    _customUrl = '';
+    _urlCtrl.clear();
+    _emailCtrl.clear();
+    _passCtrl.clear();
+    _searchCtrl.clear();
+    _searchActive = false;
+    _searchResults = [];
+  });
 
   void _openCustomSheet({bool prefill = false}) {
     final nameCtrl = TextEditingController(text: prefill ? _customName : '');
-    final urlCtrl2 =
-        TextEditingController(text: prefill ? _customUrl : '');
+    final urlCtrl2 = TextEditingController(text: prefill ? _customUrl : '');
 
     showModalBottomSheet(
       context: context,
@@ -194,8 +194,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           setState(() {
             _customName = name;
             _customUrl = url;
-            _urlCtrl.text =
-                url.isNotEmpty ? url : 'https://${name.toLowerCase()}.com';
+            _urlCtrl.text = url.isNotEmpty
+                ? url
+                : 'https://${name.toLowerCase()}.com';
           });
         },
       ),
@@ -211,7 +212,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
 
     return GestureDetector(
       onTap: () {
-        _searchFocus.unfocus();
+        //_searchFocus.unfocus();
       },
       child: Scaffold(
         backgroundColor: theme.colorScheme.surface,
@@ -220,19 +221,17 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           elevation: 0,
           scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back,
-                color: isDark
-                    ? const Color(0xFFC4C0FF)
-                    : const Color(0xFF1A1A2E)),
+            icon: Icon(
+              Icons.arrow_back,
+              color: isDark ? const Color(0xFFC4C0FF) : const Color(0xFF1A1A2E),
+            ),
             onPressed: () => context.pop(),
           ),
           title: Text(
             'Add Password',
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w600,
-              color: isDark
-                  ? const Color(0xFFE5E0EE)
-                  : const Color(0xFF1A1A2E),
+              color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
             ),
           ),
           centerTitle: true,
@@ -242,58 +241,64 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               child: Opacity(
                 opacity: canSave ? 1.0 : 0.4,
                 child: ElevatedButton(
-                  onPressed: canSave ? () async {
-                        final name = _state == _ServiceState.known
-                            ? _selected!.name
-                            : _customName;
-                        final domain = _state == _ServiceState.known
-                            ? _selected!.domain
-                            : _customUrl;
-                        final color = _state == _ServiceState.known
-                            ? _selected!.color
-                            : _kViolet;
+                  onPressed: canSave
+                      ? () async {
+                          final name = _state == _ServiceState.known
+                              ? _selected!.name
+                              : _customName;
+                          final domain = _state == _ServiceState.known
+                              ? _selected!.domain
+                              : _customUrl;
+                          final color = _state == _ServiceState.known
+                              ? _selected!.color
+                              : _kViolet;
 
-                        final item = VaultItem(
-                          id: '',
-                          type: VaultItemType.login,
-                          serviceName: name,
-                          domain: domain,
-                          serviceColor: color,
-                          username: _emailCtrl.text.trim(),
-                          password: _passCtrl.text,
-                          createdAt: DateTime.now(),
-                          updatedAt: DateTime.now(),
-                        );
-
-                        await ref
-                            .read(vaultNotifierProvider.notifier)
-                            .addItem(item);
-
-                        if (context.mounted) {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text('"$name" saved to Passwords'),
-                              backgroundColor: _kViolet,
-                              behavior: SnackBarBehavior.floating,
-                            ),
+                          final item = VaultItem(
+                            id: '',
+                            type: VaultItemType.login,
+                            serviceName: name,
+                            domain: domain,
+                            serviceColor: color,
+                            username: _emailCtrl.text.trim(),
+                            password: _passCtrl.text,
+                            createdAt: DateTime.now(),
+                            updatedAt: DateTime.now(),
                           );
-                          context.pop();
+
+                          await ref
+                              .read(vaultNotifierProvider.notifier)
+                              .addItem(item);
+
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('"$name" saved to Passwords'),
+                                backgroundColor: _kViolet,
+                                behavior: SnackBarBehavior.floating,
+                              ),
+                            );
+                            context.pop();
+                          }
                         }
-                      } : null,
+                      : null,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: _kViolet,
                     foregroundColor: Colors.white,
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 20, vertical: 8),
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12)),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
                     minimumSize: Size.zero,
                     tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     elevation: 0,
                   ),
-                  child: const Text('Save',
-                      style: TextStyle(
-                          fontWeight: FontWeight.w700, fontSize: 14)),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  ),
                 ),
               ),
             ),
@@ -324,44 +329,55 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
       decoration: BoxDecoration(
         color: cardBg,
         borderRadius: BorderRadius.circular(20),
-        border:
-            Border.all(color: borderColor, width: 1.5),
+        border: Border.all(color: borderColor, width: 1.5),
       ),
       padding: const EdgeInsets.fromLTRB(20, 24, 20, 20),
       child: Column(
         children: [
           // ── Icon + header (hidden when result dropdown is shown)
-          if (!_searchActive) ...[
-            Container(
-              width: 56, height: 56,
-              decoration: BoxDecoration(
-                  color: _kViolet.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16)),
-              child: const Icon(Icons.search, color: _kViolet, size: 28),
-            ),
-            const SizedBox(height: 16),
-            Text('Which app or website?',
-                style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 17,
-                    color: isDark
-                        ? const Color(0xFFE5E0EE)
-                        : const Color(0xFF1A1A2E))),
-            const SizedBox(height: 4),
-            Text('Search or pick a popular service',
-                style: const TextStyle(
-                    fontSize: 13,
-                    color: _kViolet,
-                    fontWeight: FontWeight.w500)),
-            const SizedBox(height: 16),
-          ],
+          _searchActive
+              ? const SizedBox.shrink()
+              : Column(
+                  children: [
+                    Container(
+                      width: 56,
+                      height: 56,
+                      decoration: BoxDecoration(
+                        color: _kViolet.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: const Icon(Icons.search, color: _kViolet, size: 28),
+                    ),
+                    const SizedBox(height: 16),
+                    Text(
+                      'Which app or website?',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 17,
+                        color: isDark
+                            ? const Color(0xFFE5E0EE)
+                            : const Color(0xFF1A1A2E),
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Search or pick a popular service',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        color: _kViolet,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+
 
           // ── Search field ──────────────────────────────────────
           Container(
+            key: const ValueKey('search_field_container'),
             decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF13121B)
-                  : const Color(0xFFF3F3FA),
+              color: isDark ? const Color(0xFF13121B) : const Color(0xFFF3F3FA),
               borderRadius: _searchActive
                   ? const BorderRadius.vertical(top: Radius.circular(12))
                   : BorderRadius.circular(12),
@@ -369,12 +385,13 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                 color: _searchFocus.hasFocus
                     ? _kViolet.withValues(alpha: 0.6)
                     : (isDark
-                        ? Colors.white.withValues(alpha: 0.07)
-                        : const Color(0xFFC7C4D8).withValues(alpha: 0.5)),
+                          ? Colors.white.withValues(alpha: 0.07)
+                          : const Color(0xFFC7C4D8).withValues(alpha: 0.5)),
                 width: _searchFocus.hasFocus ? 1.5 : 1.0,
               ),
             ),
             child: TextField(
+              key: const ValueKey('search_field'),
               controller: _searchCtrl,
               focusNode: _searchFocus,
               style: TextStyle(
@@ -391,29 +408,32 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                       ? Colors.white.withValues(alpha: 0.3)
                       : const Color(0xFF464555).withValues(alpha: 0.4),
                 ),
-                prefixIcon: Icon(Icons.search,
-                    size: 20,
-                    color: _searchFocus.hasFocus
-                        ? _kViolet.withValues(alpha: 0.6)
-                        : (isDark
+                prefixIcon: Icon(
+                  Icons.search,
+                  size: 20,
+                  color: _searchFocus.hasFocus
+                      ? _kViolet.withValues(alpha: 0.6)
+                      : (isDark
                             ? Colors.white.withValues(alpha: 0.3)
-                            : const Color(0xFF464555).withValues(alpha: 0.4))),
+                            : const Color(0xFF464555).withValues(alpha: 0.4)),
+                ),
                 suffixIcon: _searchActive
                     ? IconButton(
-                        icon: Icon(Icons.close,
-                            size: 18,
-                            color: isDark
-                                ? Colors.white.withValues(alpha: 0.4)
-                                : const Color(0xFF464555).withValues(alpha: 0.5)),
+                        icon: Icon(
+                          Icons.close,
+                          size: 18,
+                          color: isDark
+                              ? Colors.white.withValues(alpha: 0.4)
+                              : const Color(0xFF464555).withValues(alpha: 0.5),
+                        ),
                         onPressed: () {
                           _searchCtrl.clear();
-                          _searchFocus.unfocus();
+                          //_searchFocus.unfocus();
                         },
                       )
                     : null,
                 border: InputBorder.none,
-                contentPadding:
-                    const EdgeInsets.symmetric(vertical: 13),
+                contentPadding: const EdgeInsets.symmetric(vertical: 13),
               ),
             ),
           ),
@@ -429,13 +449,15 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceAround,
                 children: [
-                  ..._kQuickPicks.map((s) => _buildQuickPick(
-                        label: s.initials,
-                        title: s.name,
-                        color: s.color,
-                        isDark: isDark,
-                        onTap: () => _selectKnown(s),
-                      )),
+                  ..._kQuickPicks.map(
+                    (s) => _buildQuickPick(
+                      label: s.initials,
+                      title: s.name,
+                      color: s.color,
+                      isDark: isDark,
+                      onTap: () => _selectKnown(s),
+                    ),
+                  ),
                   _buildQuickPickCustom(isDark),
                 ],
               ),
@@ -456,15 +478,14 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     return Container(
       decoration: BoxDecoration(
         color: bg,
-        borderRadius:
-            const BorderRadius.vertical(bottom: Radius.circular(14)),
+        borderRadius: const BorderRadius.vertical(bottom: Radius.circular(14)),
         border: Border(
-          left: BorderSide(
-              color: _kViolet.withValues(alpha: 0.4), width: 1.5),
-          right: BorderSide(
-              color: _kViolet.withValues(alpha: 0.4), width: 1.5),
+          left: BorderSide(color: _kViolet.withValues(alpha: 0.4), width: 1.5),
+          right: BorderSide(color: _kViolet.withValues(alpha: 0.4), width: 1.5),
           bottom: BorderSide(
-              color: _kViolet.withValues(alpha: 0.4), width: 1.5),
+            color: _kViolet.withValues(alpha: 0.4),
+            width: 1.5,
+          ),
         ),
       ),
       child: Column(
@@ -473,43 +494,45 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           // ── Best match results ─────────────────────────────
           if (_searchResults.isNotEmpty) ...[
             Padding(
-              padding:
-                  const EdgeInsets.fromLTRB(14, 12, 14, 6),
-              child: Text('BEST MATCH',
-                  style: TextStyle(
-                      fontSize: 10,
-                      fontWeight: FontWeight.w700,
-                      letterSpacing: 1.5,
-                      color: isDark
-                          ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                          : const Color(0xFF464555).withValues(alpha: 0.55))),
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 6),
+              child: Text(
+                'BEST MATCH',
+                style: TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w700,
+                  letterSpacing: 1.5,
+                  color: isDark
+                      ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                      : const Color(0xFF464555).withValues(alpha: 0.55),
+                ),
+              ),
             ),
-            ...(_searchResults.take(4).map((s) =>
-                _buildDropdownItem(context, s, isDark))),
-            Divider(height: 1, color: divColor,
-                indent: 14, endIndent: 14),
+            ...(_searchResults
+                .take(4)
+                .map((s) => _buildDropdownItem(context, s, isDark))),
+            Divider(height: 1, color: divColor, indent: 14, endIndent: 14),
           ],
 
           // ── "Use as custom" — always shown at bottom ────────
           InkWell(
             onTap: () => _useAsCustom(_searchCtrl.text),
             child: Padding(
-              padding: const EdgeInsets.symmetric(
-                  horizontal: 14, vertical: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
               child: Row(
                 children: [
                   Container(
-                    width: 38, height: 38,
+                    width: 38,
+                    height: 38,
                     decoration: BoxDecoration(
                       color: _kViolet.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(10),
                       border: Border.all(
-                          color: _kViolet.withValues(alpha: 0.35),
-                          width: 1.2,
-                          style: BorderStyle.solid),
+                        color: _kViolet.withValues(alpha: 0.35),
+                        width: 1.2,
+                        style: BorderStyle.solid,
+                      ),
                     ),
-                    child: const Icon(Icons.add,
-                        color: _kViolet, size: 18),
+                    child: const Icon(Icons.add, color: _kViolet, size: 18),
                   ),
                   const SizedBox(width: 12),
                   Expanded(
@@ -519,33 +542,42 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                         RichText(
                           text: TextSpan(
                             style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.w600,
-                                color: isDark
-                                    ? const Color(0xFFE5E0EE)
-                                    : const Color(0xFF1A1A2E)),
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                              color: isDark
+                                  ? const Color(0xFFE5E0EE)
+                                  : const Color(0xFF1A1A2E),
+                            ),
                             children: [
                               const TextSpan(text: 'Use "'),
                               TextSpan(
-                                  text: _searchCtrl.text.trim(),
-                                  style: const TextStyle(
-                                      color: _kViolet)),
+                                text: _searchCtrl.text.trim(),
+                                style: const TextStyle(color: _kViolet),
+                              ),
                               const TextSpan(text: '" as custom'),
                             ],
                           ),
                         ),
                         const SizedBox(height: 2),
-                        Text('Not in our list? No problem.',
-                            style: TextStyle(
-                                fontSize: 12,
-                                color: isDark
-                                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                                    : const Color(0xFF464555).withValues(alpha: 0.55))),
+                        Text(
+                          'Not in our list? No problem.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark
+                                ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                                : const Color(
+                                    0xFF464555,
+                                  ).withValues(alpha: 0.55),
+                          ),
+                        ),
                       ],
                     ),
                   ),
-                  Icon(Icons.chevron_right,
-                      color: _kViolet.withValues(alpha: 0.5), size: 20),
+                  Icon(
+                    Icons.chevron_right,
+                    color: _kViolet.withValues(alpha: 0.5),
+                    size: 20,
+                  ),
                 ],
               ),
             ),
@@ -555,27 +587,29 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     );
   }
 
-  Widget _buildDropdownItem(
-      BuildContext context, _Service s, bool isDark) {
+  Widget _buildDropdownItem(BuildContext context, _Service s, bool isDark) {
     return InkWell(
       onTap: () => _selectKnown(s),
       child: Padding(
-        padding: const EdgeInsets.symmetric(
-            horizontal: 14, vertical: 10),
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
         child: Row(
           children: [
             Container(
-              width: 38, height: 38,
+              width: 38,
+              height: 38,
               decoration: BoxDecoration(
                 color: s.color.withValues(alpha: isDark ? 0.18 : 0.1),
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
-                child: Text(s.initials,
-                    style: TextStyle(
-                        color: s.color,
-                        fontWeight: FontWeight.w800,
-                        fontSize: 14)),
+                child: Text(
+                  s.initials,
+                  style: TextStyle(
+                    color: s.color,
+                    fontWeight: FontWeight.w800,
+                    fontSize: 14,
+                  ),
+                ),
               ),
             ),
             const SizedBox(width: 12),
@@ -583,27 +617,35 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(s.name,
-                      style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDark
-                              ? const Color(0xFFE5E0EE)
-                              : const Color(0xFF1A1A2E))),
-                  Text(s.domain,
-                      style: TextStyle(
-                          fontSize: 12,
-                          color: isDark
-                              ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                              : const Color(0xFF464555).withValues(alpha: 0.55))),
+                  Text(
+                    s.name,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w600,
+                      color: isDark
+                          ? const Color(0xFFE5E0EE)
+                          : const Color(0xFF1A1A2E),
+                    ),
+                  ),
+                  Text(
+                    s.domain,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: isDark
+                          ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                          : const Color(0xFF464555).withValues(alpha: 0.55),
+                    ),
+                  ),
                 ],
               ),
             ),
-            Icon(Icons.north_west,
-                size: 14,
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.2)
-                    : const Color(0xFF464555).withValues(alpha: 0.3)),
+            Icon(
+              Icons.north_west,
+              size: 14,
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.2)
+                  : const Color(0xFF464555).withValues(alpha: 0.3),
+            ),
           ],
         ),
       ),
@@ -622,27 +664,34 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
       child: Column(
         children: [
           Container(
-            width: 48, height: 48,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: color.withValues(alpha: isDark ? 0.18 : 0.1),
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
-              child: Text(label,
-                  style: TextStyle(
-                      color: color,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 15)),
+              child: Text(
+                label,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 15,
+                ),
+              ),
             ),
           ),
           const SizedBox(height: 6),
-          Text(title,
-              style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: isDark
-                      ? const Color(0xFFC7C4D8).withValues(alpha: 0.7)
-                      : const Color(0xFF464555).withValues(alpha: 0.8))),
+          Text(
+            title,
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: isDark
+                  ? const Color(0xFFC7C4D8).withValues(alpha: 0.7)
+                  : const Color(0xFF464555).withValues(alpha: 0.8),
+            ),
+          ),
         ],
       ),
     );
@@ -654,23 +703,29 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
       child: Column(
         children: [
           Container(
-            width: 48, height: 48,
+            width: 48,
+            height: 48,
             decoration: BoxDecoration(
               color: Colors.transparent,
               borderRadius: BorderRadius.circular(14),
               border: Border.all(
-                  color: _kViolet.withValues(alpha: 0.5), width: 1.5),
+                color: _kViolet.withValues(alpha: 0.5),
+                width: 1.5,
+              ),
             ),
             child: const Center(
               child: Icon(Icons.add, color: _kViolet, size: 22),
             ),
           ),
           const SizedBox(height: 6),
-          Text('Custom',
-              style: TextStyle(
-                  fontSize: 10,
-                  fontWeight: FontWeight.w600,
-                  color: _kViolet.withValues(alpha: 0.8))),
+          Text(
+            'Custom',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w600,
+              color: _kViolet.withValues(alpha: 0.8),
+            ),
+          ),
         ],
       ),
     );
@@ -684,7 +739,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
         ? (_customUrl.isEmpty ? 'No URL set — tap Edit to add' : _customUrl)
         : _selected!.domain;
     final initials = isCustom
-        ? (name.length >= 2 ? name.substring(0, 2).toUpperCase() : name.toUpperCase())
+        ? (name.length >= 2
+              ? name.substring(0, 2).toUpperCase()
+              : name.toUpperCase())
         : _selected!.initials;
     final color = isCustom ? _kViolet : _selected!.color;
     final cardBg = isDark ? const Color(0xFF1C1A24) : Colors.white;
@@ -704,16 +761,18 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
         boxShadow: [
           if (!isDark)
             BoxShadow(
-                color: color.withValues(alpha: 0.08),
-                blurRadius: 16,
-                offset: const Offset(0, 4)),
+              color: color.withValues(alpha: 0.08),
+              blurRadius: 16,
+              offset: const Offset(0, 4),
+            ),
         ],
       ),
       child: Row(
         children: [
           // Initials avatar
           Container(
-            width: 52, height: 52,
+            width: 52,
+            height: 52,
             decoration: BoxDecoration(
               color: color.withValues(alpha: isDark ? 0.18 : 0.1),
               borderRadius: BorderRadius.circular(14),
@@ -721,15 +780,19 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                   ? Border.all(
                       color: _kViolet.withValues(alpha: 0.5),
                       width: 1.5,
-                      style: BorderStyle.solid)
+                      style: BorderStyle.solid,
+                    )
                   : null,
             ),
             child: Center(
-              child: Text(initials,
-                  style: TextStyle(
-                      color: color,
-                      fontWeight: FontWeight.w800,
-                      fontSize: 17)),
+              child: Text(
+                initials,
+                style: TextStyle(
+                  color: color,
+                  fontWeight: FontWeight.w800,
+                  fontSize: 17,
+                ),
+              ),
             ),
           ),
           const SizedBox(width: 14),
@@ -738,24 +801,28 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(name,
-                    style: TextStyle(
-                        fontWeight: FontWeight.w600,
-                        fontSize: 15,
-                        color: isDark
-                            ? const Color(0xFFE5E0EE)
-                            : const Color(0xFF1A1A2E))),
+                Text(
+                  name,
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    fontSize: 15,
+                    color: isDark
+                        ? const Color(0xFFE5E0EE)
+                        : const Color(0xFF1A1A2E),
+                  ),
+                ),
                 const SizedBox(height: 2),
                 Text(
                   domain,
                   style: TextStyle(
-                      fontSize: 12,
-                      fontStyle: isNoUrl ? FontStyle.italic : FontStyle.normal,
-                      color: isNoUrl
-                          ? _kViolet.withValues(alpha: 0.6)
-                          : (isDark
+                    fontSize: 12,
+                    fontStyle: isNoUrl ? FontStyle.italic : FontStyle.normal,
+                    color: isNoUrl
+                        ? _kViolet.withValues(alpha: 0.6)
+                        : (isDark
                               ? const Color(0xFFC7C4D8).withValues(alpha: 0.55)
-                              : const Color(0xFF464555).withValues(alpha: 0.6))),
+                              : const Color(0xFF464555).withValues(alpha: 0.6)),
+                  ),
                 ),
               ],
             ),
@@ -774,11 +841,12 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               child: Text(
                 isCustom ? 'Edit' : 'Change',
                 style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? const Color(0xFFC7C4D8)
-                        : const Color(0xFF464555)),
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? const Color(0xFFC7C4D8)
+                      : const Color(0xFF464555),
+                ),
               ),
             ),
           ),
@@ -849,9 +917,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           const SizedBox(height: 6),
           Container(
             decoration: BoxDecoration(
-              color: isDark
-                  ? const Color(0xFF13121B)
-                  : const Color(0xFFF3F3FA),
+              color: isDark ? const Color(0xFF13121B) : const Color(0xFFF3F3FA),
               borderRadius: BorderRadius.circular(12),
               border: Border.all(
                 color: isDark
@@ -884,7 +950,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 13),
+                        horizontal: 14,
+                        vertical: 13,
+                      ),
                     ),
                   ),
                 ),
@@ -896,20 +964,24 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                         ? Colors.white.withValues(alpha: 0.4)
                         : const Color(0xFF464555).withValues(alpha: 0.5),
                   ),
-                  onPressed: () =>
-                      setState(() => _passVisible = !_passVisible),
+                  onPressed: () => setState(() => _passVisible = !_passVisible),
                 ),
                 IconButton(
-                  icon: Icon(Icons.refresh,
-                      size: 20, color: _kViolet.withValues(alpha: 0.7)),
+                  icon: Icon(
+                    Icons.refresh,
+                    size: 20,
+                    color: _kViolet.withValues(alpha: 0.7),
+                  ),
                   onPressed: () {
                     const chars =
                         'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*';
                     final pass = List.generate(
-                        16,
-                        (i) => chars[DateTime.now().microsecondsSinceEpoch *
-                                (i + 1) %
-                                chars.length]).join();
+                      16,
+                      (i) =>
+                          chars[DateTime.now().microsecondsSinceEpoch *
+                              (i + 1) %
+                              chars.length],
+                    ).join();
                     setState(() => _passCtrl.text = pass);
                   },
                 ),
@@ -930,8 +1002,10 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                       color: active
                           ? _strengthColor
                           : (isDark
-                              ? Colors.white.withValues(alpha: 0.1)
-                              : const Color(0xFFC7C4D8).withValues(alpha: 0.4)),
+                                ? Colors.white.withValues(alpha: 0.1)
+                                : const Color(
+                                    0xFFC7C4D8,
+                                  ).withValues(alpha: 0.4)),
                       borderRadius: BorderRadius.circular(4),
                     ),
                   ),
@@ -941,11 +1015,14 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             const SizedBox(height: 6),
             Align(
               alignment: Alignment.centerRight,
-              child: Text(_strengthLabel,
-                  style: TextStyle(
-                      fontSize: 11,
-                      fontWeight: FontWeight.w600,
-                      color: _strengthColor)),
+              child: Text(
+                _strengthLabel,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w600,
+                  color: _strengthColor,
+                ),
+              ),
             ),
           ],
           const SizedBox(height: 12),
@@ -955,17 +1032,22 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               onTap: () {},
               child: Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 7),
+                  horizontal: 14,
+                  vertical: 7,
+                ),
                 decoration: BoxDecoration(
                   color: _kViolet.withValues(alpha: isDark ? 0.15 : 0.08),
                   borderRadius: BorderRadius.circular(20),
                   border: Border.all(color: _kViolet.withValues(alpha: 0.3)),
                 ),
-                child: const Text('Generate password',
-                    style: TextStyle(
-                        color: _kViolet,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600)),
+                child: const Text(
+                  'Generate password',
+                  style: TextStyle(
+                    color: _kViolet,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ),
             ),
           ),
@@ -982,8 +1064,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF0F2922) : const Color(0xFFE8FBF5),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(
-            color: teal.withValues(alpha: isDark ? 0.25 : 0.35)),
+        border: Border.all(color: teal.withValues(alpha: isDark ? 0.25 : 0.35)),
       ),
       child: Row(
         children: [
@@ -991,25 +1072,32 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text('Two-Factor Auth (2FA)',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 15,
-                        color: isDark
-                            ? const Color(0xFFE5E0EE)
-                            : const Color(0xFF1A1A2E))),
+                Text(
+                  'Two-Factor Auth (2FA)',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    color: isDark
+                        ? const Color(0xFFE5E0EE)
+                        : const Color(0xFF1A1A2E),
+                  ),
+                ),
                 const SizedBox(height: 4),
-                Text('Scan QR or enter secret key',
-                    style: TextStyle(
-                        fontSize: 13,
-                        color: isDark
-                            ? teal.withValues(alpha: 0.7)
-                            : const Color(0xFF006B55))),
+                Text(
+                  'Scan QR or enter secret key',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark
+                        ? teal.withValues(alpha: 0.7)
+                        : const Color(0xFF006B55),
+                  ),
+                ),
               ],
             ),
           ),
           Container(
-            width: 36, height: 36,
+            width: 36,
+            height: 36,
             decoration: BoxDecoration(
               color: teal.withValues(alpha: isDark ? 0.2 : 0.15),
               shape: BoxShape.circle,
@@ -1069,18 +1157,23 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                       ),
                       border: InputBorder.none,
                       contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 13),
+                        horizontal: 14,
+                        vertical: 13,
+                      ),
                     ),
                   ),
                 ),
               ),
               if (isAutoFilled) ...[
                 const SizedBox(width: 10),
-                const Text('auto-filled',
-                    style: TextStyle(
-                        color: _kViolet,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600)),
+                const Text(
+                  'auto-filled',
+                  style: TextStyle(
+                    color: _kViolet,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
               ],
             ],
           ),
@@ -1090,10 +1183,11 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             Text(
               'Add URL so VaultKey can autofill on this site',
               style: TextStyle(
-                  fontSize: 12,
-                  color: isDark
-                      ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                      : const Color(0xFF464555).withValues(alpha: 0.55)),
+                fontSize: 12,
+                color: isDark
+                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                    : const Color(0xFF464555).withValues(alpha: 0.55),
+              ),
             ),
           ],
           Padding(
@@ -1106,12 +1200,19 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           ),
           TextButton.icon(
             onPressed: () {},
-            icon: Icon(Icons.add, size: 16, color: _kViolet.withValues(alpha: 0.8)),
-            label: Text('Add another URL',
-                style: TextStyle(
-                    color: _kViolet.withValues(alpha: 0.85),
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600)),
+            icon: Icon(
+              Icons.add,
+              size: 16,
+              color: _kViolet.withValues(alpha: 0.8),
+            ),
+            label: Text(
+              'Add another URL',
+              style: TextStyle(
+                color: _kViolet.withValues(alpha: 0.85),
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             style: TextButton.styleFrom(padding: EdgeInsets.zero),
           ),
         ],
@@ -1131,19 +1232,24 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               children: [
                 _SectionLabel('MORE OPTIONS', isDark),
                 const SizedBox(height: 6),
-                Text('Notes · Folder · Tags · Custom fields',
-                    style: TextStyle(
-                        fontSize: 13,
-                        color: isDark
-                            ? const Color(0xFFC7C4D8).withValues(alpha: 0.6)
-                            : const Color(0xFF464555).withValues(alpha: 0.65))),
+                Text(
+                  'Notes · Folder · Tags · Custom fields',
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark
+                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.6)
+                        : const Color(0xFF464555).withValues(alpha: 0.65),
+                  ),
+                ),
               ],
             ),
           ),
-          Icon(Icons.keyboard_arrow_down,
-              color: isDark
-                  ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                  : const Color(0xFF464555).withValues(alpha: 0.5)),
+          Icon(
+            Icons.keyboard_arrow_down,
+            color: isDark
+                ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                : const Color(0xFF464555).withValues(alpha: 0.5),
+          ),
         ],
       ),
     );
@@ -1173,9 +1279,10 @@ class _FormCard extends StatelessWidget {
         boxShadow: [
           if (!isDark)
             BoxShadow(
-                color: Colors.black.withValues(alpha: 0.04),
-                blurRadius: 10,
-                offset: const Offset(0, 2)),
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
+            ),
         ],
       ),
       child: child,
@@ -1187,8 +1294,11 @@ class _StyledField extends StatelessWidget {
   final TextEditingController controller;
   final String hint;
   final bool isDark;
-  const _StyledField(
-      {required this.controller, required this.hint, required this.isDark});
+  const _StyledField({
+    required this.controller,
+    required this.hint,
+    required this.isDark,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -1206,9 +1316,7 @@ class _StyledField extends StatelessWidget {
         controller: controller,
         style: TextStyle(
           fontSize: 14,
-          color: isDark
-              ? const Color(0xFFE5E0EE)
-              : const Color(0xFF1A1A2E),
+          color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
         ),
         decoration: InputDecoration(
           hintText: hint,
@@ -1219,8 +1327,10 @@ class _StyledField extends StatelessWidget {
                 : const Color(0xFF464555).withValues(alpha: 0.4),
           ),
           border: InputBorder.none,
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 14, vertical: 13),
+          contentPadding: const EdgeInsets.symmetric(
+            horizontal: 14,
+            vertical: 13,
+          ),
         ),
       ),
     );
@@ -1234,14 +1344,17 @@ class _SectionLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text,
-        style: TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.w700,
-            letterSpacing: 1.5,
-            color: isDark
-                ? const Color(0xFFC7C4D8).withValues(alpha: 0.55)
-                : const Color(0xFF464555).withValues(alpha: 0.6)));
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 11,
+        fontWeight: FontWeight.w700,
+        letterSpacing: 1.5,
+        color: isDark
+            ? const Color(0xFFC7C4D8).withValues(alpha: 0.55)
+            : const Color(0xFF464555).withValues(alpha: 0.6),
+      ),
+    );
   }
 }
 
@@ -1252,13 +1365,16 @@ class _FieldLabel extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Text(text,
-        style: TextStyle(
-            fontSize: 13,
-            fontWeight: FontWeight.w600,
-            color: isDark
-                ? const Color(0xFFE5E0EE).withValues(alpha: 0.85)
-                : const Color(0xFF1A1A2E).withValues(alpha: 0.8)));
+    return Text(
+      text,
+      style: TextStyle(
+        fontSize: 13,
+        fontWeight: FontWeight.w600,
+        color: isDark
+            ? const Color(0xFFE5E0EE).withValues(alpha: 0.85)
+            : const Color(0xFF1A1A2E).withValues(alpha: 0.8),
+      ),
+    );
   }
 }
 
@@ -1295,17 +1411,17 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
     final initials = rawName.isEmpty
         ? '?'
         : (rawName.length >= 2
-            ? rawName.substring(0, 2).toUpperCase()
-            : rawName.toUpperCase());
+              ? rawName.substring(0, 2).toUpperCase()
+              : rawName.toUpperCase());
 
     return Padding(
       padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom),
+        bottom: MediaQuery.of(context).viewInsets.bottom,
+      ),
       child: Container(
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1C1A24) : Colors.white,
-          borderRadius:
-              const BorderRadius.vertical(top: Radius.circular(24)),
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(24)),
         ),
         padding: const EdgeInsets.fromLTRB(24, 12, 24, 36),
         child: Column(
@@ -1315,7 +1431,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
             // Drag handle
             Center(
               child: Container(
-                width: 40, height: 4,
+                width: 40,
+                height: 4,
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
                   color: isDark
@@ -1325,21 +1442,26 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                 ),
               ),
             ),
-            Text('Name your service',
-                style: TextStyle(
-                    fontWeight: FontWeight.w800,
-                    fontSize: 20,
-                    color: isDark
-                        ? const Color(0xFFE5E0EE)
-                        : const Color(0xFF1A1A2E))),
+            Text(
+              'Name your service',
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 20,
+                color: isDark
+                    ? const Color(0xFFE5E0EE)
+                    : const Color(0xFF1A1A2E),
+              ),
+            ),
             const SizedBox(height: 8),
             Text(
-                'Enter the app or website you\'re saving credentials for',
-                style: TextStyle(
-                    fontSize: 13,
-                    color: isDark
-                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.6)
-                        : const Color(0xFF464555).withValues(alpha: 0.65))),
+              'Enter the app or website you\'re saving credentials for',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.6)
+                    : const Color(0xFF464555).withValues(alpha: 0.65),
+              ),
+            ),
             const SizedBox(height: 24),
 
             // Name field
@@ -1353,8 +1475,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                   color: hasName
                       ? _kViolet
                       : (isDark
-                          ? Colors.white.withValues(alpha: 0.08)
-                          : const Color(0xFFC7C4D8).withValues(alpha: 0.5)),
+                            ? Colors.white.withValues(alpha: 0.08)
+                            : const Color(0xFFC7C4D8).withValues(alpha: 0.5)),
                   width: hasName ? 1.5 : 1.0,
                 ),
               ),
@@ -1362,22 +1484,26 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                 controller: widget.nameCtrl,
                 autofocus: !hasName,
                 style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w600,
-                    color: isDark
-                        ? const Color(0xFFE5E0EE)
-                        : const Color(0xFF1A1A2E)),
+                  fontSize: 15,
+                  fontWeight: FontWeight.w600,
+                  color: isDark
+                      ? const Color(0xFFE5E0EE)
+                      : const Color(0xFF1A1A2E),
+                ),
                 decoration: InputDecoration(
                   hintText: 'e.g. My Company Portal',
                   hintStyle: TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.normal,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.3)
-                          : const Color(0xFF464555).withValues(alpha: 0.4)),
+                    fontSize: 15,
+                    fontWeight: FontWeight.normal,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : const Color(0xFF464555).withValues(alpha: 0.4),
+                  ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                 ),
               ),
             ),
@@ -1387,7 +1513,9 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
               const SizedBox(height: 12),
               Container(
                 padding: const EdgeInsets.symmetric(
-                    horizontal: 14, vertical: 10),
+                  horizontal: 14,
+                  vertical: 10,
+                ),
                 decoration: BoxDecoration(
                   color: _kViolet.withValues(alpha: isDark ? 0.12 : 0.07),
                   borderRadius: BorderRadius.circular(12),
@@ -1396,19 +1524,25 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                 child: Row(
                   children: [
                     Container(
-                      width: 36, height: 36,
+                      width: 36,
+                      height: 36,
                       decoration: BoxDecoration(
                         color: _kViolet.withValues(alpha: isDark ? 0.2 : 0.12),
                         borderRadius: BorderRadius.circular(10),
                         border: Border.all(
-                            color: _kViolet.withValues(alpha: 0.4), width: 1.5),
+                          color: _kViolet.withValues(alpha: 0.4),
+                          width: 1.5,
+                        ),
                       ),
                       child: Center(
-                        child: Text(initials,
-                            style: const TextStyle(
-                                color: _kViolet,
-                                fontWeight: FontWeight.w800,
-                                fontSize: 13)),
+                        child: Text(
+                          initials,
+                          style: const TextStyle(
+                            color: _kViolet,
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                          ),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 12),
@@ -1416,9 +1550,10 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                       child: RichText(
                         text: TextSpan(
                           style: const TextStyle(
-                              color: _kViolet,
-                              fontSize: 13,
-                              fontWeight: FontWeight.w600),
+                            color: _kViolet,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w600,
+                          ),
                           children: [
                             const TextSpan(text: 'Will appear as "'),
                             TextSpan(text: rawName),
@@ -1434,21 +1569,27 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
 
             const SizedBox(height: 20),
 
-            Text('WEBSITE URL',
-                style: TextStyle(
-                    fontSize: 11,
-                    fontWeight: FontWeight.w700,
-                    letterSpacing: 1.5,
-                    color: isDark
-                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                        : const Color(0xFF464555).withValues(alpha: 0.55))),
+            Text(
+              'WEBSITE URL',
+              style: TextStyle(
+                fontSize: 11,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.5,
+                color: isDark
+                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                    : const Color(0xFF464555).withValues(alpha: 0.55),
+              ),
+            ),
             const SizedBox(height: 4),
-            Text('optional — needed for autofill',
-                style: TextStyle(
-                    fontSize: 12,
-                    color: isDark
-                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.4)
-                        : const Color(0xFF464555).withValues(alpha: 0.45))),
+            Text(
+              'optional — needed for autofill',
+              style: TextStyle(
+                fontSize: 12,
+                color: isDark
+                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.4)
+                    : const Color(0xFF464555).withValues(alpha: 0.45),
+              ),
+            ),
             const SizedBox(height: 8),
 
             Container(
@@ -1467,22 +1608,26 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                 controller: widget.urlCtrl,
                 keyboardType: TextInputType.url,
                 style: TextStyle(
-                    fontSize: 14,
-                    color: isDark
-                        ? const Color(0xFFE5E0EE)
-                        : const Color(0xFF1A1A2E)),
+                  fontSize: 14,
+                  color: isDark
+                      ? const Color(0xFFE5E0EE)
+                      : const Color(0xFF1A1A2E),
+                ),
                 decoration: InputDecoration(
                   hintText: hasName
                       ? 'https://${rawName.toLowerCase()}.com'
                       : 'https://',
                   hintStyle: TextStyle(
-                      fontSize: 14,
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.3)
-                          : const Color(0xFF464555).withValues(alpha: 0.4)),
+                    fontSize: 14,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : const Color(0xFF464555).withValues(alpha: 0.4),
+                  ),
                   border: InputBorder.none,
                   contentPadding: const EdgeInsets.symmetric(
-                      horizontal: 16, vertical: 14),
+                    horizontal: 16,
+                    vertical: 14,
+                  ),
                 ),
               ),
             ),
@@ -1494,8 +1639,10 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
               child: ElevatedButton(
                 onPressed: hasName
                     ? () {
-                        widget.onConfirm(widget.nameCtrl.text.trim(),
-                            widget.urlCtrl.text.trim());
+                        widget.onConfirm(
+                          widget.nameCtrl.text.trim(),
+                          widget.urlCtrl.text.trim(),
+                        );
                         Navigator.of(context).pop();
                       }
                     : null,
@@ -1503,11 +1650,12 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                   backgroundColor: hasName
                       ? _kViolet
                       : (isDark
-                          ? const Color(0xFF2A2933)
-                          : const Color(0xFFE7E8EE)),
+                            ? const Color(0xFF2A2933)
+                            : const Color(0xFFE7E8EE)),
                   padding: const EdgeInsets.symmetric(vertical: 18),
                   shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 0,
                 ),
                 child: Text(
@@ -1518,8 +1666,8 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                     color: hasName
                         ? Colors.white
                         : (isDark
-                            ? const Color(0xFFC7C4D8).withValues(alpha: 0.35)
-                            : const Color(0xFF464555).withValues(alpha: 0.4)),
+                              ? const Color(0xFFC7C4D8).withValues(alpha: 0.35)
+                              : const Color(0xFF464555).withValues(alpha: 0.4)),
                   ),
                 ),
               ),
