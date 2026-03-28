@@ -1,4 +1,7 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../backend/vault_item.dart';
@@ -77,7 +80,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
 
   // custom service data
   String _customName = '';
-  String _customUrl = '';
+
+  // website or app toggle: true = Website, false = App, null = not chosen
+  bool? _isWebsite;
 
   // search
   final _searchCtrl = TextEditingController();
@@ -88,8 +93,12 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   // credentials form
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
-  final _urlCtrl = TextEditingController();
   bool _passVisible = false;
+
+  // more options form
+  bool _moreOptionsExpanded = false;
+  final _notesCtrl = TextEditingController();
+  final _folderCtrl = TextEditingController();
 
   @override
   void initState() {
@@ -113,18 +122,68 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     _searchFocus.dispose();
     _emailCtrl.dispose();
     _passCtrl.dispose();
-    _urlCtrl.dispose();
+    _notesCtrl.dispose();
+    _folderCtrl.dispose();
     super.dispose();
   }
 
   // ── Password strength ──────────────────────────────────────────
   int get _strength {
-    final len = _passCtrl.text.length;
-    if (len == 0) return 0;
-    if (len < 6) return 1;
-    if (len < 10) return 2;
-    if (len < 14) return 3;
-    return 4;
+    final pass = _passCtrl.text;
+    if (pass.isEmpty) return 0;
+    
+    int score = 0;
+    if (pass.length >= 8) score += 1;
+    if (pass.length >= 12) score += 1;
+    
+    final hasLower = RegExp(r'[a-z]').hasMatch(pass);
+    final hasUpper = RegExp(r'[A-Z]').hasMatch(pass);
+    final hasDigit = RegExp(r'\d').hasMatch(pass);
+    final hasSpecial = RegExp(r'[^a-zA-Z0-9]').hasMatch(pass);
+    
+    final typeCount = (hasLower ? 1 : 0) + (hasUpper ? 1 : 0) + 
+                      (hasDigit ? 1 : 0) + (hasSpecial ? 1 : 0);
+    
+    if (typeCount == 4) {
+      score += 2;
+    } else if (typeCount == 3) {
+      score += 1;
+    }
+    
+    if (score == 0 && pass.isNotEmpty) {
+      score = 1;
+    }
+    return score.clamp(1, 4);
+  }
+
+  void _generatePassword() {
+    const lower = 'abcdefghijklmnopqrstuvwxyz';
+    const upper = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    const digits = '0123456789';
+    const specials = '!@#\$%^&*()-_=+[]{}|;:,.<>?';
+    const allChars = lower + upper + digits + specials;
+    
+    String pass = '';
+    final random = math.Random.secure();
+    
+    // Ensure at least one of each type
+    pass += lower[random.nextInt(lower.length)];
+    pass += upper[random.nextInt(upper.length)];
+    pass += digits[random.nextInt(digits.length)];
+    pass += specials[random.nextInt(specials.length)];
+    
+    // Fill the rest (total 16 chars)
+    for (int i = 0; i < 12; i++) {
+      pass += allChars[random.nextInt(allChars.length)];
+    }
+    
+    // Shuffle the characters
+    final List<String> chars = pass.split('');
+    chars.shuffle(random);
+    
+    setState(() {
+      _passCtrl.text = chars.join('');
+    });
   }
 
   String get _strengthLabel =>
@@ -144,7 +203,6 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     setState(() {
       _selected = s;
       _state = _ServiceState.known;
-      _urlCtrl.text = s.domain.split(' ').first;
       _searchActive = false;
       _searchResults = [];
     });
@@ -153,14 +211,10 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   /// Carry typed text as custom name (Scenario C)
   void _useAsCustom(String typedName) {
     final name = typedName.trim();
-    final inferredUrl = name.isEmpty ? '' : 'https://${name.toLowerCase()}.com';
     _searchCtrl.clear();
-    //_searchFocus.unfocus();
     setState(() {
       _customName = name;
-      _customUrl = ''; // user hasn't confirmed URL yet
       _state = _ServiceState.custom;
-      _urlCtrl.text = inferredUrl; // pre-hinted
       _searchActive = false;
       _searchResults = [];
     });
@@ -170,8 +224,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     _state = _ServiceState.none;
     _selected = null;
     _customName = '';
-    _customUrl = '';
-    _urlCtrl.clear();
+    _isWebsite = null;
     _emailCtrl.clear();
     _passCtrl.clear();
     _searchCtrl.clear();
@@ -181,7 +234,6 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
 
   void _openCustomSheet({bool prefill = false}) {
     final nameCtrl = TextEditingController(text: prefill ? _customName : '');
-    final urlCtrl2 = TextEditingController(text: prefill ? _customUrl : '');
 
     showModalBottomSheet(
       context: context,
@@ -189,14 +241,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
       backgroundColor: Colors.transparent,
       builder: (_) => _CustomServiceSheet(
         nameCtrl: nameCtrl,
-        urlCtrl: urlCtrl2,
-        onConfirm: (name, url) {
+        onConfirm: (name) {
           setState(() {
             _customName = name;
-            _customUrl = url;
-            _urlCtrl.text = url.isNotEmpty
-                ? url
-                : 'https://${name.toLowerCase()}.com';
           });
         },
       ),
@@ -246,9 +293,6 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                           final name = _state == _ServiceState.known
                               ? _selected!.name
                               : _customName;
-                          final domain = _state == _ServiceState.known
-                              ? _selected!.domain
-                              : _customUrl;
                           final color = _state == _ServiceState.known
                               ? _selected!.color
                               : _kViolet;
@@ -257,12 +301,12 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                             id: '',
                             type: VaultItemType.login,
                             serviceName: name,
-                            domain: domain,
                             serviceColor: color,
                             username: _emailCtrl.text.trim(),
                             password: _passCtrl.text,
                             createdAt: DateTime.now(),
                             updatedAt: DateTime.now(),
+                            isWebsite: _isWebsite,
                           );
 
                           await ref
@@ -735,9 +779,6 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   Widget _buildServiceHeader(BuildContext context, bool isDark) {
     final isCustom = _state == _ServiceState.custom;
     final name = isCustom ? _customName : _selected!.name;
-    final domain = isCustom
-        ? (_customUrl.isEmpty ? 'No URL set — tap Edit to add' : _customUrl)
-        : _selected!.domain;
     final initials = isCustom
         ? (name.length >= 2
               ? name.substring(0, 2).toUpperCase()
@@ -745,7 +786,6 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
         : _selected!.initials;
     final color = isCustom ? _kViolet : _selected!.color;
     final cardBg = isDark ? const Color(0xFF1C1A24) : Colors.white;
-    final isNoUrl = isCustom && _customUrl.isEmpty;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
@@ -796,7 +836,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             ),
           ),
           const SizedBox(width: 14),
-          // Name & domain
+          // Name & type badge
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -811,19 +851,10 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                         : const Color(0xFF1A1A2E),
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  domain,
-                  style: TextStyle(
-                    fontSize: 12,
-                    fontStyle: isNoUrl ? FontStyle.italic : FontStyle.normal,
-                    color: isNoUrl
-                        ? _kViolet.withValues(alpha: 0.6)
-                        : (isDark
-                              ? const Color(0xFFC7C4D8).withValues(alpha: 0.55)
-                              : const Color(0xFF464555).withValues(alpha: 0.6)),
-                  ),
-                ),
+                if (_isWebsite != null) ...[
+                  const SizedBox(height: 4),
+                  _TypeBadge(isWebsite: _isWebsite!, isDark: isDark),
+                ],
               ],
             ),
           ),
@@ -881,15 +912,60 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                   ),
                 ),
               ),
+            _buildTypeToggleCard(context, isDark),
+            const SizedBox(height: 14),
             _buildCredentialsCard(context, isDark),
-            const SizedBox(height: 14),
-            _build2FACard(context, isDark),
-            const SizedBox(height: 14),
-            _buildWebsiteCard(context, isDark),
             const SizedBox(height: 14),
             _buildMoreCard(context, isDark),
           ],
         ),
+      ),
+    );
+  }
+
+  // ── Website or App toggle card ────────────────────────────────
+  Widget _buildTypeToggleCard(BuildContext context, bool isDark) {
+    return _FormCard(
+      isDark: isDark,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          _SectionLabel('IS THIS A WEBSITE OR AN APP?', isDark),
+          const SizedBox(height: 6),
+          Text(
+            'This helps VaultKey organise and recognise your passwords',
+            style: TextStyle(
+              fontSize: 12,
+              color: isDark
+                  ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                  : const Color(0xFF464555).withValues(alpha: 0.55),
+            ),
+          ),
+          const SizedBox(height: 14),
+          Row(
+            children: [
+              Expanded(
+                child: _TypeToggleButton(
+                  label: 'Website',
+                  icon: Icons.language_rounded,
+                  selected: _isWebsite == true,
+                  isDark: isDark,
+                  onTap: () => setState(() => _isWebsite = true),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: _TypeToggleButton(
+                  label: 'App',
+                  icon: Icons.smartphone_rounded,
+                  selected: _isWebsite == false,
+                  isDark: isDark,
+                  onTap: () => setState(() => _isWebsite = false),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -966,25 +1042,28 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                   ),
                   onPressed: () => setState(() => _passVisible = !_passVisible),
                 ),
-                IconButton(
-                  icon: Icon(
-                    Icons.refresh,
-                    size: 20,
-                    color: _kViolet.withValues(alpha: 0.7),
+
+                if (_passCtrl.text.isNotEmpty)
+                  IconButton(
+                    icon: Icon(
+                      Icons.copy,
+                      size: 20,
+                      color: isDark
+                          ? Colors.white.withValues(alpha: 0.4)
+                          : const Color(0xFF464555).withValues(alpha: 0.5),
+                    ),
+                    onPressed: () {
+                      Clipboard.setData(ClipboardData(text: _passCtrl.text));
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Password copied to clipboard'),
+                          backgroundColor: _kViolet,
+                          behavior: SnackBarBehavior.floating,
+                          duration: const Duration(seconds: 2),
+                        ),
+                      );
+                    },
                   ),
-                  onPressed: () {
-                    const chars =
-                        'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#\$%^&*';
-                    final pass = List.generate(
-                      16,
-                      (i) =>
-                          chars[DateTime.now().microsecondsSinceEpoch *
-                              (i + 1) %
-                              chars.length],
-                    ).join();
-                    setState(() => _passCtrl.text = pass);
-                  },
-                ),
                 const SizedBox(width: 4),
               ],
             ),
@@ -1029,7 +1108,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           Align(
             alignment: Alignment.centerRight,
             child: GestureDetector(
-              onTap: () {},
+              onTap: _generatePassword,
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
@@ -1056,201 +1135,107 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     );
   }
 
-  // ── 2FA card ───────────────────────────────────────────────────
-  Widget _build2FACard(BuildContext context, bool isDark) {
-    const teal = Color(0xFF41EEC2);
-    return Container(
-      padding: const EdgeInsets.all(18),
-      decoration: BoxDecoration(
-        color: isDark ? const Color(0xFF0F2922) : const Color(0xFFE8FBF5),
-        borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: teal.withValues(alpha: isDark ? 0.25 : 0.35)),
-      ),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Two-Factor Auth (2FA)',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                    color: isDark
-                        ? const Color(0xFFE5E0EE)
-                        : const Color(0xFF1A1A2E),
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  'Scan QR or enter secret key',
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: isDark
-                        ? teal.withValues(alpha: 0.7)
-                        : const Color(0xFF006B55),
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Container(
-            width: 36,
-            height: 36,
-            decoration: BoxDecoration(
-              color: teal.withValues(alpha: isDark ? 0.2 : 0.15),
-              shape: BoxShape.circle,
-            ),
-            child: const Icon(Icons.add, color: teal, size: 20),
-          ),
-        ],
-      ),
-    );
-  }
-
-  // ── Website & App card ─────────────────────────────────────────
-  Widget _buildWebsiteCard(BuildContext context, bool isDark) {
-    final isCustom = _state == _ServiceState.custom;
-    final isAutoFilled = _state == _ServiceState.known;
-
-    return _FormCard(
-      isDark: isDark,
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _SectionLabel('WEBSITE & APP', isDark),
-          const SizedBox(height: 14),
-          Row(
-            children: [
-              Expanded(
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: isDark
-                        ? const Color(0xFF13121B)
-                        : const Color(0xFFF3F3FA),
-                    borderRadius: BorderRadius.circular(12),
-                    border: Border.all(
-                      color: isDark
-                          ? Colors.white.withValues(alpha: 0.07)
-                          : const Color(0xFFC7C4D8).withValues(alpha: 0.5),
-                    ),
-                  ),
-                  child: TextField(
-                    controller: _urlCtrl,
-                    readOnly: isAutoFilled,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: isDark
-                          ? const Color(0xFFE5E0EE)
-                          : const Color(0xFF1A1A2E),
-                    ),
-                    decoration: InputDecoration(
-                      hintText: isCustom
-                          ? 'https://${_customName.toLowerCase()}.com'
-                          : 'https://',
-                      hintStyle: TextStyle(
-                        color: isDark
-                            ? Colors.white.withValues(alpha: 0.3)
-                            : const Color(0xFF464555).withValues(alpha: 0.4),
-                        fontSize: 14,
-                      ),
-                      border: InputBorder.none,
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 13,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              if (isAutoFilled) ...[
-                const SizedBox(width: 10),
-                const Text(
-                  'auto-filled',
-                  style: TextStyle(
-                    color: _kViolet,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ],
-            ],
-          ),
-          // Scenario C helper text
-          if (isCustom) ...[
-            const SizedBox(height: 8),
-            Text(
-              'Add URL so VaultKey can autofill on this site',
-              style: TextStyle(
-                fontSize: 12,
-                color: isDark
-                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                    : const Color(0xFF464555).withValues(alpha: 0.55),
-              ),
-            ),
-          ],
-          Padding(
-            padding: const EdgeInsets.only(top: 14),
-            child: Divider(
-              color: isDark
-                  ? Colors.white.withValues(alpha: 0.07)
-                  : const Color(0xFFC7C4D8).withValues(alpha: 0.4),
-            ),
-          ),
-          TextButton.icon(
-            onPressed: () {},
-            icon: Icon(
-              Icons.add,
-              size: 16,
-              color: _kViolet.withValues(alpha: 0.8),
-            ),
-            label: Text(
-              'Add another URL',
-              style: TextStyle(
-                color: _kViolet.withValues(alpha: 0.85),
-                fontSize: 13,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            style: TextButton.styleFrom(padding: EdgeInsets.zero),
-          ),
-        ],
-      ),
-    );
-  }
 
   // ── More options ────────────────────────────────────────────────
   Widget _buildMoreCard(BuildContext context, bool isDark) {
-    return _FormCard(
-      isDark: isDark,
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+    if (_moreOptionsExpanded) {
+      return _FormCard(
+        isDark: isDark,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
               children: [
-                _SectionLabel('MORE OPTIONS', isDark),
-                const SizedBox(height: 6),
-                Text(
-                  'Notes · Folder · Tags · Custom fields',
-                  style: TextStyle(
-                    fontSize: 13,
+                Expanded(child: _SectionLabel('MORE OPTIONS', isDark)),
+                GestureDetector(
+                  onTap: () => setState(() => _moreOptionsExpanded = false),
+                  child: Icon(
+                    Icons.keyboard_arrow_up,
                     color: isDark
-                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.6)
-                        : const Color(0xFF464555).withValues(alpha: 0.65),
+                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                        : const Color(0xFF464555).withValues(alpha: 0.5),
                   ),
                 ),
               ],
             ),
-          ),
-          Icon(
-            Icons.keyboard_arrow_down,
-            color: isDark
-                ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                : const Color(0xFF464555).withValues(alpha: 0.5),
-          ),
-        ],
+            const SizedBox(height: 14),
+            _FieldLabel('Notes', isDark),
+            const SizedBox(height: 6),
+            Container(
+              decoration: BoxDecoration(
+                color: isDark ? const Color(0xFF13121B) : const Color(0xFFF3F3FA),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isDark
+                      ? Colors.white.withValues(alpha: 0.07)
+                      : const Color(0xFFC7C4D8).withValues(alpha: 0.5),
+                ),
+              ),
+              child: TextField(
+                controller: _notesCtrl,
+                maxLines: 3,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
+                ),
+                decoration: InputDecoration(
+                  hintText: 'Add securely encrypted notes...',
+                  hintStyle: TextStyle(
+                    fontSize: 14,
+                    color: isDark
+                        ? Colors.white.withValues(alpha: 0.3)
+                        : const Color(0xFF464555).withValues(alpha: 0.4),
+                  ),
+                  border: InputBorder.none,
+                  contentPadding: const EdgeInsets.all(14),
+                ),
+              ),
+            ),
+            const SizedBox(height: 16),
+            _FieldLabel('Folder', isDark),
+            const SizedBox(height: 6),
+            _StyledField(
+              controller: _folderCtrl,
+              hint: 'e.g. Personal, Work, Finance',
+              isDark: isDark,
+            ),
+          ],
+        ),
+      );
+    }
+
+    return GestureDetector(
+      onTap: () => setState(() => _moreOptionsExpanded = true),
+      child: _FormCard(
+        isDark: isDark,
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  _SectionLabel('MORE OPTIONS', isDark),
+                  const SizedBox(height: 6),
+                  Text(
+                    'Notes · Folder',
+                    style: TextStyle(
+                      fontSize: 13,
+                      color: isDark
+                          ? const Color(0xFFC7C4D8).withValues(alpha: 0.6)
+                          : const Color(0xFF464555).withValues(alpha: 0.65),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Icon(
+              Icons.keyboard_arrow_down,
+              color: isDark
+                  ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                  : const Color(0xFF464555).withValues(alpha: 0.5),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -1378,15 +1363,121 @@ class _FieldLabel extends StatelessWidget {
   }
 }
 
+// ─── Website/App Type Toggle Button ─────────────────────────────────
+class _TypeToggleButton extends StatelessWidget {
+  final String label;
+  final IconData icon;
+  final bool selected;
+  final bool isDark;
+  final VoidCallback onTap;
+
+  const _TypeToggleButton({
+    required this.label,
+    required this.icon,
+    required this.selected,
+    required this.isDark,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 200),
+        curve: Curves.easeInOut,
+        padding: const EdgeInsets.symmetric(vertical: 14),
+        decoration: BoxDecoration(
+          color: selected
+              ? _kViolet.withValues(alpha: isDark ? 0.2 : 0.1)
+              : (isDark ? const Color(0xFF13121B) : const Color(0xFFF3F3FA)),
+          borderRadius: BorderRadius.circular(14),
+          border: Border.all(
+            color: selected
+                ? _kViolet.withValues(alpha: 0.8)
+                : (isDark
+                      ? Colors.white.withValues(alpha: 0.07)
+                      : const Color(0xFFC7C4D8).withValues(alpha: 0.5)),
+            width: selected ? 2.0 : 1.0,
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 26,
+              color: selected
+                  ? _kViolet
+                  : (isDark
+                        ? Colors.white.withValues(alpha: 0.35)
+                        : const Color(0xFF464555).withValues(alpha: 0.45)),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              label,
+              style: TextStyle(
+                fontSize: 13,
+                fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
+                color: selected
+                    ? _kViolet
+                    : (isDark
+                          ? Colors.white.withValues(alpha: 0.5)
+                          : const Color(0xFF464555).withValues(alpha: 0.6)),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+// ─── Type Badge (shown in service header after selection) ────────────
+class _TypeBadge extends StatelessWidget {
+  final bool isWebsite;
+  final bool isDark;
+
+  const _TypeBadge({required this.isWebsite, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+      decoration: BoxDecoration(
+        color: _kViolet.withValues(alpha: isDark ? 0.18 : 0.1),
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isWebsite ? Icons.language_rounded : Icons.smartphone_rounded,
+            size: 11,
+            color: _kViolet,
+          ),
+          const SizedBox(width: 4),
+          Text(
+            isWebsite ? 'Website' : 'App',
+            style: const TextStyle(
+              fontSize: 11,
+              fontWeight: FontWeight.w600,
+              color: _kViolet,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 // ─── Custom service bottom sheet ─────────────────────────────────────
 class _CustomServiceSheet extends StatefulWidget {
   final TextEditingController nameCtrl;
-  final TextEditingController urlCtrl;
-  final void Function(String name, String url) onConfirm;
+  final void Function(String name) onConfirm;
 
   const _CustomServiceSheet({
     required this.nameCtrl,
-    required this.urlCtrl,
     required this.onConfirm,
   });
 
@@ -1399,7 +1490,6 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
   void initState() {
     super.initState();
     widget.nameCtrl.addListener(() => setState(() {}));
-    widget.urlCtrl.addListener(() => setState(() {}));
   }
 
   @override
@@ -1567,71 +1657,6 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
               ),
             ],
 
-            const SizedBox(height: 20),
-
-            Text(
-              'WEBSITE URL',
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                letterSpacing: 1.5,
-                color: isDark
-                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                    : const Color(0xFF464555).withValues(alpha: 0.55),
-              ),
-            ),
-            const SizedBox(height: 4),
-            Text(
-              'optional — needed for autofill',
-              style: TextStyle(
-                fontSize: 12,
-                color: isDark
-                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.4)
-                    : const Color(0xFF464555).withValues(alpha: 0.45),
-              ),
-            ),
-            const SizedBox(height: 8),
-
-            Container(
-              decoration: BoxDecoration(
-                color: isDark
-                    ? const Color(0xFF13121B)
-                    : const Color(0xFFF3F3FA),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: isDark
-                      ? Colors.white.withValues(alpha: 0.08)
-                      : const Color(0xFFC7C4D8).withValues(alpha: 0.5),
-                ),
-              ),
-              child: TextField(
-                controller: widget.urlCtrl,
-                keyboardType: TextInputType.url,
-                style: TextStyle(
-                  fontSize: 14,
-                  color: isDark
-                      ? const Color(0xFFE5E0EE)
-                      : const Color(0xFF1A1A2E),
-                ),
-                decoration: InputDecoration(
-                  hintText: hasName
-                      ? 'https://${rawName.toLowerCase()}.com'
-                      : 'https://',
-                  hintStyle: TextStyle(
-                    fontSize: 14,
-                    color: isDark
-                        ? Colors.white.withValues(alpha: 0.3)
-                        : const Color(0xFF464555).withValues(alpha: 0.4),
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                ),
-              ),
-            ),
-
             const SizedBox(height: 28),
 
             SizedBox(
@@ -1641,7 +1666,6 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
                     ? () {
                         widget.onConfirm(
                           widget.nameCtrl.text.trim(),
-                          widget.urlCtrl.text.trim(),
                         );
                         Navigator.of(context).pop();
                       }

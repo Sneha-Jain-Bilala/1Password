@@ -217,23 +217,6 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
           ),
           centerTitle: true,
           actions: [
-            // Scan button
-            IconButton(
-              onPressed: _openScanSheet,
-              tooltip: 'Scan card',
-              icon: Container(
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  color: accentColor.withValues(alpha: isDark ? 0.18 : 0.1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  Icons.document_scanner_outlined,
-                  color: accentColor,
-                  size: 20,
-                ),
-              ),
-            ),
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: ListenableBuilder(
@@ -428,50 +411,6 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
     );
   }
 
-  // ── Network type chips ─────────────────────────────────────────────────────
-  Widget _buildNetworkChips(bool isDark) {
-    return Row(
-      children: _CardType.values.map((type) {
-        final isSelected = _cardType == type;
-        final chipColor = isSelected
-            ? type.gradientColors.last
-            : (isDark
-                  ? Colors.white.withValues(alpha: 0.07)
-                  : Colors.black.withValues(alpha: 0.05));
-        return GestureDetector(
-          onTap: () {
-            setState(() => _cardType = type);
-          },
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 200),
-            margin: const EdgeInsets.only(right: 8),
-            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-            decoration: BoxDecoration(
-              color: chipColor.withValues(alpha: isSelected ? 0.18 : 1),
-              borderRadius: BorderRadius.circular(8),
-              border: Border.all(
-                color: isSelected
-                    ? type.gradientColors.last.withValues(alpha: 0.5)
-                    : Colors.transparent,
-              ),
-            ),
-            child: Text(
-              type.label,
-              style: TextStyle(
-                fontSize: 11,
-                fontWeight: FontWeight.w700,
-                color: isSelected
-                    ? type.gradientColors.last
-                    : (isDark
-                          ? Colors.white.withValues(alpha: 0.4)
-                          : Colors.black.withValues(alpha: 0.4)),
-              ),
-            ),
-          ),
-        );
-      }).toList(),
-    );
-  }
 
   // ── Card preview ───────────────────────────────────────────────────────────
   Widget _buildCardPreview(bool isDark) {

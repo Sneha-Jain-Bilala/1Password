@@ -46,6 +46,10 @@ class VaultItem {
   final DateTime createdAt;
   final DateTime updatedAt;
 
+  // ── service kind (for login type) ─────────────────────────────
+  /// true = Website, false = App, null = unknown
+  final bool? isWebsite;
+
   const VaultItem({
     required this.id,
     required this.type,
@@ -60,6 +64,7 @@ class VaultItem {
     this.customFields = const {},
     required this.createdAt,
     required this.updatedAt,
+    this.isWebsite,
   });
 
   VaultItem copyWith({
@@ -72,6 +77,7 @@ class VaultItem {
     String? notes,
     String? folderName,
     Map<String, String>? customFields,
+    bool? isWebsite,
   }) {
     return VaultItem(
       id: id,
@@ -87,6 +93,7 @@ class VaultItem {
       customFields: customFields ?? this.customFields,
       createdAt: createdAt,
       updatedAt: DateTime.now(),
+      isWebsite: isWebsite ?? this.isWebsite,
     );
   }
 

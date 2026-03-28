@@ -110,6 +110,8 @@ class BrowseScreen extends ConsumerStatefulWidget {
 
 class _BrowseScreenState extends ConsumerState<BrowseScreen> {
   final _searchController = TextEditingController();
+  // null = grid view, non-null = showing list for that category
+  VaultItemType? _expandedCategory;
 
   @override
   void dispose() {
@@ -129,170 +131,387 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
         elevation: 0,
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
-        title: Row(
-          children: [
+        leading: _expandedCategory != null
+            ? IconButton(
+                icon: Icon(
+                  Icons.arrow_back,
+                  color: isDark
+                      ? const Color(0xFFC4C0FF)
+                      : const Color(0xFF4D41DF),
+                ),
+                onPressed: () => setState(() => _expandedCategory = null),
+              )
+            : null,
+        title: _expandedCategory != null
+            ? Text(
+                _categories
+                        .firstWhere((c) => c.itemType == _expandedCategory)
+                        .title,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: isDark
+                      ? const Color(0xFFC4C0FF)
+                      : const Color(0xFF1A1A2E),
+                ),
+              )
+            : Row(
+                children: [
+                  Container(
+                    width: 30,
+                    height: 30,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      gradient: LinearGradient(
+                        colors: isDark
+                            ? [
+                                const Color(0xFFC4C0FF),
+                                const Color(0xFF8781FF),
+                              ]
+                            : [
+                                const Color(0xFF675DF9),
+                                const Color(0xFF4D41DF),
+                              ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.security,
+                      size: 16,
+                      color: Colors.white,
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    'VaultKey',
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w800,
+                      color: isDark
+                          ? const Color(0xFFC4C0FF)
+                          : const Color(0xFF1A1A2E),
+                      letterSpacing: -0.8,
+                    ),
+                  ),
+                ],
+              ),
+        actions: [
+          if (_expandedCategory == null) ...[
+            IconButton(
+              icon: Icon(
+                Icons.notifications_outlined,
+                color: isDark
+                    ? const Color(0xFFC4C0FF)
+                    : const Color(0xFF4D41DF),
+              ),
+              onPressed: () {},
+            ),
             Container(
-              width: 30,
-              height: 30,
+              width: 34,
+              height: 34,
+              margin: const EdgeInsets.only(right: 12),
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
                 gradient: LinearGradient(
                   colors: isDark
-                      ? [const Color(0xFFC4C0FF), const Color(0xFF8781FF)]
+                      ? [const Color(0xFF8781FF), const Color(0xFF4D41DF)]
                       : [const Color(0xFF675DF9), const Color(0xFF4D41DF)],
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
                 ),
               ),
-              child: const Icon(Icons.security, size: 16, color: Colors.white),
+              child: const Center(
+                child: Text(
+                  'JD',
+                  style: TextStyle(
+                    color: Colors.white,
+                    fontSize: 11,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
             ),
-            const SizedBox(width: 10),
-            Text(
-              'VaultKey',
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w800,
+          ],
+        ],
+      ),
+      body: _expandedCategory != null
+          ? _buildPasswordList(context, isDark, _expandedCategory!)
+          : _buildGridView(context, isDark),
+    );
+  }
+
+  // ── Grid view (default browse) ─────────────────────────────────
+  Widget _buildGridView(BuildContext context, bool isDark) {
+    return ListView(
+      padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
+      children: [
+        Text(
+          'Browse Vault',
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+            fontWeight: FontWeight.w800,
+            color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
+            letterSpacing: -0.5,
+          ),
+        ),
+        const SizedBox(height: 20),
+
+        // Search Bar
+        Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1C1A24) : Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: isDark
+                  ? Colors.white.withValues(alpha: 0.07)
+                  : const Color(0xFFC7C4D8).withValues(alpha: 0.4),
+            ),
+            boxShadow: [
+              BoxShadow(
                 color: isDark
-                    ? const Color(0xFFC4C0FF)
-                    : const Color(0xFF1A1A2E),
-                letterSpacing: -0.8,
+                    ? const Color(0xFFC4C0FF).withValues(alpha: 0.05)
+                    : Colors.black.withValues(alpha: 0.04),
+                blurRadius: 12,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: TextField(
+            controller: _searchController,
+            style: TextStyle(
+              color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
+            ),
+            decoration: InputDecoration(
+              hintText: 'Search your vault...',
+              hintStyle: TextStyle(
+                color: isDark
+                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.4)
+                    : const Color(0xFF464555).withValues(alpha: 0.45),
+                fontSize: 15,
+              ),
+              prefixIcon: Icon(
+                Icons.search,
+                color: isDark
+                    ? const Color(0xFFC4C0FF).withValues(alpha: 0.5)
+                    : const Color(0xFF4D41DF).withValues(alpha: 0.5),
+              ),
+              border: InputBorder.none,
+              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+            ),
+          ),
+        ),
+        const SizedBox(height: 28),
+
+        // Grid
+        GridView.builder(
+          itemCount: _categories.length,
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            crossAxisCount: 2,
+            mainAxisSpacing: 14,
+            crossAxisSpacing: 14,
+            childAspectRatio: 1.05,
+          ),
+          itemBuilder: (context, i) {
+            final cat = _categories[i];
+            final count = cat.itemType != null
+                ? ref
+                      .watch(vaultNotifierProvider.notifier)
+                      .countByType(cat.itemType!)
+                : 0;
+            return _buildCategoryCard(context, cat, isDark, count);
+          },
+        ),
+        const SizedBox(height: 32),
+
+        // Recent Collections header
+        Text(
+          'RECENT COLLECTIONS',
+          style: Theme.of(context).textTheme.labelSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+            letterSpacing: 2,
+            color: isDark
+                ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                : const Color(0xFF464555).withValues(alpha: 0.55),
+          ),
+        ),
+        const SizedBox(height: 12),
+
+        ..._recent.map((r) => _buildRecentItem(context, r, isDark)),
+      ],
+    );
+  }
+
+  // ── Password list (expanded category view) ─────────────────────
+  Widget _buildPasswordList(
+    BuildContext context,
+    bool isDark,
+    VaultItemType type,
+  ) {
+    final items = ref
+        .watch(vaultNotifierProvider)
+        .where((item) => item.type == type)
+        .toList();
+
+    if (items.isEmpty) {
+      return Center(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              Icons.lock_outline,
+              size: 56,
+              color: isDark
+                  ? const Color(0xFFC4C0FF).withValues(alpha: 0.3)
+                  : const Color(0xFF4D41DF).withValues(alpha: 0.25),
+            ),
+            const SizedBox(height: 16),
+            Text(
+              'No passwords saved yet',
+              style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                color: isDark
+                    ? const Color(0xFFE5E0EE).withValues(alpha: 0.6)
+                    : const Color(0xFF1A1A2E).withValues(alpha: 0.5),
+              ),
+            ),
+            const SizedBox(height: 6),
+            Text(
+              'Tap + to add your first password',
+              style: TextStyle(
+                fontSize: 13,
+                color: isDark
+                    ? const Color(0xFFC7C4D8).withValues(alpha: 0.4)
+                    : const Color(0xFF464555).withValues(alpha: 0.45),
               ),
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: Icon(
-              Icons.notifications_outlined,
-              color: isDark ? const Color(0xFFC4C0FF) : const Color(0xFF4D41DF),
+      );
+    }
+
+    return ListView.separated(
+      padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
+      itemCount: items.length,
+      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      itemBuilder: (context, index) {
+        final item = items[index];
+        return _buildPasswordItem(context, item, isDark);
+      },
+    );
+  }
+
+  Widget _buildPasswordItem(
+    BuildContext context,
+    VaultItem item,
+    bool isDark,
+  ) {
+    final color = item.serviceColor ?? const Color(0xFF6C63FF);
+    final initials = item.initials;
+    final cardBg = isDark ? const Color(0xFF1C1A24) : Colors.white;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: cardBg,
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: isDark
+              ? Colors.white.withValues(alpha: 0.06)
+              : const Color(0xFFC7C4D8).withValues(alpha: 0.3),
+        ),
+        boxShadow: [
+          if (!isDark)
+            BoxShadow(
+              color: Colors.black.withValues(alpha: 0.04),
+              blurRadius: 10,
+              offset: const Offset(0, 2),
             ),
-            onPressed: () {},
-          ),
-          Container(
-            width: 34,
-            height: 34,
-            margin: const EdgeInsets.only(right: 12),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              gradient: LinearGradient(
-                colors: isDark
-                    ? [const Color(0xFF8781FF), const Color(0xFF4D41DF)]
-                    : [const Color(0xFF675DF9), const Color(0xFF4D41DF)],
-              ),
-            ),
-            child: const Center(
-              child: Text(
-                'JD',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontSize: 11,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ),
-          ),
         ],
       ),
-      body: ListView(
-        padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
-        children: [
-          Text(
-            'Browse Vault',
-            style: theme.textTheme.headlineMedium?.copyWith(
-              fontWeight: FontWeight.w800,
-              color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
-              letterSpacing: -0.5,
-            ),
+      child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 16,
+          vertical: 8,
+        ),
+        leading: Container(
+          width: 46,
+          height: 46,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: isDark ? 0.18 : 0.1),
+            borderRadius: BorderRadius.circular(13),
           ),
-          const SizedBox(height: 20),
-
-          // Search Bar
-          Container(
-            decoration: BoxDecoration(
-              color: isDark ? const Color(0xFF1C1A24) : Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isDark
-                    ? Colors.white.withValues(alpha: 0.07)
-                    : const Color(0xFFC7C4D8).withValues(alpha: 0.4),
-              ),
-              boxShadow: [
-                BoxShadow(
-                  color: isDark
-                      ? const Color(0xFFC4C0FF).withValues(alpha: 0.05)
-                      : Colors.black.withValues(alpha: 0.04),
-                  blurRadius: 12,
-                  offset: const Offset(0, 3),
-                ),
-              ],
-            ),
-            child: TextField(
-              controller: _searchController,
+          child: Center(
+            child: Text(
+              initials,
               style: TextStyle(
-                color: isDark
-                    ? const Color(0xFFE5E0EE)
-                    : const Color(0xFF1A1A2E),
+                color: color,
+                fontWeight: FontWeight.w800,
+                fontSize: 14,
               ),
-              decoration: InputDecoration(
-                hintText: 'Search your vault...',
-                hintStyle: TextStyle(
-                  color: isDark
-                      ? const Color(0xFFC7C4D8).withValues(alpha: 0.4)
-                      : const Color(0xFF464555).withValues(alpha: 0.45),
+            ),
+          ),
+        ),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                item.serviceName,
+                style: TextStyle(
+                  fontWeight: FontWeight.w700,
                   fontSize: 15,
-                ),
-                prefixIcon: Icon(
-                  Icons.search,
                   color: isDark
-                      ? const Color(0xFFC4C0FF).withValues(alpha: 0.5)
-                      : const Color(0xFF4D41DF).withValues(alpha: 0.5),
+                      ? const Color(0xFFE5E0EE)
+                      : const Color(0xFF1A1A2E),
                 ),
-                border: InputBorder.none,
-                contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                overflow: TextOverflow.ellipsis,
               ),
             ),
-          ),
-          const SizedBox(height: 28),
-
-          // Grid
-          GridView.builder(
-            itemCount: _categories.length,
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              mainAxisSpacing: 14,
-              crossAxisSpacing: 14,
-              childAspectRatio: 1.05,
-            ),
-            itemBuilder: (context, i) {
-              final cat = _categories[i];
-              final count = cat.itemType != null
-                  ? ref
-                        .watch(vaultNotifierProvider.notifier)
-                        .countByType(cat.itemType!)
-                  : 0;
-              return _buildCategoryCard(context, cat, isDark, count);
-            },
-          ),
-          const SizedBox(height: 32),
-
-          // Recent Collections header
-          Text(
-            'RECENT COLLECTIONS',
-            style: theme.textTheme.labelSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              letterSpacing: 2,
+            // Website or App tag
+            if (item.isWebsite != null) ...[
+              const SizedBox(width: 8),
+              _PasswordTypeBadge(isWebsite: item.isWebsite!, isDark: isDark),
+            ],
+          ],
+        ),
+        subtitle: item.username != null && item.username!.isNotEmpty
+            ? Padding(
+                padding: const EdgeInsets.only(top: 2),
+                child: Text(
+                  _maskUsername(item.username!),
+                  style: TextStyle(
+                    fontSize: 13,
+                    color: isDark
+                        ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
+                        : const Color(0xFF464555).withValues(alpha: 0.55),
+                  ),
+                ),
+              )
+            : null,
+        trailing: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            IconButton(
+              icon: const Icon(Icons.copy, size: 18),
               color: isDark
-                  ? const Color(0xFFC7C4D8).withValues(alpha: 0.5)
-                  : const Color(0xFF464555).withValues(alpha: 0.55),
+                  ? const Color(0xFFC7C4D8).withValues(alpha: 0.4)
+                  : const Color(0xFF464555).withValues(alpha: 0.4),
+              onPressed: () {},
             ),
-          ),
-          const SizedBox(height: 12),
-
-          ..._recent.map((r) => _buildRecentItem(context, r, isDark)),
-        ],
+            Icon(
+              Icons.chevron_right,
+              color: isDark
+                  ? const Color(0xFFC7C4D8).withValues(alpha: 0.3)
+                  : const Color(0xFF464555).withValues(alpha: 0.3),
+            ),
+          ],
+        ),
+        onTap: () {},
       ),
     );
+  }
+
+  String _maskUsername(String username) {
+    if (username.length <= 3) return username;
+    final visible = username.substring(0, 3);
+    return '$visible${'•' * (username.length - 3).clamp(4, 8)}';
   }
 
   Widget _buildCategoryCard(
@@ -312,7 +531,9 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
       color: cardColor,
       borderRadius: BorderRadius.circular(22),
       child: InkWell(
-        onTap: () {},
+        onTap: cat.itemType != null
+            ? () => setState(() => _expandedCategory = cat.itemType)
+            : null,
         borderRadius: BorderRadius.circular(22),
         splashColor: iconColor.withValues(alpha: 0.08),
         highlightColor: iconColor.withValues(alpha: 0.04),
@@ -437,6 +658,49 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
               : const Color(0xFF464555).withValues(alpha: 0.3),
         ),
         onTap: () {},
+      ),
+    );
+  }
+}
+
+// ─── Password Type Badge ─────────────────────────────────────────────
+class _PasswordTypeBadge extends StatelessWidget {
+  final bool isWebsite;
+  final bool isDark;
+
+  const _PasswordTypeBadge({required this.isWebsite, required this.isDark});
+
+  @override
+  Widget build(BuildContext context) {
+    final color = isWebsite ? const Color(0xFF6C63FF) : const Color(0xFF41EEC2);
+    final bgColor = isWebsite
+        ? color.withValues(alpha: isDark ? 0.18 : 0.1)
+        : color.withValues(alpha: isDark ? 0.18 : 0.12);
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 3),
+      decoration: BoxDecoration(
+        color: bgColor,
+        borderRadius: BorderRadius.circular(6),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            isWebsite ? Icons.language_rounded : Icons.smartphone_rounded,
+            size: 10,
+            color: color,
+          ),
+          const SizedBox(width: 3),
+          Text(
+            isWebsite ? 'Website' : 'App',
+            style: TextStyle(
+              fontSize: 10,
+              fontWeight: FontWeight.w700,
+              color: color,
+            ),
+          ),
+        ],
       ),
     );
   }
