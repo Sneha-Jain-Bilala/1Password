@@ -1,8 +1,55 @@
+// lib/screens/dashboard_screen.dart
+//
+// Changes from original:
+//  • Feature 1 — PlatformIcon widget replaces the hardcoded Icons.language globe.
+//  • Feature 2 — chevron_right button triggers BiometricAuthService before
+//                navigating; shows a SnackBar on failure/cancellation.
+
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+
+import '../services/platform_icon_service.dart'; // Feature 1
+import '../services/biometric_auth_service.dart'; // Feature 2
 import '../widgets/app_card.dart';
 
 class DashboardScreen extends StatelessWidget {
   const DashboardScreen({super.key});
+
+  // ── Feature 2: authenticate then navigate ─────────────────────────────────
+  Future<void> _onItemTap(BuildContext context, String platformName) async {
+    final result = await BiometricAuthService.authenticate(
+      reason: 'Verify your identity to view "$platformName" password',
+    );
+
+    if (!context.mounted) return;
+
+    if (result == BiometricResult.success) {
+      // Replace with your real route + any extra data you need to pass
+      context.push('/item_detail', extra: platformName);
+    } else {
+      final message = BiometricAuthService.errorMessage(result);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Row(
+            children: [
+              const Icon(Icons.fingerprint, color: Colors.white),
+              const SizedBox(width: 12),
+              Expanded(child: Text(message)),
+            ],
+          ),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Theme.of(context).colorScheme.error,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+          duration: const Duration(seconds: 3),
+        ),
+      );
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
@@ -71,7 +118,7 @@ class DashboardScreen extends StatelessWidget {
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           children: [
-            // Health Score Hero Card
+            // ── Health Score Hero Card ──────────────────────────────────────
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
@@ -93,7 +140,6 @@ class DashboardScreen extends StatelessWidget {
               ),
               child: Stack(
                 children: [
-                  // Decorative blobbing
                   Positioned(
                     right: -48,
                     top: -48,
@@ -151,7 +197,7 @@ class DashboardScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            // Circular Progress Indicator
+                            // Circular score
                             SizedBox(
                               width: 100,
                               height: 100,
@@ -212,39 +258,33 @@ class DashboardScreen extends StatelessWidget {
                                 Icon(
                                   Icons.verified_user,
                                   size: 16,
-                                  color: theme.colorScheme.onPrimary.withValues(
-                                    alpha: 0.9,
-                                  ),
+                                  color: theme.colorScheme.onPrimary,
                                 ),
-                                const SizedBox(width: 4),
+                                const SizedBox(width: 8),
                                 Text(
                                   '248 Passwords Encrypted',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                    color: theme.colorScheme.onPrimary
-                                        .withValues(alpha: 0.9),
+                                  style: theme.textTheme.bodySmall?.copyWith(
+                                    color: theme.colorScheme.onPrimary,
                                   ),
                                 ),
                               ],
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 6,
-                              ),
-                              decoration: BoxDecoration(
-                                color: Colors.white.withValues(alpha: 0.2),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: const Text(
-                                'Details',
-                                style: TextStyle(
-                                  fontSize: 12,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.white,
+                            TextButton(
+                              style: TextButton.styleFrom(
+                                backgroundColor: Colors.white.withValues(
+                                  alpha: 0.15,
+                                ),
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 8,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
+                              onPressed: () {},
+                              child: const Text('Details'),
                             ),
                           ],
                         ),
@@ -257,7 +297,7 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            // Quick Access
+            // ── Quick Access ────────────────────────────────────────────────
             Text(
               'QUICK ACCESS',
               style: theme.textTheme.labelMedium?.copyWith(
@@ -269,8 +309,7 @@ class DashboardScreen extends StatelessWidget {
             SingleChildScrollView(
               scrollDirection: Axis.horizontal,
               primary: false,
-              physics: AlwaysScrollableScrollPhysics(),
-              //clipBehavior: Clip.none,
+              physics: const AlwaysScrollableScrollPhysics(),
               child: Row(
                 children: [
                   _buildQuickAccessPill(context, Icons.history, 'Recent', true),
@@ -294,7 +333,7 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            // Recent Activity
+            // ── Recent Activity ─────────────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -315,6 +354,8 @@ class DashboardScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
+            // ── Activity items ──────────────────────────────────────────────
+            // Feature 1 + Feature 2 are both applied inside _buildRecentActivityItem
             _buildRecentActivityItem(
               context,
               'Netflix',
@@ -343,12 +384,14 @@ class DashboardScreen extends StatelessWidget {
               true,
             ),
 
-            const SizedBox(height: 80), // Padding for bottom navbar
+            const SizedBox(height: 80),
           ],
         ),
       ),
     );
   }
+
+  // ── Quick access pill (unchanged) ─────────────────────────────────────────
 
   Widget _buildQuickAccessPill(
     BuildContext context,
@@ -394,6 +437,8 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
+  // ── Recent activity item — Feature 1 + Feature 2 applied here ─────────────
+
   Widget _buildRecentActivityItem(
     BuildContext context,
     String title,
@@ -405,18 +450,9 @@ class DashboardScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surfaceContainerLowest,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.1),
-              ),
-            ),
-            child: Icon(Icons.language, color: theme.colorScheme.primary),
-          ),
+          // ── Feature 1: PlatformIcon replaces hardcoded Icons.language ──
+          PlatformIcon(platformName: title, size: 48),
+
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -464,13 +500,17 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
+
+          // Copy button (unchanged)
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.copy, size: 20),
             color: theme.colorScheme.onSurfaceVariant,
           ),
+
+          // ── Feature 2: Biometric auth before navigation ─────────────────
           IconButton(
-            onPressed: () {},
+            onPressed: () => _onItemTap(context, title),
             icon: const Icon(Icons.chevron_right, size: 24),
             color: theme.colorScheme.onSurfaceVariant,
           ),
