@@ -131,25 +131,28 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   int get _strength {
     final pass = _passCtrl.text;
     if (pass.isEmpty) return 0;
-    
+
     int score = 0;
     if (pass.length >= 8) score += 1;
     if (pass.length >= 12) score += 1;
-    
+
     final hasLower = RegExp(r'[a-z]').hasMatch(pass);
     final hasUpper = RegExp(r'[A-Z]').hasMatch(pass);
     final hasDigit = RegExp(r'\d').hasMatch(pass);
     final hasSpecial = RegExp(r'[^a-zA-Z0-9]').hasMatch(pass);
-    
-    final typeCount = (hasLower ? 1 : 0) + (hasUpper ? 1 : 0) + 
-                      (hasDigit ? 1 : 0) + (hasSpecial ? 1 : 0);
-    
+
+    final typeCount =
+        (hasLower ? 1 : 0) +
+        (hasUpper ? 1 : 0) +
+        (hasDigit ? 1 : 0) +
+        (hasSpecial ? 1 : 0);
+
     if (typeCount == 4) {
       score += 2;
     } else if (typeCount == 3) {
       score += 1;
     }
-    
+
     if (score == 0 && pass.isNotEmpty) {
       score = 1;
     }
@@ -162,25 +165,25 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     const digits = '0123456789';
     const specials = '!@#\$%^&*()-_=+[]{}|;:,.<>?';
     const allChars = lower + upper + digits + specials;
-    
+
     String pass = '';
     final random = math.Random.secure();
-    
+
     // Ensure at least one of each type
     pass += lower[random.nextInt(lower.length)];
     pass += upper[random.nextInt(upper.length)];
     pass += digits[random.nextInt(digits.length)];
     pass += specials[random.nextInt(specials.length)];
-    
+
     // Fill the rest (total 16 chars)
     for (int i = 0; i < 12; i++) {
       pass += allChars[random.nextInt(allChars.length)];
     }
-    
+
     // Shuffle the characters
     final List<String> chars = pass.split('');
     chars.shuffle(random);
-    
+
     setState(() {
       _passCtrl.text = chars.join('');
     });
@@ -390,7 +393,11 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                         color: _kViolet.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Icon(Icons.search, color: _kViolet, size: 28),
+                      child: const Icon(
+                        Icons.search,
+                        color: _kViolet,
+                        size: 28,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -415,7 +422,6 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                     const SizedBox(height: 16),
                   ],
                 ),
-
 
           // ── Search field ──────────────────────────────────────
           Container(
@@ -1135,7 +1141,6 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     );
   }
 
-
   // ── More options ────────────────────────────────────────────────
   Widget _buildMoreCard(BuildContext context, bool isDark) {
     if (_moreOptionsExpanded) {
@@ -1163,7 +1168,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             const SizedBox(height: 6),
             Container(
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF13121B) : const Color(0xFFF3F3FA),
+                color: isDark
+                    ? const Color(0xFF13121B)
+                    : const Color(0xFFF3F3FA),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
@@ -1176,7 +1183,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                 maxLines: 3,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
+                  color: isDark
+                      ? const Color(0xFFE5E0EE)
+                      : const Color(0xFF1A1A2E),
                 ),
                 decoration: InputDecoration(
                   hintText: 'Add securely encrypted notes...',
@@ -1476,10 +1485,7 @@ class _CustomServiceSheet extends StatefulWidget {
   final TextEditingController nameCtrl;
   final void Function(String name) onConfirm;
 
-  const _CustomServiceSheet({
-    required this.nameCtrl,
-    required this.onConfirm,
-  });
+  const _CustomServiceSheet({required this.nameCtrl, required this.onConfirm});
 
   @override
   State<_CustomServiceSheet> createState() => _CustomServiceSheetState();
@@ -1664,9 +1670,7 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
               child: ElevatedButton(
                 onPressed: hasName
                     ? () {
-                        widget.onConfirm(
-                          widget.nameCtrl.text.trim(),
-                        );
+                        widget.onConfirm(widget.nameCtrl.text.trim());
                         Navigator.of(context).pop();
                       }
                     : null,
