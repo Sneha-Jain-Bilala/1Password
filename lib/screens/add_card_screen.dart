@@ -58,6 +58,7 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
   final _cvvCtrl = TextEditingController();
   final _labelCtrl = TextEditingController();
   bool _cvvVisible = false;
+  bool _isFavourite = false;
   _CardType _cardType = _CardType.other;
 
   @override
@@ -217,35 +218,59 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
           ),
           centerTitle: true,
           actions: [
+            // Favourite button (light by default, darkens when clicked)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: Opacity(
+                opacity: _isFavourite ? 1.0 : 0.4,
+                child: ElevatedButton(
+                  onPressed: () => setState(() => _isFavourite = !_isFavourite),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accentColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Favourite',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                  ),
+                ),
+              ),
+            ),
+
+            // Save button (existing)
             Padding(
               padding: const EdgeInsets.only(right: 12),
-              child: ListenableBuilder(
-                listenable: Listenable.merge([_nameCtrl, _numberCtrl]),
-                builder: (context, _) => Opacity(
-                  opacity: _canSave ? 1.0 : 0.4,
-                  child: ElevatedButton(
-                    onPressed: _canSave ? _save : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: accentColor,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 20,
-                        vertical: 8,
-                      ),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      elevation: 0,
+              child: Opacity(
+                opacity: _canSave ? 1.0 : 0.4,
+                child: ElevatedButton(
+                  onPressed: _canSave ? _save : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: accentColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
                     ),
-                    child: const Text(
-                      'Save',
-                      style: TextStyle(
-                        fontWeight: FontWeight.w700,
-                        fontSize: 14,
-                      ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
                     ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    elevation: 0,
+                  ),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                   ),
                 ),
               ),
@@ -410,7 +435,6 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
       ),
     );
   }
-
 
   // ── Card preview ───────────────────────────────────────────────────────────
   Widget _buildCardPreview(bool isDark) {

@@ -131,25 +131,28 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   int get _strength {
     final pass = _passCtrl.text;
     if (pass.isEmpty) return 0;
-    
+
     int score = 0;
     if (pass.length >= 8) score += 1;
     if (pass.length >= 12) score += 1;
-    
+
     final hasLower = RegExp(r'[a-z]').hasMatch(pass);
     final hasUpper = RegExp(r'[A-Z]').hasMatch(pass);
     final hasDigit = RegExp(r'\d').hasMatch(pass);
     final hasSpecial = RegExp(r'[^a-zA-Z0-9]').hasMatch(pass);
-    
-    final typeCount = (hasLower ? 1 : 0) + (hasUpper ? 1 : 0) + 
-                      (hasDigit ? 1 : 0) + (hasSpecial ? 1 : 0);
-    
+
+    final typeCount =
+        (hasLower ? 1 : 0) +
+        (hasUpper ? 1 : 0) +
+        (hasDigit ? 1 : 0) +
+        (hasSpecial ? 1 : 0);
+
     if (typeCount == 4) {
       score += 2;
     } else if (typeCount == 3) {
       score += 1;
     }
-    
+
     if (score == 0 && pass.isNotEmpty) {
       score = 1;
     }
@@ -162,25 +165,25 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     const digits = '0123456789';
     const specials = '!@#\$%^&*()-_=+[]{}|;:,.<>?';
     const allChars = lower + upper + digits + specials;
-    
+
     String pass = '';
     final random = math.Random.secure();
-    
+
     // Ensure at least one of each type
     pass += lower[random.nextInt(lower.length)];
     pass += upper[random.nextInt(upper.length)];
     pass += digits[random.nextInt(digits.length)];
     pass += specials[random.nextInt(specials.length)];
-    
+
     // Fill the rest (total 16 chars)
     for (int i = 0; i < 12; i++) {
       pass += allChars[random.nextInt(allChars.length)];
     }
-    
+
     // Shuffle the characters
     final List<String> chars = pass.split('');
     chars.shuffle(random);
-    
+
     setState(() {
       _passCtrl.text = chars.join('');
     });
@@ -250,12 +253,50 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     );
   }
 
+  bool get _canSave => _emailCtrl.text.trim().isNotEmpty && _passCtrl.text.isNotEmpty;
+
+  Future<void> _save() async {
+    if (!_canSave) return;
+    
+    final name = _state == _ServiceState.known
+        ? _selected!.name
+        : _customName;
+    final color = _state == _ServiceState.known
+        ? _selected!.color
+        : _kViolet;
+
+    final item = VaultItem(
+      id: '',
+      type: VaultItemType.login,
+      serviceName: name,
+      serviceColor: color,
+      username: _emailCtrl.text.trim(),
+      password: _passCtrl.text,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      isWebsite: _isWebsite,
+    );
+
+    await ref.read(vaultNotifierProvider.notifier).addItem(item);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('"$name" saved to Passwords'),
+          backgroundColor: _kViolet,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      context.pop();
+    }
+  }
+
   // ── Build ──────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final canSave = _state != _ServiceState.none;
+    final accentColor = isDark ? _kViolet : const Color(0xFF4D41DF);
 
     return GestureDetector(
       onTap: () {
@@ -283,65 +324,65 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           ),
           centerTitle: true,
           actions: [
+            // Favourite button (same style as Save)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: accentColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Favourite',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                ),
+              ),
+            ),
+
+            // Save button (existing)
             Padding(
               padding: const EdgeInsets.only(right: 12),
-              child: Opacity(
-                opacity: canSave ? 1.0 : 0.4,
-                child: ElevatedButton(
-                  onPressed: canSave
-                      ? () async {
-                          final name = _state == _ServiceState.known
-                              ? _selected!.name
-                              : _customName;
-                          final color = _state == _ServiceState.known
-                              ? _selected!.color
-                              : _kViolet;
-
-                          final item = VaultItem(
-                            id: '',
-                            type: VaultItemType.login,
-                            serviceName: name,
-                            serviceColor: color,
-                            username: _emailCtrl.text.trim(),
-                            password: _passCtrl.text,
-                            createdAt: DateTime.now(),
-                            updatedAt: DateTime.now(),
-                            isWebsite: _isWebsite,
-                          );
-
-                          await ref
-                              .read(vaultNotifierProvider.notifier)
-                              .addItem(item);
-
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('"$name" saved to Passwords'),
-                                backgroundColor: _kViolet,
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                            context.pop();
-                          }
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _kViolet,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
+              child: ListenableBuilder(
+                listenable: Listenable.merge([
+                  _emailCtrl,
+                  _passCtrl,
+                ]),
+                builder: (context, _) => Opacity(
+                  opacity: _canSave ? 1.0 : 0.4,
+                  child: ElevatedButton(
+                    onPressed: _canSave ? _save : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accentColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      elevation: 0,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
                     ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                   ),
                 ),
               ),
@@ -390,7 +431,11 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                         color: _kViolet.withValues(alpha: 0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
-                      child: const Icon(Icons.search, color: _kViolet, size: 28),
+                      child: const Icon(
+                        Icons.search,
+                        color: _kViolet,
+                        size: 28,
+                      ),
                     ),
                     const SizedBox(height: 16),
                     Text(
@@ -415,7 +460,6 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                     const SizedBox(height: 16),
                   ],
                 ),
-
 
           // ── Search field ──────────────────────────────────────
           Container(
@@ -1135,7 +1179,6 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     );
   }
 
-
   // ── More options ────────────────────────────────────────────────
   Widget _buildMoreCard(BuildContext context, bool isDark) {
     if (_moreOptionsExpanded) {
@@ -1163,7 +1206,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
             const SizedBox(height: 6),
             Container(
               decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF13121B) : const Color(0xFFF3F3FA),
+                color: isDark
+                    ? const Color(0xFF13121B)
+                    : const Color(0xFFF3F3FA),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
                   color: isDark
@@ -1176,7 +1221,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                 maxLines: 3,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
+                  color: isDark
+                      ? const Color(0xFFE5E0EE)
+                      : const Color(0xFF1A1A2E),
                 ),
                 decoration: InputDecoration(
                   hintText: 'Add securely encrypted notes...',
@@ -1476,10 +1523,7 @@ class _CustomServiceSheet extends StatefulWidget {
   final TextEditingController nameCtrl;
   final void Function(String name) onConfirm;
 
-  const _CustomServiceSheet({
-    required this.nameCtrl,
-    required this.onConfirm,
-  });
+  const _CustomServiceSheet({required this.nameCtrl, required this.onConfirm});
 
   @override
   State<_CustomServiceSheet> createState() => _CustomServiceSheetState();
@@ -1664,9 +1708,7 @@ class _CustomServiceSheetState extends State<_CustomServiceSheet> {
               child: ElevatedButton(
                 onPressed: hasName
                     ? () {
-                        widget.onConfirm(
-                          widget.nameCtrl.text.trim(),
-                        );
+                        widget.onConfirm(widget.nameCtrl.text.trim());
                         Navigator.of(context).pop();
                       }
                     : null,
