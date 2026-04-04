@@ -9,8 +9,17 @@ const _kOrangeDark = Color(0xFFF57C00);
 
 // Common list of countries for the dropdown
 const _kCountries = [
-  'India', 'United States', 'United Kingdom', 'Canada', 'Australia',
-  'Germany', 'France', 'Japan', 'Singapore', 'UAE', 'Other',
+  'India',
+  'United States',
+  'United Kingdom',
+  'Canada',
+  'Australia',
+  'Germany',
+  'France',
+  'Japan',
+  'Singapore',
+  'UAE',
+  'Other',
 ];
 
 class AddAddressScreen extends ConsumerStatefulWidget {
@@ -65,7 +74,8 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
     final notes = [
       _fullNameCtrl.text.trim(),
       _streetCtrl.text.trim(),
-      '${_cityCtrl.text.trim()}, ${_stateCtrl.text.trim()} ${_postalCtrl.text.trim()}'.trim(),
+      '${_cityCtrl.text.trim()}, ${_stateCtrl.text.trim()} ${_postalCtrl.text.trim()}'
+          .trim(),
       _country,
     ].join('\n');
     final item = VaultItem(
@@ -104,8 +114,10 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           elevation: 0,
           scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back,
-                color: isDark ? const Color(0xFFC4C0FF) : const Color(0xFF1A1A2E)),
+            icon: Icon(
+              Icons.arrow_back,
+              color: isDark ? const Color(0xFFC4C0FF) : const Color(0xFF1A1A2E),
+            ),
             onPressed: () => context.pop(),
           ),
           title: Text(
@@ -117,10 +129,44 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           ),
           centerTitle: true,
           actions: [
+            // Favourite button
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ElevatedButton(
+                onPressed: () {
+                  // Handle favourite logic here
+                  print("Favourite pressed");
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: accentColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  elevation: 0,
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                ),
+                child: const Text(
+                  'Favourite',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                ),
+              ),
+            ),
+
+            // Save button
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: ListenableBuilder(
-                listenable: Listenable.merge([_fullNameCtrl, _streetCtrl, _cityCtrl]),
+                listenable: Listenable.merge([
+                  _fullNameCtrl,
+                  _streetCtrl,
+                  _cityCtrl,
+                ]),
                 builder: (context, _) => Opacity(
                   opacity: _canSave ? 1.0 : 0.4,
                   child: ElevatedButton(
@@ -128,14 +174,24 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                     style: ElevatedButton.styleFrom(
                       backgroundColor: accentColor,
                       foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      elevation: 0,
                       minimumSize: Size.zero,
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      elevation: 0,
                     ),
-                    child: const Text('Save',
-                        style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -173,78 +229,82 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
             ),
             const SizedBox(height: 16),
 
-            Row(children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _SectionLabel(isDark: isDark, label: 'CITY'),
-                    const SizedBox(height: 8),
-                    _AddressField(
-                      controller: _cityCtrl,
-                      isDark: isDark,
-                      accentColor: accentColor,
-                      hintText: 'City',
-                      icon: Icons.location_city_outlined,
-                    ),
-                  ],
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionLabel(isDark: isDark, label: 'CITY'),
+                      const SizedBox(height: 8),
+                      _AddressField(
+                        controller: _cityCtrl,
+                        isDark: isDark,
+                        accentColor: accentColor,
+                        hintText: 'City',
+                        icon: Icons.location_city_outlined,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _SectionLabel(isDark: isDark, label: 'STATE'),
-                    const SizedBox(height: 8),
-                    _AddressField(
-                      controller: _stateCtrl,
-                      isDark: isDark,
-                      accentColor: accentColor,
-                      hintText: 'State',
-                      icon: Icons.map_outlined,
-                    ),
-                  ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionLabel(isDark: isDark, label: 'STATE'),
+                      const SizedBox(height: 8),
+                      _AddressField(
+                        controller: _stateCtrl,
+                        isDark: isDark,
+                        accentColor: accentColor,
+                        hintText: 'State',
+                        icon: Icons.map_outlined,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ]),
+              ],
+            ),
             const SizedBox(height: 16),
 
-            Row(children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _SectionLabel(isDark: isDark, label: 'POSTAL CODE'),
-                    const SizedBox(height: 8),
-                    _AddressField(
-                      controller: _postalCtrl,
-                      isDark: isDark,
-                      accentColor: accentColor,
-                      hintText: 'Postal code',
-                      icon: Icons.pin_outlined,
-                      keyboardType: TextInputType.number,
-                    ),
-                  ],
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionLabel(isDark: isDark, label: 'POSTAL CODE'),
+                      const SizedBox(height: 8),
+                      _AddressField(
+                        controller: _postalCtrl,
+                        isDark: isDark,
+                        accentColor: accentColor,
+                        hintText: 'Postal code',
+                        icon: Icons.pin_outlined,
+                        keyboardType: TextInputType.number,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _SectionLabel(isDark: isDark, label: 'COUNTRY'),
-                    const SizedBox(height: 8),
-                    _CountryDropdown(
-                      isDark: isDark,
-                      accentColor: accentColor,
-                      value: _country,
-                      onChanged: (v) => setState(() => _country = v!),
-                    ),
-                  ],
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      _SectionLabel(isDark: isDark, label: 'COUNTRY'),
+                      const SizedBox(height: 8),
+                      _CountryDropdown(
+                        isDark: isDark,
+                        accentColor: accentColor,
+                        value: _country,
+                        onChanged: (v) => setState(() => _country = v!),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ]),
+              ],
+            ),
             const SizedBox(height: 16),
 
             _SectionLabel(isDark: isDark, label: 'LABEL (OPTIONAL)'),
@@ -262,16 +322,26 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _canSave ? _save : null,
-                icon: const Icon(Icons.check_circle_outline,
-                    size: 18, color: Colors.white),
-                label: const Text('Save Address',
-                    style: TextStyle(
-                        fontWeight: FontWeight.w700, fontSize: 15, color: Colors.white)),
+                icon: const Icon(
+                  Icons.check_circle_outline,
+                  size: 18,
+                  color: Colors.white,
+                ),
+                label: const Text(
+                  'Save Address',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 15,
+                    color: Colors.white,
+                  ),
+                ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: accentColor,
                   disabledBackgroundColor: accentColor.withValues(alpha: 0.3),
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 0,
                 ),
               ),
@@ -289,13 +359,16 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
       decoration: BoxDecoration(
         color: isDark ? const Color(0xFF2E241F) : const Color(0xFFFFF4E5),
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: accentColor.withValues(alpha: isDark ? 0.3 : 0.2)),
+        border: Border.all(
+          color: accentColor.withValues(alpha: isDark ? 0.3 : 0.2),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            width: 44, height: 44,
+            width: 44,
+            height: 44,
             decoration: BoxDecoration(
               color: accentColor.withValues(alpha: 0.15),
               borderRadius: BorderRadius.circular(12),
@@ -309,7 +382,9 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
               style: TextStyle(
                 fontSize: 13,
                 height: 1.6,
-                color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
+                color: isDark
+                    ? const Color(0xFFE5E0EE)
+                    : const Color(0xFF1A1A2E),
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -390,7 +465,11 @@ class _AddressField extends StatelessWidget {
           ),
           prefixIcon: Padding(
             padding: const EdgeInsets.only(bottom: 0),
-            child: Icon(icon, color: accentColor.withValues(alpha: 0.6), size: 20),
+            child: Icon(
+              icon,
+              color: accentColor.withValues(alpha: 0.6),
+              size: 20,
+            ),
           ),
           border: InputBorder.none,
           contentPadding: maxLines > 1
@@ -432,8 +511,11 @@ class _CountryDropdown extends StatelessWidget {
           value: value,
           isExpanded: true,
           dropdownColor: isDark ? const Color(0xFF1C1A24) : Colors.white,
-          icon: Icon(Icons.expand_more_rounded,
-              color: accentColor.withValues(alpha: 0.6), size: 20),
+          icon: Icon(
+            Icons.expand_more_rounded,
+            color: accentColor.withValues(alpha: 0.6),
+            size: 20,
+          ),
           style: TextStyle(
             fontSize: 13,
             color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),

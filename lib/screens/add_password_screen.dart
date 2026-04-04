@@ -253,12 +253,50 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     );
   }
 
+  bool get _canSave => _emailCtrl.text.trim().isNotEmpty && _passCtrl.text.isNotEmpty;
+
+  Future<void> _save() async {
+    if (!_canSave) return;
+    
+    final name = _state == _ServiceState.known
+        ? _selected!.name
+        : _customName;
+    final color = _state == _ServiceState.known
+        ? _selected!.color
+        : _kViolet;
+
+    final item = VaultItem(
+      id: '',
+      type: VaultItemType.login,
+      serviceName: name,
+      serviceColor: color,
+      username: _emailCtrl.text.trim(),
+      password: _passCtrl.text,
+      createdAt: DateTime.now(),
+      updatedAt: DateTime.now(),
+      isWebsite: _isWebsite,
+    );
+
+    await ref.read(vaultNotifierProvider.notifier).addItem(item);
+
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('"$name" saved to Passwords'),
+          backgroundColor: _kViolet,
+          behavior: SnackBarBehavior.floating,
+        ),
+      );
+      context.pop();
+    }
+  }
+
   // ── Build ──────────────────────────────────────────────────────
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-    final canSave = _state != _ServiceState.none;
+    final accentColor = isDark ? _kViolet : const Color(0xFF4D41DF);
 
     return GestureDetector(
       onTap: () {
@@ -286,65 +324,65 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           ),
           centerTitle: true,
           actions: [
+            // Favourite button (same style as Save)
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: accentColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Favourite',
+                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
+                ),
+              ),
+            ),
+
+            // Save button (existing)
             Padding(
               padding: const EdgeInsets.only(right: 12),
-              child: Opacity(
-                opacity: canSave ? 1.0 : 0.4,
-                child: ElevatedButton(
-                  onPressed: canSave
-                      ? () async {
-                          final name = _state == _ServiceState.known
-                              ? _selected!.name
-                              : _customName;
-                          final color = _state == _ServiceState.known
-                              ? _selected!.color
-                              : _kViolet;
-
-                          final item = VaultItem(
-                            id: '',
-                            type: VaultItemType.login,
-                            serviceName: name,
-                            serviceColor: color,
-                            username: _emailCtrl.text.trim(),
-                            password: _passCtrl.text,
-                            createdAt: DateTime.now(),
-                            updatedAt: DateTime.now(),
-                            isWebsite: _isWebsite,
-                          );
-
-                          await ref
-                              .read(vaultNotifierProvider.notifier)
-                              .addItem(item);
-
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('"$name" saved to Passwords'),
-                                backgroundColor: _kViolet,
-                                behavior: SnackBarBehavior.floating,
-                              ),
-                            );
-                            context.pop();
-                          }
-                        }
-                      : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: _kViolet,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
+              child: ListenableBuilder(
+                listenable: Listenable.merge([
+                  _emailCtrl,
+                  _passCtrl,
+                ]),
+                builder: (context, _) => Opacity(
+                  opacity: _canSave ? 1.0 : 0.4,
+                  child: ElevatedButton(
+                    onPressed: _canSave ? _save : null,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accentColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 20,
+                        vertical: 8,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      elevation: 0,
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                    child: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 14,
+                      ),
                     ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                   ),
                 ),
               ),
