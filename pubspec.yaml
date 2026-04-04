@@ -18,6 +18,9 @@ dependencies:
   auto_size_text: ^3.0.0
   google_fonts: ^6.2.1
   ml_card_scanner: ^0.2.3
+  supabase_flutter: ^2.9.1
+  shared_preferences: ^2.5.3
+  crypto: ^3.0.3
 
   # ── Feature 2: Biometric authentication ──────────────────────────────────
   local_auth: ^2.3.0

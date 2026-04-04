@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../backend/app_theme.dart';
+import '../services/onboarding_prefs_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,10 +20,11 @@ class _SplashScreenState extends State<SplashScreen>
     super.initState();
     _controller =
         AnimationController(vsync: this, duration: const Duration(seconds: 2))
-          ..forward().then((_) {
-            if (mounted) {
-              context.go('/onboarding');
-            }
+          ..forward().then((_) async {
+            if (!mounted) return;
+            final completed = await OnboardingPrefsService.isCompleted();
+            if (!mounted) return;
+            context.go(completed ? '/sign_in' : '/onboarding');
           });
   }
 
