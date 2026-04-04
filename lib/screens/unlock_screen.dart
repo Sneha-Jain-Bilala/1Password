@@ -1,13 +1,16 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../backend/app_theme.dart';
+import '../backend/auth_controller.dart';
 
-class UnlockScreen extends StatelessWidget {
+class UnlockScreen extends ConsumerWidget {
   const UnlockScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final user = ref.watch(currentUserProvider);
     return Theme(
       data: AppTheme.darkTheme,
       child: Scaffold(
@@ -75,7 +78,7 @@ class UnlockScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'user@gmail.com',
+                          user?.email ?? 'Signed in user',
                           style: AppTheme.darkTheme.textTheme.bodyMedium?.copyWith(
                             color: AppTheme.darkTheme.colorScheme.onSurfaceVariant,
                             fontWeight: FontWeight.w500,
@@ -101,10 +104,7 @@ class UnlockScreen extends StatelessWidget {
                           child: Material(
                             color: Colors.transparent,
                             child: InkWell(
-                              onTap: () {
-                                // Navigate to Dashboard
-                                context.go('/dashboard');
-                              },
+                              onTap: () => context.go('/master_password'),
                               customBorder: const CircleBorder(),
                               child: Center(
                                 child: Container(
@@ -157,7 +157,7 @@ class UnlockScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 24),
                         TextButton(
-                          onPressed: () => context.go('/dashboard'),
+                          onPressed: () => context.go('/master_password'),
                           style: TextButton.styleFrom(
                             foregroundColor: AppTheme.darkTheme.colorScheme.primary,
                             backgroundColor: AppTheme.darkTheme.colorScheme.primary.withValues(alpha: 0.05),
@@ -165,6 +165,27 @@ class UnlockScreen extends StatelessWidget {
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           ),
                           child: const Text('Use Master Password', style: TextStyle(fontWeight: FontWeight.w600, letterSpacing: 0.5)),
+                        ),
+                        const SizedBox(height: 10),
+                        TextButton(
+                          onPressed: () async {
+                            try {
+                              await ref.read(authControllerProvider.notifier).signOut();
+                              if (context.mounted) {
+                                context.go('/sign_in');
+                              }
+                            } catch (error) {
+                              if (context.mounted) {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(AuthController.messageFromError(error)),
+                                    behavior: SnackBarBehavior.floating,
+                                  ),
+                                );
+                              }
+                            }
+                          },
+                          child: const Text('Sign out'),
                         ),
                       ],
                     ),

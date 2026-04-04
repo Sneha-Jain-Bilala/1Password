@@ -1,10 +1,17 @@
+import 'dart:async';
+
 import 'package:go_router/go_router.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
+import '../backend/auth_controller.dart';
 import 'splash_screen.dart';
 import 'onboarding_screen.dart';
+import 'sign_in_screen.dart';
+import 'sign_up_screen.dart';
 import 'unlock_screen.dart';
+import 'master_password_screen.dart';
 import 'main_shell.dart';
 import 'dashboard_screen.dart';
 import 'settings_screen.dart';
@@ -23,8 +30,33 @@ part 'app_router.g.dart';
 
 @riverpod
 GoRouter appRouter(Ref ref) {
+  final client = ref.watch(supabaseClientProvider);
+  final refresh = _GoRouterRefreshStream(client.auth.onAuthStateChange);
+  ref.onDispose(refresh.dispose);
+
   return GoRouter(
     initialLocation: '/',
+    refreshListenable: refresh,
+    redirect: (context, state) {
+      final location = state.matchedLocation;
+      final isLoggedIn = client.auth.currentSession != null;
+
+      final isPublicRoute =
+          location == '/' ||
+          location == '/onboarding' ||
+          location == '/sign_in' ||
+          location == '/sign_up';
+
+      if (!isLoggedIn && !isPublicRoute) {
+        return '/sign_in';
+      }
+
+      if (isLoggedIn && isPublicRoute) {
+        return '/unlock';
+      }
+
+      return null;
+    },
     routes: [
       GoRoute(
         path: '/',
@@ -35,8 +67,20 @@ GoRouter appRouter(Ref ref) {
         builder: (context, state) => const OnboardingScreen(),
       ),
       GoRoute(
+        path: '/sign_in',
+        builder: (context, state) => const SignInScreen(),
+      ),
+      GoRoute(
+        path: '/sign_up',
+        builder: (context, state) => const SignUpScreen(),
+      ),
+      GoRoute(
         path: '/unlock',
         builder: (context, state) => const UnlockScreen(),
+      ),
+      GoRoute(
+        path: '/master_password',
+        builder: (context, state) => const MasterPasswordScreen(),
       ),
       GoRoute(
         path: '/add_password',
@@ -111,4 +155,18 @@ GoRouter appRouter(Ref ref) {
       )
     ],
   );
+}
+
+class _GoRouterRefreshStream extends ChangeNotifier {
+  _GoRouterRefreshStream(Stream<dynamic> stream) {
+    _subscription = stream.listen((_) => notifyListeners());
+  }
+
+  late final StreamSubscription<dynamic> _subscription;
+
+  @override
+  void dispose() {
+    _subscription.cancel();
+    super.dispose();
+  }
 }
