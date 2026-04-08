@@ -37,6 +37,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
   final _postalCtrl = TextEditingController();
   String _country = 'India';
   final _labelCtrl = TextEditingController();
+  bool _isFavourite = false;
 
   @override
   void dispose() {
@@ -132,30 +133,62 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
             // Favourite button
             Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: ElevatedButton(
-                onPressed: () {
-                  // Handle favourite logic here
-                  print("Favourite pressed");
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: accentColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  elevation: 0,
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                ),
-                child: const Text(
-                  'Favourite',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                ),
-              ),
+              child: _isFavourite
+                  ? ElevatedButton.icon(
+                      onPressed: () =>
+                          setState(() => _isFavourite = !_isFavourite),
+                      icon: Icon(Icons.favorite, size: 16, color: Colors.white),
+                      label: const Text(
+                        'Favourite',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    )
+                  : OutlinedButton.icon(
+                      onPressed: () =>
+                          setState(() => _isFavourite = !_isFavourite),
+                      icon: Icon(
+                        Icons.favorite_border,
+                        size: 16,
+                        color: accentColor,
+                      ),
+                      label: Text(
+                        'Favourite',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: accentColor,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: accentColor),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
             ),
 
             // Save button
