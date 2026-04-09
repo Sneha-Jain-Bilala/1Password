@@ -2,6 +2,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../backend/app_theme.dart';
+import '../services/onboarding_prefs_service.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -35,6 +36,12 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'icon': 'cloud_sync',
     },
   ];
+
+  Future<void> _completeAndGo(String route) async {
+    await OnboardingPrefsService.markCompleted();
+    if (!mounted) return;
+    context.go(route);
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -179,7 +186,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     curve: Curves.easeInOut,
                                   );
                                 } else {
-                                  context.go('/unlock');
+                                  _completeAndGo('/sign_up');
                                 }
                               },
                               style: ElevatedButton.styleFrom(
@@ -216,7 +223,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ),
                               TextButton(
                                 onPressed: () {
-                                  context.go('/unlock');
+                                  _completeAndGo('/sign_in');
                                 },
                                 child: const Text(
                                   "Sign In",

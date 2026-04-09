@@ -37,7 +37,9 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
       type: VaultItemType.secureNote,
       serviceName: _titleCtrl.text.trim(),
       notes: _contentCtrl.text.trim(),
-      folderName: _folderCtrl.text.trim().isEmpty ? null : _folderCtrl.text.trim(),
+      folderName: _folderCtrl.text.trim().isEmpty
+          ? null
+          : _folderCtrl.text.trim(),
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
     );
@@ -69,8 +71,10 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
           elevation: 0,
           scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: Icon(Icons.arrow_back,
-                color: isDark ? const Color(0xFFC4C0FF) : const Color(0xFF1A1A2E)),
+            icon: Icon(
+              Icons.arrow_back,
+              color: isDark ? const Color(0xFFC4C0FF) : const Color(0xFF1A1A2E),
+            ),
             onPressed: () => context.pop(),
           ),
           title: Text(
@@ -82,25 +86,85 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
           ),
           centerTitle: true,
           actions: [
+            // Favourite button
+            Padding(
+              padding: const EdgeInsets.only(right: 8),
+              child: ElevatedButton(
+                onPressed: () {},
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: iconColor,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 20,
+                    vertical: 8,
+                  ),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  minimumSize: Size.zero,
+                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                  elevation: 0,
+                ),
+                child: const Text(
+                  'Favourite',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w700,
+                    fontSize: 14,
+                  ),
+                ),
+              ),
+            ),
+
+            // Save button
             Padding(
               padding: const EdgeInsets.only(right: 12),
-              child: ListenableBuilder(
-                listenable: _titleCtrl,
-                builder: (context, _) => Opacity(
-                  opacity: _canSave ? 1.0 : 0.4,
-                  child: ElevatedButton(
-                    onPressed: _canSave ? _save : null,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: isDark ? _kTeal : _kTealDark,
-                      foregroundColor: isDark ? Colors.black : Colors.white,
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 8),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      elevation: 0,
+              child: Opacity(
+                opacity: _canSave ? 1.0 : 0.4,
+                child: ElevatedButton(
+                  onPressed: _canSave ? _save : null,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: iconColor,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 20,
+                      vertical: 8,
                     ),
-                    child: const Text('Save', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14)),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    minimumSize: Size.zero,
+                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    elevation: 0,
                   ),
+                  child: const Text(
+                    'Save',
+                    style: TextStyle(
+                      fontWeight: FontWeight.w700,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+
+            // Pin toggle
+            GestureDetector(
+              onTap: () => setState(() => _isPinned = !_isPinned),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding: const EdgeInsets.all(8),
+                decoration: BoxDecoration(
+                  color: _isPinned
+                      ? iconColor.withValues(alpha: 0.15)
+                      : Colors.transparent,
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  _isPinned ? Icons.push_pin : Icons.push_pin_outlined,
+                  color: _isPinned
+                      ? iconColor
+                      : iconColor.withValues(alpha: 0.4),
+                  size: 20,
                 ),
               ),
             ),
@@ -109,73 +173,6 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
         body: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
           children: [
-            // Header card
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: isDark ? const Color(0xFF132922) : const Color(0xFFE0FAF5),
-                borderRadius: BorderRadius.circular(20),
-                border: Border.all(
-                  color: iconColor.withValues(alpha: isDark ? 0.3 : 0.2),
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 52, height: 52,
-                    decoration: BoxDecoration(
-                      color: iconColor.withValues(alpha: 0.15),
-                      borderRadius: BorderRadius.circular(14),
-                    ),
-                    child: Icon(Icons.sticky_note_2_outlined, color: iconColor, size: 26),
-                  ),
-                  const SizedBox(width: 14),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          'Secure Note',
-                          style: TextStyle(
-                            fontWeight: FontWeight.w700,
-                            fontSize: 16,
-                            color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          'Encrypted end-to-end',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: iconColor,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  // Pin toggle
-                  GestureDetector(
-                    onTap: () => setState(() => _isPinned = !_isPinned),
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      padding: const EdgeInsets.all(8),
-                      decoration: BoxDecoration(
-                        color: _isPinned
-                            ? iconColor.withValues(alpha: 0.15)
-                            : Colors.transparent,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Icon(
-                        _isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                        color: _isPinned ? iconColor : iconColor.withValues(alpha: 0.4),
-                        size: 20,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
             const SizedBox(height: 24),
 
             // Title field
@@ -209,7 +206,9 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                 minLines: 6,
                 style: TextStyle(
                   fontSize: 14,
-                  color: isDark ? const Color(0xFFE5E0EE) : const Color(0xFF1A1A2E),
+                  color: isDark
+                      ? const Color(0xFFE5E0EE)
+                      : const Color(0xFF1A1A2E),
                   height: 1.6,
                 ),
                 decoration: InputDecoration(
@@ -244,8 +243,11 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
               width: double.infinity,
               child: ElevatedButton.icon(
                 onPressed: _canSave ? _save : null,
-                icon: Icon(Icons.check_circle_outline, size: 18,
-                    color: isDark ? Colors.black : Colors.white),
+                icon: Icon(
+                  Icons.check_circle_outline,
+                  size: 18,
+                  color: isDark ? Colors.black : Colors.white,
+                ),
                 label: Text(
                   'Save Note',
                   style: TextStyle(
@@ -256,9 +258,12 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                 ),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isDark ? _kTeal : _kTealDark,
-                  disabledBackgroundColor: (isDark ? _kTeal : _kTealDark).withValues(alpha: 0.3),
+                  disabledBackgroundColor: (isDark ? _kTeal : _kTealDark)
+                      .withValues(alpha: 0.3),
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16),
+                  ),
                   elevation: 0,
                 ),
               ),
@@ -331,9 +336,16 @@ class _NoteField extends StatelessWidget {
                 : const Color(0xFF464555).withValues(alpha: 0.4),
             fontSize: 14,
           ),
-          prefixIcon: Icon(icon, color: iconColor.withValues(alpha: 0.6), size: 20),
+          prefixIcon: Icon(
+            icon,
+            color: iconColor.withValues(alpha: 0.6),
+            size: 20,
+          ),
           border: InputBorder.none,
-          contentPadding: const EdgeInsets.symmetric(vertical: 16, horizontal: 4),
+          contentPadding: const EdgeInsets.symmetric(
+            vertical: 16,
+            horizontal: 4,
+          ),
         ),
       ),
     );
