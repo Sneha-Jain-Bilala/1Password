@@ -19,6 +19,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
   final _contentCtrl = TextEditingController();
   final _folderCtrl = TextEditingController();
   bool _isPinned = false;
+  bool _isFavourite = false;
 
   @override
   void dispose() {
@@ -89,30 +90,62 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
             // Favourite button
             Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: iconColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Favourite',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
+              child: _isFavourite
+                  ? ElevatedButton.icon(
+                      onPressed: () =>
+                          setState(() => _isFavourite = !_isFavourite),
+                      icon: Icon(Icons.favorite, size: 16, color: Colors.white),
+                      label: const Text(
+                        'Favourite',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: iconColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    )
+                  : OutlinedButton.icon(
+                      onPressed: () =>
+                          setState(() => _isFavourite = !_isFavourite),
+                      icon: Icon(
+                        Icons.favorite_border,
+                        size: 16,
+                        color: iconColor,
+                      ),
+                      label: Text(
+                        'Favourite',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: iconColor,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: iconColor),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
             ),
 
             // Save button
@@ -138,10 +171,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
                   ),
                   child: const Text(
                     'Save',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 14,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
                   ),
                 ),
               ),
@@ -238,35 +268,92 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
             ),
             const SizedBox(height: 28),
 
-            // Save button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _canSave ? _save : null,
-                icon: Icon(
-                  Icons.check_circle_outline,
-                  size: 18,
-                  color: isDark ? Colors.black : Colors.white,
+            Row(
+              children: [
+                Expanded(
+                  child: _isFavourite
+                      ? ElevatedButton.icon(
+                          onPressed: () =>
+                              setState(() => _isFavourite = !_isFavourite),
+                          icon: Icon(
+                            Icons.favorite,
+                            size: 18,
+                            color: isDark ? Colors.black : Colors.white,
+                          ),
+                          label: Text(
+                            'Favourite',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              color: isDark ? Colors.black : Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: isDark ? _kTeal : _kTealDark,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                        )
+                      : OutlinedButton.icon(
+                          onPressed: () =>
+                              setState(() => _isFavourite = !_isFavourite),
+                          icon: Icon(
+                            Icons.favorite_border,
+                            size: 18,
+                            color: isDark ? _kTeal : _kTealDark,
+                          ),
+                          label: Text(
+                            'Favourite',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              color: isDark ? _kTeal : _kTealDark,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(
+                              color: isDark ? _kTeal : _kTealDark,
+                            ),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
                 ),
-                label: Text(
-                  'Save Note',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                    color: isDark ? Colors.black : Colors.white,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _canSave ? _save : null,
+                    icon: Icon(
+                      Icons.check_circle_outline,
+                      size: 18,
+                      color: isDark ? Colors.black : Colors.white,
+                    ),
+                    label: Text(
+                      'Save',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        color: isDark ? Colors.black : Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: isDark ? _kTeal : _kTealDark,
+                      disabledBackgroundColor: (isDark ? _kTeal : _kTealDark)
+                          .withValues(alpha: 0.3),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: isDark ? _kTeal : _kTealDark,
-                  disabledBackgroundColor: (isDark ? _kTeal : _kTealDark)
-                      .withValues(alpha: 0.3),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-              ),
+              ],
             ),
           ],
         ),

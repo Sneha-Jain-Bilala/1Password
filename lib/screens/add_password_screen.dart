@@ -94,6 +94,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
   bool _passVisible = false;
+  bool _isFavourite = false;
 
   // more options form
   bool _moreOptionsExpanded = false;
@@ -253,17 +254,14 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
     );
   }
 
-  bool get _canSave => _emailCtrl.text.trim().isNotEmpty && _passCtrl.text.isNotEmpty;
+  bool get _canSave =>
+      _emailCtrl.text.trim().isNotEmpty && _passCtrl.text.isNotEmpty;
 
   Future<void> _save() async {
     if (!_canSave) return;
-    
-    final name = _state == _ServiceState.known
-        ? _selected!.name
-        : _customName;
-    final color = _state == _ServiceState.known
-        ? _selected!.color
-        : _kViolet;
+
+    final name = _state == _ServiceState.known ? _selected!.name : _customName;
+    final color = _state == _ServiceState.known ? _selected!.color : _kViolet;
 
     final item = VaultItem(
       id: '',
@@ -324,40 +322,76 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           ),
           centerTitle: true,
           actions: [
-            // Favourite button (same style as Save)
+            // Favourite button
             Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: ElevatedButton(
-                onPressed: () {},
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: accentColor,
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 20,
-                    vertical: 8,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  minimumSize: Size.zero,
-                  tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                  elevation: 0,
-                ),
-                child: const Text(
-                  'Favourite',
-                  style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                ),
-              ),
+              child: _isFavourite
+                  ? ElevatedButton.icon(
+                      onPressed: () =>
+                          setState(() => _isFavourite = !_isFavourite),
+                      icon: const Icon(
+                        Icons.favorite,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        'Favourite',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    )
+                  : OutlinedButton.icon(
+                      onPressed: () =>
+                          setState(() => _isFavourite = !_isFavourite),
+                      icon: Icon(
+                        Icons.favorite_border,
+                        size: 16,
+                        color: accentColor,
+                      ),
+                      label: Text(
+                        'Favourite',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: accentColor,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: accentColor),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    ),
             ),
 
             // Save button (existing)
             Padding(
               padding: const EdgeInsets.only(right: 12),
               child: ListenableBuilder(
-                listenable: Listenable.merge([
-                  _emailCtrl,
-                  _passCtrl,
-                ]),
+                listenable: Listenable.merge([_emailCtrl, _passCtrl]),
                 builder: (context, _) => Opacity(
                   opacity: _canSave ? 1.0 : 0.4,
                   child: ElevatedButton(
@@ -397,6 +431,93 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                 : _buildServiceHeader(context, isDark),
             const SizedBox(height: 24),
             _buildForm(context, isDark),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: _isFavourite
+                      ? ElevatedButton.icon(
+                          onPressed: () =>
+                              setState(() => _isFavourite = !_isFavourite),
+                          icon: const Icon(
+                            Icons.favorite,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Favourite',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: accentColor,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                        )
+                      : OutlinedButton.icon(
+                          onPressed: () =>
+                              setState(() => _isFavourite = !_isFavourite),
+                          icon: Icon(
+                            Icons.favorite_border,
+                            size: 18,
+                            color: accentColor,
+                          ),
+                          label: Text(
+                            'Favourite',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              color: accentColor,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: accentColor),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _canSave ? _save : null,
+                    icon: const Icon(
+                      Icons.check_circle_outline,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      'Save',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accentColor,
+                      disabledBackgroundColor: accentColor.withValues(
+                        alpha: 0.3,
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ],
         ),
       ),
