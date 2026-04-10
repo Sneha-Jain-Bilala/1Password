@@ -101,19 +101,9 @@ class DashboardScreen extends StatelessWidget {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.notifications_outlined,
-              color: isDark
-                  ? const Color(0xFFC4C0FF)
-                  : theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
+       
       ),
+      
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
