@@ -8,7 +8,11 @@ plugins {
 android {
     namespace = "com.example.passmanager"
     compileSdk = 36
-    ndkVersion = flutter.ndkVersion
+
+    externalNativeBuild {
+        cmake { path = null }
+        ndkBuild { path = null }
+    }
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

@@ -218,33 +218,69 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
           ),
           centerTitle: true,
           actions: [
-            // Favourite button (light by default, darkens when clicked)
+            // Favourite button
             Padding(
               padding: const EdgeInsets.only(right: 8),
-              child: Opacity(
-                opacity: _isFavourite ? 1.0 : 0.4,
-                child: ElevatedButton(
-                  onPressed: () => setState(() => _isFavourite = !_isFavourite),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: accentColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
+              child: _isFavourite
+                  ? ElevatedButton.icon(
+                      onPressed: () =>
+                          setState(() => _isFavourite = !_isFavourite),
+                      icon: const Icon(
+                        Icons.favorite,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                      label: const Text(
+                        'Favourite',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                        ),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: accentColor,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                    )
+                  : OutlinedButton.icon(
+                      onPressed: () =>
+                          setState(() => _isFavourite = !_isFavourite),
+                      icon: Icon(
+                        Icons.favorite_border,
+                        size: 16,
+                        color: accentColor,
+                      ),
+                      label: Text(
+                        'Favourite',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w700,
+                          fontSize: 14,
+                          color: accentColor,
+                        ),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: BorderSide(color: accentColor),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 8,
+                        ),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        minimumSize: Size.zero,
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
                     ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Favourite',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                  ),
-                ),
-              ),
             ),
 
             // Save button (existing)
@@ -402,33 +438,91 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
             ),
             const SizedBox(height: 28),
 
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton.icon(
-                onPressed: _canSave ? _save : null,
-                icon: const Icon(
-                  Icons.check_circle_outline,
-                  size: 18,
-                  color: Colors.white,
+            Row(
+              children: [
+                Expanded(
+                  child: _isFavourite
+                      ? ElevatedButton.icon(
+                          onPressed: () =>
+                              setState(() => _isFavourite = !_isFavourite),
+                          icon: const Icon(
+                            Icons.favorite,
+                            size: 18,
+                            color: Colors.white,
+                          ),
+                          label: const Text(
+                            'Favourite',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              color: Colors.white,
+                            ),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: accentColor,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            elevation: 0,
+                          ),
+                        )
+                      : OutlinedButton.icon(
+                          onPressed: () =>
+                              setState(() => _isFavourite = !_isFavourite),
+                          icon: Icon(
+                            Icons.favorite_border,
+                            size: 18,
+                            color: accentColor,
+                          ),
+                          label: Text(
+                            'Favourite',
+                            style: TextStyle(
+                              fontWeight: FontWeight.w700,
+                              fontSize: 15,
+                              color: accentColor,
+                            ),
+                          ),
+                          style: OutlinedButton.styleFrom(
+                            side: BorderSide(color: accentColor),
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                        ),
                 ),
-                label: const Text(
-                  'Save Card',
-                  style: TextStyle(
-                    fontWeight: FontWeight.w700,
-                    fontSize: 15,
-                    color: Colors.white,
+                const SizedBox(width: 12),
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: _canSave ? _save : null,
+                    icon: const Icon(
+                      Icons.check_circle_outline,
+                      size: 18,
+                      color: Colors.white,
+                    ),
+                    label: const Text(
+                      'Save Card',
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 15,
+                        color: Colors.white,
+                      ),
+                    ),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: accentColor,
+                      disabledBackgroundColor: accentColor.withValues(
+                        alpha: 0.3,
+                      ),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 0,
+                    ),
                   ),
                 ),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: accentColor,
-                  disabledBackgroundColor: accentColor.withValues(alpha: 0.3),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  elevation: 0,
-                ),
-              ),
+              ],
             ),
           ],
         ),
