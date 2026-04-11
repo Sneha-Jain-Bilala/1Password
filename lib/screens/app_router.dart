@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../backend/auth_controller.dart';
+
 import 'splash_screen.dart';
 import 'onboarding_screen.dart';
 import 'sign_in_screen.dart';
@@ -26,6 +27,11 @@ import 'add_note_screen.dart';
 import 'add_card_screen.dart';
 import 'add_address_screen.dart';
 
+// ✅ NEW SCREENS
+import 'profile_screen.dart';
+import 'change_password_screen.dart';
+import 'privacy_policy_screen.dart';
+
 part 'app_router.g.dart';
 
 @riverpod
@@ -37,6 +43,8 @@ GoRouter appRouter(Ref ref) {
   return GoRouter(
     initialLocation: '/',
     refreshListenable: refresh,
+
+    // ✅ AUTH REDIRECT (IMPORTANT)
     redirect: (context, state) {
       final location = state.matchedLocation;
       final isLoggedIn = client.auth.currentSession != null;
@@ -57,11 +65,10 @@ GoRouter appRouter(Ref ref) {
 
       return null;
     },
+
     routes: [
-      GoRoute(
-        path: '/',
-        builder: (context, state) => const SplashScreen(),
-      ),
+      // ✅ BASIC ROUTES
+      GoRoute(path: '/', builder: (context, state) => const SplashScreen()),
       GoRoute(
         path: '/onboarding',
         builder: (context, state) => const OnboardingScreen(),
@@ -82,6 +89,8 @@ GoRouter appRouter(Ref ref) {
         path: '/master_password',
         builder: (context, state) => const MasterPasswordScreen(),
       ),
+
+      // ✅ ADD SCREENS
       GoRoute(
         path: '/add_password',
         builder: (context, state) => const AddPasswordScreen(),
@@ -98,10 +107,16 @@ GoRouter appRouter(Ref ref) {
         path: '/add_address',
         builder: (context, state) => const AddAddressScreen(),
       ),
+
+      // ✅ FIXED ITEM DETAIL (IMPORTANT)
       GoRoute(
         path: '/item_detail',
-        builder: (context, state) => const ItemDetailScreen(),
+        builder: (context, state) {
+          final platformName = state.extra as String?;
+          return ItemDetailScreen(platformName: platformName ?? '');
+        },
       ),
+
       GoRoute(
         path: '/password_health',
         builder: (context, state) => const PasswordHealthScreen(),
@@ -114,6 +129,22 @@ GoRouter appRouter(Ref ref) {
         path: '/autofill',
         builder: (context, state) => const AutofillPromptScreen(),
       ),
+
+      // ✅ NEW FEATURES (FROM CLAUDE)
+      GoRoute(
+        path: '/profile',
+        builder: (context, state) => const ProfileScreen(),
+      ),
+      GoRoute(
+        path: '/change_password',
+        builder: (context, state) => const ChangePasswordScreen(),
+      ),
+      GoRoute(
+        path: '/privacy_policy',
+        builder: (context, state) => const PrivacyPolicyScreen(),
+      ),
+
+      // ✅ BOTTOM NAV
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return MainShell(navigationShell: navigationShell);
@@ -152,11 +183,12 @@ GoRouter appRouter(Ref ref) {
             ],
           ),
         ],
-      )
+      ),
     ],
   );
 }
 
+// ✅ REQUIRED FOR AUTH REFRESH
 class _GoRouterRefreshStream extends ChangeNotifier {
   _GoRouterRefreshStream(Stream<dynamic> stream) {
     _subscription = stream.listen((_) => notifyListeners());

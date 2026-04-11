@@ -1,40 +1,37 @@
 // lib/screens/dashboard_screen.dart
 //
-// Changes from original:
-//  • Feature 1 — PlatformIcon widget replaces the hardcoded Icons.language globe.
-//  • Feature 2 — chevron_right button triggers BiometricAuthService before
-//                navigating; shows a SnackBar on failure/cancellation.
+// Feature 2: Dynamic greeting (time-based) + real user name from Supabase.
+// Feature 1 (PlatformIcon) and biometric-on-tap remain from previous session.
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../services/platform_icon_service.dart'; // Feature 1
-import '../services/biometric_auth_service.dart'; // Feature 2
+import '../backend/user_display_provider.dart';
+import '../services/platform_icon_service.dart';
+import '../services/biometric_auth_service.dart';
 import '../widgets/app_card.dart';
 
-class DashboardScreen extends StatelessWidget {
+// Convert to ConsumerWidget so we can read Riverpod providers
+class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
-  // ── Feature 2: authenticate then navigate ─────────────────────────────────
   Future<void> _onItemTap(BuildContext context, String platformName) async {
     final result = await BiometricAuthService.authenticate(
       reason: 'Verify your identity to view "$platformName" password',
     );
-
     if (!context.mounted) return;
 
     if (result == BiometricResult.success) {
-      // Replace with your real route + any extra data you need to pass
       context.push('/item_detail', extra: platformName);
     } else {
-      final message = BiometricAuthService.errorMessage(result);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
             children: [
               const Icon(Icons.fingerprint, color: Colors.white),
               const SizedBox(width: 12),
-              Expanded(child: Text(message)),
+              Expanded(child: Text(BiometricAuthService.errorMessage(result))),
             ],
           ),
           behavior: SnackBarBehavior.floating,
@@ -49,12 +46,14 @@ class DashboardScreen extends StatelessWidget {
     }
   }
 
-  // ─────────────────────────────────────────────────────────────────────────
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+
+    // ── Feature 2: Dynamic greeting + user name ───────────────────────────
+    final greeting = dynamicGreeting(); // "Good Morning" etc.
+    final userName = ref.watch(userDisplayNameProvider); // from Supabase
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -82,14 +81,16 @@ class DashboardScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
+                // ── Dynamic greeting ────────────────────────────────────
                 Text(
-                  'Good morning,',
+                  '$greeting,',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
+                // ── Dynamic user name ───────────────────────────────────
                 Text(
-                  'Alex 👋',
+                  '$userName 👋',
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: isDark
                         ? const Color(0xFFC4C0FF)
@@ -101,14 +102,24 @@ class DashboardScreen extends StatelessWidget {
             ),
           ],
         ),
-       
+        actions: [
+          IconButton(
+            onPressed: () {},
+            icon: Icon(
+              Icons.notifications_outlined,
+              color: isDark
+                  ? const Color(0xFFC4C0FF)
+                  : theme.colorScheme.primary,
+            ),
+          ),
+          const SizedBox(width: 8),
+        ],
       ),
-      
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
           children: [
-            // ── Health Score Hero Card ──────────────────────────────────────
+            // ── Health Score Hero Card ──────────────────────────────────
             Container(
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(28),
@@ -187,7 +198,6 @@ class DashboardScreen extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            // Circular score
                             SizedBox(
                               width: 100,
                               height: 100,
@@ -287,7 +297,6 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            // ── Quick Access ────────────────────────────────────────────────
             Text(
               'QUICK ACCESS',
               style: theme.textTheme.labelMedium?.copyWith(
@@ -323,7 +332,6 @@ class DashboardScreen extends StatelessWidget {
 
             const SizedBox(height: 32),
 
-            // ── Recent Activity ─────────────────────────────────────────────
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -344,8 +352,6 @@ class DashboardScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // ── Activity items ──────────────────────────────────────────────
-            // Feature 1 + Feature 2 are both applied inside _buildRecentActivityItem
             _buildRecentActivityItem(
               context,
               'Netflix',
@@ -380,8 +386,6 @@ class DashboardScreen extends StatelessWidget {
       ),
     );
   }
-
-  // ── Quick access pill (unchanged) ─────────────────────────────────────────
 
   Widget _buildQuickAccessPill(
     BuildContext context,
@@ -427,8 +431,6 @@ class DashboardScreen extends StatelessWidget {
     );
   }
 
-  // ── Recent activity item — Feature 1 + Feature 2 applied here ─────────────
-
   Widget _buildRecentActivityItem(
     BuildContext context,
     String title,
@@ -440,9 +442,7 @@ class DashboardScreen extends StatelessWidget {
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
-          // ── Feature 1: PlatformIcon replaces hardcoded Icons.language ──
           PlatformIcon(platformName: title, size: 48),
-
           const SizedBox(width: 16),
           Expanded(
             child: Column(
@@ -490,15 +490,11 @@ class DashboardScreen extends StatelessWidget {
               ],
             ),
           ),
-
-          // Copy button (unchanged)
           IconButton(
             onPressed: () {},
             icon: const Icon(Icons.copy, size: 20),
             color: theme.colorScheme.onSurfaceVariant,
           ),
-
-          // ── Feature 2: Biometric auth before navigation ─────────────────
           IconButton(
             onPressed: () => _onItemTap(context, title),
             icon: const Icon(Icons.chevron_right, size: 24),

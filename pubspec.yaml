@@ -19,11 +19,9 @@ dependencies:
   google_fonts: ^6.2.1
   ml_card_scanner: ^0.2.3
   supabase_flutter: ^2.9.1
-  shared_preferences: ^2.5.3
+  shared_preferences: ^2.5.3 # theme + biometric pref persistence
   crypto: ^3.0.3
-
-  # ── Feature 2: Biometric authentication ──────────────────────────────────
-  local_auth: ^2.3.0
+  local_auth: ^2.3.0 # biometric authentication
 
 dev_dependencies:
   flutter_test:
