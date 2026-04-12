@@ -1,9 +1,11 @@
 // lib/screens/dashboard_screen.dart
 //
-// Feature 2: Dynamic greeting (time-based) + real user name from Supabase.
-// Feature 1 (PlatformIcon) and biometric-on-tap remain from previous session.
+// Feature 2: Entire password tile is now clickable (not just the ">" arrow).
+// Tapping anywhere on the tile triggers biometric auth → navigates to detail.
+// The copy button still works independently without triggering auth.
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
@@ -12,7 +14,6 @@ import '../services/platform_icon_service.dart';
 import '../services/biometric_auth_service.dart';
 import '../widgets/app_card.dart';
 
-// Convert to ConsumerWidget so we can read Riverpod providers
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
@@ -24,7 +25,8 @@ class DashboardScreen extends ConsumerWidget {
 
     if (result == BiometricResult.success) {
       context.push('/item_detail', extra: platformName);
-    } else {
+    } else if (result != BiometricResult.cancelled) {
+      // Don't show a snackbar for cancelled — user chose to dismiss
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Row(
@@ -46,14 +48,32 @@ class DashboardScreen extends ConsumerWidget {
     }
   }
 
+  // Copy username to clipboard without authentication
+  void _onCopyTap(BuildContext context, String subtitle) {
+    Clipboard.setData(ClipboardData(text: subtitle));
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: const Row(
+          children: [
+            Icon(Icons.check, color: Colors.white, size: 18),
+            SizedBox(width: 10),
+            Text('Username copied'),
+          ],
+        ),
+        behavior: SnackBarBehavior.floating,
+        duration: const Duration(seconds: 2),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        margin: const EdgeInsets.all(16),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
-
-    // ── Feature 2: Dynamic greeting + user name ───────────────────────────
-    final greeting = dynamicGreeting(); // "Good Morning" etc.
-    final userName = ref.watch(userDisplayNameProvider); // from Supabase
+    final greeting = dynamicGreeting();
+    final userNameAsync = ref.watch(userDisplayNameProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -81,22 +101,26 @@ class DashboardScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                // ── Dynamic greeting ────────────────────────────────────
                 Text(
                   '$greeting,',
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: theme.colorScheme.onSurfaceVariant,
                   ),
                 ),
-                // ── Dynamic user name ───────────────────────────────────
-                Text(
-                  '$userName 👋',
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    color: isDark
-                        ? const Color(0xFFC4C0FF)
-                        : theme.colorScheme.primary,
-                    fontWeight: FontWeight.w600,
+                userNameAsync.when(
+                  data: (name) => Text(
+                    '$name 👋',
+                    style: theme.textTheme.titleMedium?.copyWith(
+                      color: isDark
+                          ? const Color(0xFFC4C0FF)
+                          : theme.colorScheme.primary,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
+                  loading: () =>
+                      Text('...', style: theme.textTheme.titleMedium),
+                  error: (_, __) =>
+                      Text('User 👋', style: theme.textTheme.titleMedium),
                 ),
               ],
             ),
@@ -431,6 +455,7 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
+  // ── Feature 2: entire tile is now wrapped in InkWell ─────────────────────
   Widget _buildRecentActivityItem(
     BuildContext context,
     String title,
@@ -438,69 +463,86 @@ class DashboardScreen extends ConsumerWidget {
     bool is2FA,
   ) {
     final theme = Theme.of(context);
+
     return AppCard(
-      padding: const EdgeInsets.all(16),
-      child: Row(
-        children: [
-          PlatformIcon(platformName: title, size: 48),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: theme.textTheme.bodyLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Row(
+      padding: EdgeInsets.zero,
+      child: InkWell(
+        onTap: () => _onItemTap(context, title), // ← whole tile tappable
+        borderRadius: BorderRadius.circular(16), // match AppCard radius
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              PlatformIcon(platformName: title, size: 48),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      subtitle,
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
+                      title,
+                      style: theme.textTheme.bodyLarge?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: theme.colorScheme.onSurface,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Container(
-                      width: 6,
-                      height: 6,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: is2FA
-                            ? theme.colorScheme.secondary
-                            : theme.colorScheme.outlineVariant,
-                        boxShadow: is2FA
-                            ? [
-                                BoxShadow(
-                                  color: theme.colorScheme.secondary.withValues(
-                                    alpha: 0.5,
-                                  ),
-                                  blurRadius: 8,
-                                ),
-                              ]
-                            : null,
-                      ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          subtitle,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          width: 6,
+                          height: 6,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: is2FA
+                                ? theme.colorScheme.secondary
+                                : theme.colorScheme.outlineVariant,
+                            boxShadow: is2FA
+                                ? [
+                                    BoxShadow(
+                                      color: theme.colorScheme.secondary
+                                          .withValues(alpha: 0.5),
+                                      blurRadius: 8,
+                                    ),
+                                  ]
+                                : null,
+                          ),
+                        ),
+                      ],
                     ),
                   ],
                 ),
-              ],
-            ),
+              ),
+
+              // Copy button — stops tap propagation so it doesn't trigger auth
+              GestureDetector(
+                onTap: () => _onCopyTap(context, subtitle),
+                behavior: HitTestBehavior.opaque,
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Icon(
+                    Icons.copy,
+                    size: 20,
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ),
+              const SizedBox(width: 4),
+              Icon(
+                Icons.chevron_right,
+                size: 24,
+                color: theme.colorScheme.onSurfaceVariant,
+              ),
+            ],
           ),
-          IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.copy, size: 20),
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-          IconButton(
-            onPressed: () => _onItemTap(context, title),
-            icon: const Icon(Icons.chevron_right, size: 24),
-            color: theme.colorScheme.onSurfaceVariant,
-          ),
-        ],
+        ),
       ),
     );
   }

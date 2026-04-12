@@ -13,7 +13,7 @@ class ProfileScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final user = Supabase.instance.client.auth.currentUser;
-    final displayName = ref.watch(userDisplayNameProvider);
+    final displayName = ref.watch(userDisplayNameProvider).value ?? 'User';
 
     return Scaffold(
       appBar: AppBar(title: const Text('Profile')),

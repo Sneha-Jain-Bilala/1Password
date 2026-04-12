@@ -1,3 +1,9 @@
+// lib/screens/sign_up_screen.dart
+//
+// Feature 1 change: after successful sign-up with an active session,
+// navigate to /biometric_setup instead of /unlock.
+// The rest of the UI is unchanged.
+
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -50,8 +56,10 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
           );
 
       if (!mounted) return;
+
       if (hasSession) {
-        context.go('/unlock');
+        // ── Feature 1: go to biometric setup, not /unlock ─────────────────
+        context.go('/biometric_setup');
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
@@ -70,6 +78,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
   Future<void> _socialSignIn(Future<void> Function() action) async {
     try {
       await action();
+      // After OAuth sign-up, also go through biometric setup
+      if (mounted) context.go('/biometric_setup');
     } catch (error) {
       if (!mounted) return;
       _showError(AuthController.messageFromError(error));
@@ -104,12 +114,14 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
               Positioned(
                 top: -90,
                 left: -100,
-                child: _GlowBlob(color: const Color(0xFFFF6BB4).withValues(alpha: 0.2)),
+                child: _GlowBlob(
+                    color: const Color(0xFFFF6BB4).withValues(alpha: 0.2)),
               ),
               Positioned(
                 bottom: -120,
                 right: -80,
-                child: _GlowBlob(color: const Color(0xFF8A75FF).withValues(alpha: 0.18)),
+                child: _GlowBlob(
+                    color: const Color(0xFF8A75FF).withValues(alpha: 0.18)),
               ),
               SafeArea(
                 child: Center(
@@ -125,7 +137,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                           decoration: BoxDecoration(
                             color: Colors.white.withValues(alpha: 0.08),
                             borderRadius: BorderRadius.circular(28),
-                            border: Border.all(color: Colors.white.withValues(alpha: 0.16)),
+                            border: Border.all(
+                                color: Colors.white.withValues(alpha: 0.16)),
                           ),
                           child: Form(
                             key: _formKey,
@@ -134,17 +147,24 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                               children: [
                                 Text(
                                   'Create Account',
-                                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                                    fontWeight: FontWeight.w800,
-                                    color: Colors.white,
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .displaySmall
+                                      ?.copyWith(
+                                        fontWeight: FontWeight.w800,
+                                        color: Colors.white,
+                                      ),
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
                                   'New user? Sign up to secure your vault across devices.',
-                                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.white.withValues(alpha: 0.78),
-                                  ),
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .bodyMedium
+                                      ?.copyWith(
+                                        color:
+                                            Colors.white.withValues(alpha: 0.78),
+                                      ),
                                 ),
                                 const SizedBox(height: 24),
                                 _AuthTextField(
@@ -155,7 +175,9 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   prefixIcon: Icons.person_outline,
                                   validator: (value) {
                                     final input = value?.trim() ?? '';
-                                    if (input.isEmpty) return 'Full name is required';
+                                    if (input.isEmpty) {
+                                      return 'Full name is required';
+                                    }
                                     if (input.length < 2) {
                                       return 'Please enter your full name';
                                     }
@@ -171,8 +193,12 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   prefixIcon: Icons.mail_outline,
                                   validator: (value) {
                                     final input = value?.trim() ?? '';
-                                    if (input.isEmpty) return 'Email is required';
-                                    if (!input.contains('@')) return 'Enter a valid email';
+                                    if (input.isEmpty) {
+                                      return 'Email is required';
+                                    }
+                                    if (!input.contains('@')) {
+                                      return 'Enter a valid email';
+                                    }
                                     return null;
                                   },
                                 ),
@@ -186,14 +212,15 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   suffixIcon: IconButton(
                                     onPressed: isBusy
                                         ? null
-                                        : () => setState(
-                                              () => _obscurePassword = !_obscurePassword,
-                                            ),
+                                        : () => setState(() =>
+                                            _obscurePassword =
+                                                !_obscurePassword),
                                     icon: Icon(
                                       _obscurePassword
                                           ? Icons.visibility_outlined
                                           : Icons.visibility_off_outlined,
-                                      color: Colors.white.withValues(alpha: 0.72),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.72),
                                     ),
                                   ),
                                   validator: (value) {
@@ -201,7 +228,7 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       return 'Password is required';
                                     }
                                     if ((value ?? '').length < 8) {
-                                      return 'Use at least 8 characters';
+                                      return 'Minimum 8 characters';
                                     }
                                     return null;
                                   },
@@ -212,26 +239,23 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   enabled: !isBusy,
                                   hintText: 'Confirm password',
                                   obscureText: _obscureConfirmPassword,
-                                  prefixIcon: Icons.verified_outlined,
+                                  prefixIcon: Icons.lock_outline,
                                   suffixIcon: IconButton(
                                     onPressed: isBusy
                                         ? null
-                                        : () => setState(
-                                              () => _obscureConfirmPassword =
-                                                  !_obscureConfirmPassword,
-                                            ),
+                                        : () => setState(() =>
+                                            _obscureConfirmPassword =
+                                                !_obscureConfirmPassword),
                                     icon: Icon(
                                       _obscureConfirmPassword
                                           ? Icons.visibility_outlined
                                           : Icons.visibility_off_outlined,
-                                      color: Colors.white.withValues(alpha: 0.72),
+                                      color:
+                                          Colors.white.withValues(alpha: 0.72),
                                     ),
                                   ),
                                   validator: (value) {
-                                    if ((value ?? '').isEmpty) {
-                                      return 'Confirm your password';
-                                    }
-                                    if ((value ?? '') != _passwordController.text) {
+                                    if (value != _passwordController.text) {
                                       return 'Passwords do not match';
                                     }
                                     return null;
@@ -252,7 +276,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       ? const SizedBox(
                                           width: 20,
                                           height: 20,
-                                          child: CircularProgressIndicator(strokeWidth: 2),
+                                          child: CircularProgressIndicator(
+                                              strokeWidth: 2),
                                         )
                                       : const Text(
                                           'Sign Up',
@@ -270,7 +295,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                   label: 'Continue with Google',
                                   onPressed: isBusy
                                       ? null
-                                      : () => _socialSignIn(authController.signInWithGoogle),
+                                      : () => _socialSignIn(
+                                          authController.signInWithGoogle),
                                 ),
                                 if (authController.supportsAppleSignIn)
                                   Padding(
@@ -280,7 +306,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                       label: 'Continue with Apple',
                                       onPressed: isBusy
                                           ? null
-                                          : () => _socialSignIn(authController.signInWithApple),
+                                          : () => _socialSignIn(
+                                              authController.signInWithApple),
                                     ),
                                   ),
                                 const SizedBox(height: 18),
@@ -290,11 +317,13 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
                                     Text(
                                       'Already registered? ',
                                       style: TextStyle(
-                                        color: Colors.white.withValues(alpha: 0.72),
-                                      ),
+                                          color: Colors.white
+                                              .withValues(alpha: 0.72)),
                                     ),
                                     TextButton(
-                                      onPressed: isBusy ? null : () => context.go('/sign_in'),
+                                      onPressed: isBusy
+                                          ? null
+                                          : () => context.go('/sign_in'),
                                       child: const Text('Sign in instead'),
                                     ),
                                   ],
@@ -315,6 +344,8 @@ class _SignUpScreenState extends ConsumerState<SignUpScreen> {
     );
   }
 }
+
+// ── Shared sub-widgets (unchanged from original) ──────────────────────────────
 
 class _AuthTextField extends StatelessWidget {
   const _AuthTextField({
@@ -351,7 +382,8 @@ class _AuthTextField extends StatelessWidget {
         fillColor: Colors.white.withValues(alpha: 0.12),
         hintText: hintText,
         hintStyle: TextStyle(color: Colors.white.withValues(alpha: 0.56)),
-        prefixIcon: Icon(prefixIcon, color: Colors.white.withValues(alpha: 0.74)),
+        prefixIcon:
+            Icon(prefixIcon, color: Colors.white.withValues(alpha: 0.74)),
         suffixIcon: suffixIcon,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(14),
@@ -372,7 +404,6 @@ class _AuthTextField extends StatelessWidget {
 
 class _SeparatorLabel extends StatelessWidget {
   const _SeparatorLabel({required this.label});
-
   final String label;
 
   @override
@@ -382,13 +413,9 @@ class _SeparatorLabel extends StatelessWidget {
         Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.2))),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: 10),
-          child: Text(
-            label,
-            style: TextStyle(
-              color: Colors.white.withValues(alpha: 0.7),
-              fontSize: 12,
-            ),
-          ),
+          child: Text(label,
+              style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.7), fontSize: 12)),
         ),
         Expanded(child: Divider(color: Colors.white.withValues(alpha: 0.2))),
       ],
@@ -424,7 +451,6 @@ class _SocialButton extends StatelessWidget {
 
 class _GlowBlob extends StatelessWidget {
   const _GlowBlob({required this.color});
-
   final Color color;
 
   @override

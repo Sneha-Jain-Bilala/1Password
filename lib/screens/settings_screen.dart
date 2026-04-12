@@ -1,18 +1,14 @@
 // lib/screens/settings_screen.dart
 //
-// Feature 3: All settings tiles are now fully functional:
-//  • Biometrics toggle  — persisted via SharedPreferences
-//  • Change Master Password — navigates to /change_password
-//  • Dark Mode toggle   — drives app theme, persisted
-//  • Profile            — navigates to /profile
-//  • Sync               — simulated with progress indicator + snackbar
-//  • Privacy Policy     — navigates to /privacy_policy
+// Feature 3: Sign Out button added at bottom of settings list.
+// Calls Supabase signOut() → clears session → redirects to /sign_in via GoRouter.
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 import '../backend/theme_provider.dart';
 import '../backend/biometric_pref_provider.dart';
+import '../backend/auth_controller.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -23,10 +19,10 @@ class SettingsScreen extends ConsumerStatefulWidget {
 
 class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   bool _isSyncing = false;
+  bool _isSigningOut = false;
 
   Future<void> _triggerSync() async {
     setState(() => _isSyncing = true);
-    // Simulate a network sync delay
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
     setState(() => _isSyncing = false);
@@ -47,6 +43,59 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     );
   }
 
+  // ── Feature 3: Sign Out ───────────────────────────────────────────────────
+  Future<void> _signOut() async {
+    // Confirm dialog
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (ctx) => AlertDialog(
+        title: const Text('Sign Out'),
+        content: const Text(
+          'Are you sure you want to sign out? Your vault data will remain encrypted on this device.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(ctx, false),
+            child: const Text('Cancel'),
+          ),
+          FilledButton(
+            onPressed: () => Navigator.pop(ctx, true),
+            style: FilledButton.styleFrom(
+              backgroundColor: Theme.of(context).colorScheme.error,
+            ),
+            child: const Text('Sign Out'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed != true || !mounted) return;
+
+    setState(() => _isSigningOut = true);
+
+    try {
+      await ref.read(authControllerProvider.notifier).signOut();
+      if (!mounted) return;
+      // GoRouter's auth redirect will handle navigation to /sign_in
+      // but we go explicitly to be safe
+      context.go('/sign_in');
+    } catch (error) {
+      if (!mounted) return;
+      setState(() => _isSigningOut = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(AuthController.messageFromError(error)),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: Theme.of(context).colorScheme.error,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(12),
+          ),
+          margin: const EdgeInsets.all(16),
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -57,9 +106,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
       appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         children: [
-          // ── Security ────────────────────────────────────────────────────
+          // ── Security ──────────────────────────────────────────────────
           _buildGroup(context, 'Security', [
-            // Biometrics toggle
             SwitchListTile(
               secondary: const Icon(Icons.fingerprint),
               title: const Text('Biometric Login'),
@@ -70,11 +118,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
               ),
               value: biometricEnabled,
-              onChanged: (val) {
-                ref.read(biometricPrefProvider.notifier).setEnabled(val);
-              },
+              onChanged: (val) =>
+                  ref.read(biometricPrefProvider.notifier).setEnabled(val),
             ),
-            // Change master password
             ListTile(
               leading: const Icon(Icons.lock),
               title: const Text('Change Master Password'),
@@ -83,19 +129,17 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ]),
 
-          // ── Appearance ──────────────────────────────────────────────────
+          // ── Appearance ─────────────────────────────────────────────────
           _buildGroup(context, 'Appearance', [
             SwitchListTile(
               secondary: Icon(isDark ? Icons.dark_mode : Icons.light_mode),
               title: const Text('Dark Mode'),
               value: isDark,
-              onChanged: (_) {
-                ref.read(themeProvider.notifier).toggle();
-              },
+              onChanged: (_) => ref.read(themeProvider.notifier).toggle(),
             ),
           ]),
 
-          // ── Account ─────────────────────────────────────────────────────
+          // ── Account ────────────────────────────────────────────────────
           _buildGroup(context, 'Account', [
             ListTile(
               leading: const Icon(Icons.person),
@@ -121,7 +165,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
             ),
           ]),
 
-          // ── About ───────────────────────────────────────────────────────
+          // ── About ──────────────────────────────────────────────────────
           _buildGroup(context, 'About', [
             const ListTile(
               leading: Icon(Icons.info),
@@ -134,6 +178,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
               onTap: () => context.push('/privacy_policy'),
             ),
           ]),
+
+          // ── Feature 3: Sign Out ─────────────────────────────────────────
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: _isSigningOut
+                ? const Center(child: CircularProgressIndicator())
+                : OutlinedButton.icon(
+                    onPressed: _signOut,
+                    icon: const Icon(Icons.logout),
+                    label: const Text('Sign Out'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: theme.colorScheme.error,
+                      side: BorderSide(color: theme.colorScheme.error),
+                      minimumSize: const Size.fromHeight(52),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                    ),
+                  ),
+          ),
+          const SizedBox(height: 32),
         ],
       ),
     );
