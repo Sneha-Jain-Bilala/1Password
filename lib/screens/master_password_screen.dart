@@ -115,12 +115,11 @@ class _MasterPasswordScreenState extends ConsumerState<MasterPasswordScreen> {
         _inlineError = AuthController.messageFromError(error);
       });
     } finally {
-      if (!mounted) {
-        return;
+      if (mounted) {
+        setState(() {
+          _isSubmitting = false;
+        });
       }
-      setState(() {
-        _isSubmitting = false;
-      });
     }
   }
 
@@ -158,9 +157,7 @@ class _MasterPasswordScreenState extends ConsumerState<MasterPasswordScreen> {
                           _hasMasterPassword
                               ? 'Master password is already configured. Enter it to unlock your vault.'
                               : 'No master password found. Create one to continue.',
-                          style: Theme.of(context)
-                              .textTheme
-                              .bodyMedium
+                          style: Theme.of(context).textTheme.bodyMedium
                               ?.copyWith(color: Colors.white70),
                           textAlign: TextAlign.center,
                         ),
@@ -207,8 +204,9 @@ class _MasterPasswordScreenState extends ConsumerState<MasterPasswordScreen> {
                         ),
                         const SizedBox(height: 8),
                         TextButton(
-                          onPressed:
-                              _isSubmitting ? null : () => context.go('/unlock'),
+                          onPressed: _isSubmitting
+                              ? null
+                              : () => context.go('/unlock'),
                           child: const Text('Back'),
                         ),
                       ],
