@@ -126,18 +126,7 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.notifications_outlined,
-              color: isDark
-                  ? const Color(0xFFC4C0FF)
-                  : theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
+        actions: [],
       ),
       body: SafeArea(
         child: ListView(

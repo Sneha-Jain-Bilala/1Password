@@ -145,8 +145,8 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
         title: _expandedCategory != null
             ? Text(
                 _categories
-                        .firstWhere((c) => c.itemType == _expandedCategory)
-                        .title,
+                    .firstWhere((c) => c.itemType == _expandedCategory)
+                    .title,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w700,
                   color: isDark
@@ -163,10 +163,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
                         colors: isDark
-                            ? [
-                                const Color(0xFFC4C0FF),
-                                const Color(0xFF8781FF),
-                              ]
+                            ? [const Color(0xFFC4C0FF), const Color(0xFF8781FF)]
                             : [
                                 const Color(0xFF675DF9),
                                 const Color(0xFF4D41DF),
@@ -196,15 +193,6 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
               ),
         actions: [
           if (_expandedCategory == null) ...[
-            IconButton(
-              icon: Icon(
-                Icons.notifications_outlined,
-                color: isDark
-                    ? const Color(0xFFC4C0FF)
-                    : const Color(0xFF4D41DF),
-              ),
-              onPressed: () {},
-            ),
             Container(
               width: 34,
               height: 34,
@@ -399,11 +387,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
     );
   }
 
-  Widget _buildPasswordItem(
-    BuildContext context,
-    VaultItem item,
-    bool isDark,
-  ) {
+  Widget _buildPasswordItem(BuildContext context, VaultItem item, bool isDark) {
     final color = item.serviceColor ?? const Color(0xFF6C63FF);
     final initials = item.initials;
     final cardBg = isDark ? const Color(0xFF1C1A24) : Colors.white;
@@ -427,10 +411,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
         ],
       ),
       child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 8,
-        ),
+        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
         leading: Container(
           width: 46,
           height: 46,
