@@ -2,24 +2,30 @@ import 'package:flutter/material.dart';
 
 /// Which Browse bucket this item belongs to.
 enum VaultItemType {
-  login,       // → Passwords
-  secureNote,  // → Secure Notes
-  card,        // → Cards
-  contact,     // → Contacts
-  document,    // → Docs
-  address,     // → Address
+  login, // → Passwords
+  secureNote, // → Secure Notes
+  card, // → Cards
+  contact, // → Contacts
+  document, // → Docs
+  address, // → Address
 }
 
 /// Maps a [VaultItemType] to the Browse grid label.
 extension VaultItemTypeX on VaultItemType {
   String get browseLabel {
     switch (this) {
-      case VaultItemType.login:      return 'Passwords';
-      case VaultItemType.secureNote: return 'Secure Notes';
-      case VaultItemType.card:       return 'Cards';
-      case VaultItemType.contact:    return 'Contacts';
-      case VaultItemType.document:   return 'Docs';
-      case VaultItemType.address:    return 'Address';
+      case VaultItemType.login:
+        return 'Passwords';
+      case VaultItemType.secureNote:
+        return 'Secure Notes';
+      case VaultItemType.card:
+        return 'Cards';
+      case VaultItemType.contact:
+        return 'Contacts';
+      case VaultItemType.document:
+        return 'Docs';
+      case VaultItemType.address:
+        return 'Address';
     }
   }
 }
@@ -49,6 +55,7 @@ class VaultItem {
   // ── service kind (for login type) ─────────────────────────────
   /// true = Website, false = App, null = unknown
   final bool? isWebsite;
+  final bool isFavourite;
 
   const VaultItem({
     required this.id,
@@ -65,6 +72,7 @@ class VaultItem {
     required this.createdAt,
     required this.updatedAt,
     this.isWebsite,
+    this.isFavourite = false,
   });
 
   VaultItem copyWith({
@@ -78,6 +86,7 @@ class VaultItem {
     String? folderName,
     Map<String, String>? customFields,
     bool? isWebsite,
+    bool? isFavourite,
   }) {
     return VaultItem(
       id: id,
@@ -94,6 +103,7 @@ class VaultItem {
       createdAt: createdAt,
       updatedAt: DateTime.now(),
       isWebsite: isWebsite ?? this.isWebsite,
+      isFavourite: isFavourite ?? this.isFavourite,
     );
   }
 
@@ -103,7 +113,9 @@ class VaultItem {
     if (words.length >= 2) {
       return '${words[0][0]}${words[1][0]}'.toUpperCase();
     }
-    if (serviceName.length >= 2) return serviceName.substring(0, 2).toUpperCase();
+    if (serviceName.length >= 2) {
+      return serviceName.substring(0, 2).toUpperCase();
+    }
     return serviceName.toUpperCase();
   }
 }

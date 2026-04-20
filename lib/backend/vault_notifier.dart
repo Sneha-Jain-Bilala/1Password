@@ -90,6 +90,42 @@ class VaultNotifier extends _$VaultNotifier {
   List<VaultItem> get recent =>
       [...state]..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
+  /// All favourite items sorted by most recently updated.
+  List<VaultItem> get favourites =>
+      state.where((i) => i.isFavourite).toList()
+        ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+
+  /// Update favourite status for a single item.
+  Future<void> setFavourite(String id, bool isFavourite) async {
+    final index = state.indexWhere((i) => i.id == id);
+    if (index == -1) return;
+
+    final current = state[index];
+    if (current.isFavourite == isFavourite) return;
+
+    final updated = current.copyWith(isFavourite: isFavourite);
+    await _repo.update(updated);
+    state = _repo.getAll();
+
+    await ref
+        .read(activityNotifierProvider.notifier)
+        .logActivity(
+          type: isFavourite
+              ? ActivityType.itemFavourited
+              : ActivityType.itemUnfavourited,
+          itemName: updated.serviceName,
+          itemType: updated.type.browseLabel,
+          isHighlighted: true,
+        );
+  }
+
+  /// Toggle favourite status for a single item.
+  Future<void> toggleFavourite(String id) async {
+    final index = state.indexWhere((i) => i.id == id);
+    if (index == -1) return;
+    await setFavourite(id, !state[index].isFavourite);
+  }
+
   // ── Activity type mapping helpers ────────────────────────────────
   ActivityType _getActivityTypeForAdd(VaultItemType type) {
     switch (type) {

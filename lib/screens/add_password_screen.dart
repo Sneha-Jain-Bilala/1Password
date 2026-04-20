@@ -273,6 +273,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       isWebsite: _isWebsite,
+      isFavourite: _isFavourite,
     );
 
     await ref.read(vaultNotifierProvider.notifier).addItem(item);

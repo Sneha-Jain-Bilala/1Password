@@ -86,6 +86,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
       notes: notes,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
+      isFavourite: _isFavourite,
     );
     await ref.read(vaultNotifierProvider.notifier).addItem(item);
     if (mounted) {
