@@ -11,11 +11,36 @@ import 'package:go_router/go_router.dart';
 
 import '../backend/user_display_provider.dart';
 import '../backend/activity_notifier.dart';
+import '../backend/activity_item.dart';
 import '../widgets/app_card.dart';
 import '../widgets/profile_menu_side_panel.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
+
+  /// Get color for activity type
+  Color? _getActivityColor(ActivityType activityType, ThemeData theme) {
+    final typeString = activityType.toString();
+
+    // Green for additions
+    if (typeString.contains('Added') ||
+        typeString.contains('Favoured') ||
+        typeString.contains('Completed')) {
+      return theme.colorScheme.secondary;
+    }
+
+    // Blue for updates
+    if (typeString.contains('Updated')) {
+      return theme.colorScheme.primary;
+    }
+
+    // Red for deletions/errors
+    if (typeString.contains('Deleted') || typeString.contains('Failed')) {
+      return theme.colorScheme.error;
+    }
+
+    return null;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -370,10 +395,10 @@ class DashboardScreen extends ConsumerWidget {
   /// Build a single activity card.
   Widget _buildActivityItemCard(
     BuildContext context,
-    dynamic activity,
+    ActivityItem activity,
     ThemeData theme,
   ) {
-    final acColor = activity.type.getColor(context);
+    final acColor = _getActivityColor(activity.type, theme);
     final timeAgo = activity.getTimeAgo();
 
     return AppCard(

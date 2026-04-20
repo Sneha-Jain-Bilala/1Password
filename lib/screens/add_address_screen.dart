@@ -96,7 +96,6 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      context.pop();
     }
   }
 
@@ -356,7 +355,8 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                 Expanded(
                   child: _isFavourite
                       ? ElevatedButton.icon(
-                          onPressed: () => setState(() => _isFavourite = !_isFavourite),
+                          onPressed: () =>
+                              setState(() => _isFavourite = !_isFavourite),
                           icon: Icon(
                             Icons.favorite,
                             size: 18,
@@ -380,7 +380,8 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                           ),
                         )
                       : OutlinedButton.icon(
-                          onPressed: () => setState(() => _isFavourite = !_isFavourite),
+                          onPressed: () =>
+                              setState(() => _isFavourite = !_isFavourite),
                           icon: Icon(
                             Icons.favorite_border,
                             size: 18,
@@ -422,7 +423,9 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
                     ),
                     style: ElevatedButton.styleFrom(
                       backgroundColor: accentColor,
-                      disabledBackgroundColor: accentColor.withValues(alpha: 0.3),
+                      disabledBackgroundColor: accentColor.withValues(
+                        alpha: 0.3,
+                      ),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(16),

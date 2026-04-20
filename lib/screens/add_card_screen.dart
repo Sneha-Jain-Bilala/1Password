@@ -184,7 +184,6 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
-      context.pop();
     }
   }
 

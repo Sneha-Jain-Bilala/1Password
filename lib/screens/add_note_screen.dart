@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:uuid/uuid.dart';
 import '../backend/vault_item.dart';
 import '../backend/vault_notifier.dart';
 
@@ -33,27 +34,43 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
 
   Future<void> _save() async {
     if (!_canSave) return;
-    final item = VaultItem(
-      id: '',
-      type: VaultItemType.secureNote,
-      serviceName: _titleCtrl.text.trim(),
-      notes: _contentCtrl.text.trim(),
-      folderName: _folderCtrl.text.trim().isEmpty
-          ? null
-          : _folderCtrl.text.trim(),
-      createdAt: DateTime.now(),
-      updatedAt: DateTime.now(),
-    );
-    await ref.read(vaultNotifierProvider.notifier).addItem(item);
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('"${item.serviceName}" saved to Secure Notes'),
-          backgroundColor: _kTealDark,
-          behavior: SnackBarBehavior.floating,
-        ),
+
+    try {
+      final item = VaultItem(
+        id: const Uuid().v4(),
+        type: VaultItemType.secureNote,
+        serviceName: _titleCtrl.text.trim(),
+        notes: _contentCtrl.text.trim(),
+        folderName: _folderCtrl.text.trim().isEmpty
+            ? null
+            : _folderCtrl.text.trim(),
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
       );
-      context.pop();
+
+      await ref.read(vaultNotifierProvider.notifier).addItem(item);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('"${item.serviceName}" saved to Secure Notes'),
+            backgroundColor: _kTealDark,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error saving note: $e'),
+            backgroundColor: Theme.of(context).colorScheme.error,
+            behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     }
   }
 

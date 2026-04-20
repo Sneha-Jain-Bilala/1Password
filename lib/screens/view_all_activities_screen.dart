@@ -1,10 +1,35 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../backend/activity_notifier.dart';
+import '../backend/activity_item.dart';
 import '../widgets/app_card.dart';
 
 class ViewAllActivitiesScreen extends ConsumerWidget {
   const ViewAllActivitiesScreen({super.key});
+
+  /// Get color for activity type
+  Color? _getActivityColor(ActivityType activityType, ThemeData theme) {
+    final typeString = activityType.toString();
+
+    // Green for additions
+    if (typeString.contains('Added') ||
+        typeString.contains('Favoured') ||
+        typeString.contains('Completed')) {
+      return theme.colorScheme.secondary;
+    }
+
+    // Blue for updates
+    if (typeString.contains('Updated')) {
+      return theme.colorScheme.primary;
+    }
+
+    // Red for deletions/errors
+    if (typeString.contains('Deleted') || typeString.contains('Failed')) {
+      return theme.colorScheme.error;
+    }
+
+    return null;
+  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -71,10 +96,10 @@ class ViewAllActivitiesScreen extends ConsumerWidget {
 
   Widget _buildActivityCard(
     BuildContext context,
-    dynamic activity,
+    ActivityItem activity,
     ThemeData theme,
   ) {
-    final acColor = activity.type.getColor(context);
+    final acColor = _getActivityColor(activity.type, theme);
     final timeAgo = activity.getTimeAgo();
 
     return AppCard(
