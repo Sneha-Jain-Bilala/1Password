@@ -13,6 +13,8 @@ import '../backend/user_display_provider.dart';
 import '../services/platform_icon_service.dart';
 import '../services/biometric_auth_service.dart';
 import '../widgets/app_card.dart';
+import '../widgets/profile_menu_side_panel.dart';
+import '../widgets/profile_menu_side_panel.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
@@ -83,18 +85,24 @@ class DashboardScreen extends ConsumerWidget {
         surfaceTintColor: Colors.transparent,
         title: Row(
           children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: theme.colorScheme.surfaceContainerHigh,
-                border: Border.all(
-                  color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                  width: 2,
+            GestureDetector(
+              onTap: () => showProfileMenu(context),
+              child: MouseRegion(
+                cursor: SystemMouseCursors.click,
+                child: Container(
+                  width: 40,
+                  height: 40,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: theme.colorScheme.surfaceContainerHigh,
+                    border: Border.all(
+                      color: theme.colorScheme.primary.withValues(alpha: 0.2),
+                      width: 2,
+                    ),
+                  ),
+                  child: const Icon(Icons.person, size: 24),
                 ),
               ),
-              child: const Icon(Icons.person, size: 24),
             ),
             const SizedBox(width: 12),
             Column(
@@ -126,18 +134,7 @@ class DashboardScreen extends ConsumerWidget {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            onPressed: () {},
-            icon: Icon(
-              Icons.notifications_outlined,
-              color: isDark
-                  ? const Color(0xFFC4C0FF)
-                  : theme.colorScheme.primary,
-            ),
-          ),
-          const SizedBox(width: 8),
-        ],
+        actions: [],
       ),
       body: SafeArea(
         child: ListView(
