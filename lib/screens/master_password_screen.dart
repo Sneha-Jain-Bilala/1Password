@@ -231,241 +231,245 @@ class _MasterPasswordScreenState extends ConsumerState<MasterPasswordScreen>
                         )
                       : FadeTransition(
                           opacity: _fadeAnimation,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              // Header Section
-                              Container(
-                                padding: const EdgeInsets.all(32),
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppColors.darkPrimary.withValues(
-                                        alpha: 0.2,
-                                      ),
-                                      AppColors.darkSecondary.withValues(
-                                        alpha: 0.1,
+                          child: SingleChildScrollView(
+                            padding: EdgeInsets.only(
+                              bottom: MediaQuery.of(context).viewInsets.bottom,
+                            ),
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                // Header Section
+                                Container(
+                                  padding: const EdgeInsets.all(32),
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColors.darkPrimary.withValues(
+                                          alpha: 0.2,
+                                        ),
+                                        AppColors.darkSecondary.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                      ],
+                                      begin: Alignment.topLeft,
+                                      end: Alignment.bottomRight,
+                                    ),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.darkPrimary.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        blurRadius: 20,
+                                        spreadRadius: 5,
                                       ),
                                     ],
-                                    begin: Alignment.topLeft,
-                                    end: Alignment.bottomRight,
                                   ),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.darkPrimary.withValues(
-                                        alpha: 0.3,
-                                      ),
-                                      blurRadius: 20,
-                                      spreadRadius: 5,
-                                    ),
-                                  ],
+                                  child: Icon(
+                                    _hasMasterPassword
+                                        ? Icons.lock_open_rounded
+                                        : Icons.lock_rounded,
+                                    size: 64,
+                                    color: AppColors.darkPrimary,
+                                  ),
                                 ),
-                                child: Icon(
+                                const SizedBox(height: 32),
+
+                                // Title
+                                Text(
                                   _hasMasterPassword
-                                      ? Icons.lock_open_rounded
-                                      : Icons.lock_rounded,
-                                  size: 64,
-                                  color: AppColors.darkPrimary,
-                                ),
-                              ),
-                              const SizedBox(height: 32),
-
-                              // Title
-                              Text(
-                                _hasMasterPassword
-                                    ? 'Welcome Back'
-                                    : 'Secure Your Vault',
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .headlineMedium
-                                    ?.copyWith(
-                                      color: AppColors.darkOnSurface,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 12),
-
-                              // Subtitle
-                              Text(
-                                _hasMasterPassword
-                                    ? 'Enter your master password to unlock your vault'
-                                    : 'Create a strong master password to protect your data',
-                                style: Theme.of(context).textTheme.bodyLarge
-                                    ?.copyWith(
-                                      color: AppColors.darkOnSurface.withValues(
-                                        alpha: 0.7,
+                                      ? 'Welcome Back'
+                                      : 'Secure Your Vault',
+                                  style: Theme.of(context)
+                                      .textTheme
+                                      .headlineMedium
+                                      ?.copyWith(
+                                        color: AppColors.darkOnSurface,
+                                        fontWeight: FontWeight.bold,
                                       ),
-                                      height: 1.5,
-                                    ),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 40),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 12),
 
-                              // Password Fields
-                              _buildPasswordField(
-                                controller: _passwordController,
-                                label: 'Master Password',
-                                obscureText: _obscurePassword,
-                                onToggleVisibility: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                                enabled: !_isSubmitting,
-                              ),
+                                // Subtitle
+                                Text(
+                                  _hasMasterPassword
+                                      ? 'Enter your master password to unlock your vault'
+                                      : 'Create a strong master password to protect your data',
+                                  style: Theme.of(context).textTheme.bodyLarge
+                                      ?.copyWith(
+                                        color: AppColors.darkOnSurface
+                                            .withValues(alpha: 0.7),
+                                        height: 1.5,
+                                      ),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 40),
 
-                              if (!_hasMasterPassword) ...[
-                                const SizedBox(height: 16),
+                                // Password Fields
                                 _buildPasswordField(
-                                  controller: _confirmController,
-                                  label: 'Confirm Master Password',
-                                  obscureText: _obscureConfirm,
+                                  controller: _passwordController,
+                                  label: 'Master Password',
+                                  obscureText: _obscurePassword,
                                   onToggleVisibility: () {
                                     setState(() {
-                                      _obscureConfirm = !_obscureConfirm;
+                                      _obscurePassword = !_obscurePassword;
                                     });
                                   },
                                   enabled: !_isSubmitting,
                                 ),
-                              ],
 
-                              // Error Message
-                              if (_inlineError != null) ...[
-                                const SizedBox(height: 16),
-                                Container(
-                                  padding: const EdgeInsets.all(12),
-                                  decoration: BoxDecoration(
-                                    color: AppColors.error.withValues(
-                                      alpha: 0.1,
-                                    ),
-                                    borderRadius: BorderRadius.circular(12),
-                                    border: Border.all(
+                                if (!_hasMasterPassword) ...[
+                                  const SizedBox(height: 16),
+                                  _buildPasswordField(
+                                    controller: _confirmController,
+                                    label: 'Confirm Master Password',
+                                    obscureText: _obscureConfirm,
+                                    onToggleVisibility: () {
+                                      setState(() {
+                                        _obscureConfirm = !_obscureConfirm;
+                                      });
+                                    },
+                                    enabled: !_isSubmitting,
+                                  ),
+                                ],
+
+                                // Error Message
+                                if (_inlineError != null) ...[
+                                  const SizedBox(height: 16),
+                                  Container(
+                                    padding: const EdgeInsets.all(12),
+                                    decoration: BoxDecoration(
                                       color: AppColors.error.withValues(
-                                        alpha: 0.3,
+                                        alpha: 0.1,
                                       ),
-                                    ),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      Icon(
-                                        Icons.error_outline,
-                                        color: AppColors.error,
-                                        size: 20,
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          _inlineError!,
-                                          style: TextStyle(
-                                            color: AppColors.error,
-                                            fontSize: 14,
-                                          ),
+                                      borderRadius: BorderRadius.circular(12),
+                                      border: Border.all(
+                                        color: AppColors.error.withValues(
+                                          alpha: 0.3,
                                         ),
                                       ),
+                                    ),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.error_outline,
+                                          color: AppColors.error,
+                                          size: 20,
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Expanded(
+                                          child: Text(
+                                            _inlineError!,
+                                            style: TextStyle(
+                                              color: AppColors.error,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+
+                                const SizedBox(height: 32),
+
+                                // Action Button
+                                Container(
+                                  width: double.infinity,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      colors: [
+                                        AppColors.darkPrimary,
+                                        AppColors.darkPrimaryContainer,
+                                      ],
+                                      begin: Alignment.centerLeft,
+                                      end: Alignment.centerRight,
+                                    ),
+                                    borderRadius: BorderRadius.circular(16),
+                                    boxShadow: [
+                                      BoxShadow(
+                                        color: AppColors.darkPrimary.withValues(
+                                          alpha: 0.3,
+                                        ),
+                                        blurRadius: 12,
+                                        offset: const Offset(0, 6),
+                                      ),
+                                    ],
+                                  ),
+                                  child: ElevatedButton(
+                                    onPressed: _isSubmitting ? null : _submit,
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.transparent,
+                                      shadowColor: Colors.transparent,
+                                      shape: RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(16),
+                                      ),
+                                    ),
+                                    child: _isSubmitting
+                                        ? const SizedBox(
+                                            width: 24,
+                                            height: 24,
+                                            child: CircularProgressIndicator(
+                                              strokeWidth: 2,
+                                              valueColor:
+                                                  AlwaysStoppedAnimation<Color>(
+                                                    Colors.white,
+                                                  ),
+                                            ),
+                                          )
+                                        : Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            children: [
+                                              Text(
+                                                _hasMasterPassword
+                                                    ? 'Unlock Vault'
+                                                    : 'Create Password',
+                                                style: const TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Icon(
+                                                _hasMasterPassword
+                                                    ? Icons.arrow_forward
+                                                    : Icons.shield,
+                                                size: 20,
+                                              ),
+                                            ],
+                                          ),
+                                  ),
+                                ),
+
+                                const SizedBox(height: 24),
+
+                                // Back Button
+                                TextButton(
+                                  onPressed: _isSubmitting
+                                      ? null
+                                      : () => context.go('/unlock'),
+                                  style: TextButton.styleFrom(
+                                    foregroundColor: AppColors.darkOnSurface
+                                        .withValues(alpha: 0.7),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 24,
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(Icons.arrow_back, size: 18),
+                                      SizedBox(width: 8),
+                                      Text('Back'),
                                     ],
                                   ),
                                 ),
                               ],
-
-                              const SizedBox(height: 32),
-
-                              // Action Button
-                              Container(
-                                width: double.infinity,
-                                height: 56,
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    colors: [
-                                      AppColors.darkPrimary,
-                                      AppColors.darkPrimaryContainer,
-                                    ],
-                                    begin: Alignment.centerLeft,
-                                    end: Alignment.centerRight,
-                                  ),
-                                  borderRadius: BorderRadius.circular(16),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: AppColors.darkPrimary.withValues(
-                                        alpha: 0.3,
-                                      ),
-                                      blurRadius: 12,
-                                      offset: const Offset(0, 6),
-                                    ),
-                                  ],
-                                ),
-                                child: ElevatedButton(
-                                  onPressed: _isSubmitting ? null : _submit,
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(16),
-                                    ),
-                                  ),
-                                  child: _isSubmitting
-                                      ? const SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(
-                                            strokeWidth: 2,
-                                            valueColor:
-                                                AlwaysStoppedAnimation<Color>(
-                                                  Colors.white,
-                                                ),
-                                          ),
-                                        )
-                                      : Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Text(
-                                              _hasMasterPassword
-                                                  ? 'Unlock Vault'
-                                                  : 'Create Password',
-                                              style: const TextStyle(
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w600,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Icon(
-                                              _hasMasterPassword
-                                                  ? Icons.arrow_forward
-                                                  : Icons.shield,
-                                              size: 20,
-                                            ),
-                                          ],
-                                        ),
-                                ),
-                              ),
-
-                              const SizedBox(height: 24),
-
-                              // Back Button
-                              TextButton(
-                                onPressed: _isSubmitting
-                                    ? null
-                                    : () => context.go('/unlock'),
-                                style: TextButton.styleFrom(
-                                  foregroundColor: AppColors.darkOnSurface
-                                      .withValues(alpha: 0.7),
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 24,
-                                    vertical: 12,
-                                  ),
-                                ),
-                                child: const Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(Icons.arrow_back, size: 18),
-                                    SizedBox(width: 8),
-                                    Text('Back'),
-                                  ],
-                                ),
-                              ),
-                            ],
+                            ),
                           ),
                         ),
                 ),

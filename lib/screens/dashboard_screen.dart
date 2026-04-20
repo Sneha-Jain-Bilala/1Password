@@ -229,24 +229,31 @@ class DashboardScreen extends ConsumerWidget {
                         const Divider(color: Colors.white24),
                         const SizedBox(height: 16),
                         Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Icon(
-                                  Icons.verified_user,
-                                  size: 16,
-                                  color: theme.colorScheme.onPrimary,
-                                ),
-                                const SizedBox(width: 8),
-                                Text(
-                                  '248 Passwords Encrypted',
-                                  style: theme.textTheme.bodySmall?.copyWith(
+                            Expanded(
+                              child: Row(
+                                children: [
+                                  Icon(
+                                    Icons.verified_user,
+                                    size: 16,
                                     color: theme.colorScheme.onPrimary,
                                   ),
-                                ),
-                              ],
+                                  const SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      '248 Passwords Encrypted',
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                      style: theme.textTheme.bodySmall
+                                          ?.copyWith(
+                                            color: theme.colorScheme.onPrimary,
+                                          ),
+                                    ),
+                                  ),
+                                ],
+                              ),
                             ),
+                            const SizedBox(width: 12),
                             TextButton(
                               style: TextButton.styleFrom(
                                 backgroundColor: Colors.white.withValues(
@@ -434,7 +441,9 @@ class DashboardScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      activity.type.label,
+                      activity.itemName,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onSurface,
@@ -442,7 +451,9 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      activity.itemName,
+                      activity.type.label,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),

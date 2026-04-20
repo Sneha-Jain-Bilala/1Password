@@ -159,15 +159,11 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
 
   Future<void> _save() async {
     if (!_canSave) return;
-    final cardNum = _numberCtrl.text.replaceAll(' ', '');
-    final last4 = cardNum.length >= 4
-        ? cardNum.substring(cardNum.length - 4)
-        : cardNum;
     final item = VaultItem(
       id: '',
       type: VaultItemType.card,
       serviceName: _labelCtrl.text.trim().isEmpty
-          ? '${_cardType.label} •••• $last4'
+          ? _cardType.label
           : _labelCtrl.text.trim(),
       username: _nameCtrl.text.trim(),
       password: _numberCtrl.text.trim(),

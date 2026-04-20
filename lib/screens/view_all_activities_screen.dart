@@ -101,6 +101,9 @@ class ViewAllActivitiesScreen extends ConsumerWidget {
   ) {
     final acColor = _getActivityColor(activity.type, theme);
     final timeAgo = activity.getTimeAgo();
+    final subtitle = activity.itemType == null
+        ? activity.type.label
+        : '${activity.type.label} • ${activity.itemType}';
 
     return AppCard(
       padding: const EdgeInsets.all(16),
@@ -130,34 +133,23 @@ class ViewAllActivitiesScreen extends ConsumerWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  activity.type.label,
+                  activity.itemName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
                   style: theme.textTheme.bodyLarge?.copyWith(
                     fontWeight: FontWeight.w600,
                     color: theme.colorScheme.onSurface,
                   ),
                 ),
                 const SizedBox(height: 4),
-                Row(
-                  children: [
-                    Text(
-                      activity.itemName,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: theme.colorScheme.onSurfaceVariant,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    if (activity.itemType != null) ...[
-                      const SizedBox(width: 8),
-                      Text(
-                        '• ${activity.itemType}',
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: theme.colorScheme.onSurfaceVariant.withValues(
-                            alpha: 0.7,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
+                Text(
+                  subtitle,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 if (activity.description != null) ...[
                   const SizedBox(height: 4),
