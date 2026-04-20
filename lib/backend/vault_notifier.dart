@@ -1,23 +1,31 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'auth_controller.dart';
 import 'vault_item.dart';
 import 'vault_repository.dart';
-import 'in_memory_vault_repository.dart';
+import 'supabase_vault_repository.dart';
 
 part 'vault_notifier.g.dart';
 
 // ─── Repository provider (injectable / swappable) ───────────────────
 @riverpod
 VaultRepository vaultRepository(Ref ref) {
-  return InMemoryVaultRepository();
-  // Future: return SupabaseVaultRepository(ref.read(supabaseClientProvider));
+  return SupabaseVaultRepository(ref.read(supabaseClientProvider));
 }
 
 // ─── Notifier — the single source of truth for vault items ──────────
 @riverpod
 class VaultNotifier extends _$VaultNotifier {
   @override
-  List<VaultItem> build() => [];
+  List<VaultItem> build() {
+    // Load from Supabase on first build (fire-and-forget; UI rebuilds when done)
+    Future.microtask(() async {
+      final repo = ref.read(vaultRepositoryProvider) as SupabaseVaultRepository;
+      await repo.loadAll();
+      state = repo.getAll();
+    });
+    return [];
+  }
 
   VaultRepository get _repo => ref.read(vaultRepositoryProvider);
 
