@@ -10,65 +10,12 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../backend/user_display_provider.dart';
-import '../services/platform_icon_service.dart';
-import '../services/biometric_auth_service.dart';
+import '../backend/activity_notifier.dart';
 import '../widgets/app_card.dart';
-import '../widgets/profile_menu_side_panel.dart';
 import '../widgets/profile_menu_side_panel.dart';
 
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
-
-  Future<void> _onItemTap(BuildContext context, String platformName) async {
-    final result = await BiometricAuthService.authenticate(
-      reason: 'Verify your identity to view "$platformName" password',
-    );
-    if (!context.mounted) return;
-
-    if (result == BiometricResult.success) {
-      context.push('/item_detail', extra: platformName);
-    } else if (result != BiometricResult.cancelled) {
-      // Don't show a snackbar for cancelled — user chose to dismiss
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Row(
-            children: [
-              const Icon(Icons.fingerprint, color: Colors.white),
-              const SizedBox(width: 12),
-              Expanded(child: Text(BiometricAuthService.errorMessage(result))),
-            ],
-          ),
-          behavior: SnackBarBehavior.floating,
-          backgroundColor: Theme.of(context).colorScheme.error,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 3),
-        ),
-      );
-    }
-  }
-
-  // Copy username to clipboard without authentication
-  void _onCopyTap(BuildContext context, String subtitle) {
-    Clipboard.setData(ClipboardData(text: subtitle));
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Row(
-          children: [
-            Icon(Icons.check, color: Colors.white, size: 18),
-            SizedBox(width: 10),
-            Text('Username copied'),
-          ],
-        ),
-        behavior: SnackBarBehavior.floating,
-        duration: const Duration(seconds: 2),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        margin: const EdgeInsets.all(16),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -83,28 +30,13 @@ class DashboardScreen extends ConsumerWidget {
         backgroundColor: theme.colorScheme.surface.withValues(alpha: 0.8),
         scrolledUnderElevation: 0,
         surfaceTintColor: Colors.transparent,
+        leadingWidth: 72,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 16),
+          child: Center(child: _buildProfileAvatarButton(context, theme)),
+        ),
         title: Row(
           children: [
-            GestureDetector(
-              onTap: () => showProfileMenu(context),
-              child: MouseRegion(
-                cursor: SystemMouseCursors.click,
-                child: Container(
-                  width: 40,
-                  height: 40,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: theme.colorScheme.surfaceContainerHigh,
-                    border: Border.all(
-                      color: theme.colorScheme.primary.withValues(alpha: 0.2),
-                      width: 2,
-                    ),
-                  ),
-                  child: const Icon(Icons.person, size: 24),
-                ),
-              ),
-            ),
-            const SizedBox(width: 12),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -363,46 +295,216 @@ class DashboardScreen extends ConsumerWidget {
                     letterSpacing: 2,
                   ),
                 ),
-                Text(
-                  'View All',
-                  style: theme.textTheme.labelMedium?.copyWith(
-                    color: theme.colorScheme.primary,
+                GestureDetector(
+                  onTap: () => context.push('/activities'),
+                  child: Text(
+                    'View All',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      color: theme.colorScheme.primary,
+                    ),
                   ),
                 ),
               ],
             ),
             const SizedBox(height: 16),
 
-            _buildRecentActivityItem(
-              context,
-              'Netflix',
-              'alex.v•••••••••',
-              true,
-            ),
-            const SizedBox(height: 12),
-            _buildRecentActivityItem(
-              context,
-              'GitHub',
-              'dev_alex••••••••',
-              true,
-            ),
-            const SizedBox(height: 12),
-            _buildRecentActivityItem(
-              context,
-              'Binance Vault',
-              'crypto_h••••••••',
-              false,
-            ),
-            const SizedBox(height: 12),
-            _buildRecentActivityItem(
-              context,
-              'Dribbble Pro',
-              'pixel_per••••••••',
-              true,
-            ),
+            // Dynamic Recent Activities
+            _buildDynamicRecentActivities(context, ref, theme),
 
             const SizedBox(height: 80),
           ],
+        ),
+      ),
+    );
+  }
+
+  /// Build dynamic recent activities from the activity notifier.
+  Widget _buildDynamicRecentActivities(
+    BuildContext context,
+    WidgetRef ref,
+    ThemeData theme,
+  ) {
+    final activities = ref.watch(activityNotifierProvider);
+    final top5 = activities.take(5).toList();
+
+    if (top5.isEmpty) {
+      // Show placeholder when no activities
+      return AppCard(
+        padding: const EdgeInsets.all(16),
+        child: Center(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(vertical: 24),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.history_outlined,
+                  size: 40,
+                  color: theme.colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.5,
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Text(
+                  'No recent activity',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Column(
+      children: [
+        for (int i = 0; i < top5.length; i++) ...[
+          _buildActivityItemCard(context, top5[i], theme),
+          if (i < top5.length - 1) const SizedBox(height: 12),
+        ],
+      ],
+    );
+  }
+
+  /// Build a single activity card.
+  Widget _buildActivityItemCard(
+    BuildContext context,
+    dynamic activity,
+    ThemeData theme,
+  ) {
+    final acColor = activity.type.getColor(context);
+    final timeAgo = activity.getTimeAgo();
+
+    return AppCard(
+      padding: EdgeInsets.zero,
+      child: InkWell(
+        onTap: () {},
+        borderRadius: BorderRadius.circular(16),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              // Activity icon
+              Container(
+                width: 48,
+                height: 48,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color:
+                      acColor?.withValues(alpha: 0.15) ??
+                      theme.colorScheme.surfaceContainerHigh,
+                ),
+                child: Icon(
+                  activity.type.icon,
+                  size: 20,
+                  color: acColor ?? theme.colorScheme.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(width: 12),
+
+              // Activity details
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      activity.type.label,
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w600,
+                        color: theme.colorScheme.onSurface,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      activity.itemName,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // Time ago
+              Text(
+                timeAgo,
+                style: theme.textTheme.labelSmall?.copyWith(
+                  color: theme.colorScheme.onSurfaceVariant.withValues(
+                    alpha: 0.7,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileAvatarButton(BuildContext context, ThemeData theme) {
+    return Tooltip(
+      message: 'Open profile menu',
+      child: MouseRegion(
+        cursor: SystemMouseCursors.click,
+        child: Material(
+          color: Colors.transparent,
+          child: InkWell(
+            onTap: () => showProfileMenu(context),
+            customBorder: const CircleBorder(),
+            child: SizedBox(
+              width: 48,
+              height: 48,
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.colorScheme.surfaceContainerHigh,
+                      border: Border.all(
+                        color: theme.colorScheme.primary.withValues(alpha: 0.4),
+                        width: 2,
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: theme.colorScheme.primary.withValues(
+                            alpha: 0.12,
+                          ),
+                          blurRadius: 10,
+                          offset: const Offset(0, 3),
+                        ),
+                      ],
+                    ),
+                    child: const Icon(Icons.person, size: 22),
+                  ),
+                  Positioned(
+                    right: 5,
+                    bottom: 4,
+                    child: Container(
+                      width: 14,
+                      height: 14,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: theme.colorScheme.primary,
+                        border: Border.all(
+                          color: theme.colorScheme.surface,
+                          width: 1.5,
+                        ),
+                      ),
+                      child: Icon(
+                        Icons.expand_more,
+                        size: 10,
+                        color: theme.colorScheme.onPrimary,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
       ),
     );
@@ -453,94 +555,4 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   // ── Feature 2: entire tile is now wrapped in InkWell ─────────────────────
-  Widget _buildRecentActivityItem(
-    BuildContext context,
-    String title,
-    String subtitle,
-    bool is2FA,
-  ) {
-    final theme = Theme.of(context);
-
-    return AppCard(
-      padding: EdgeInsets.zero,
-      child: InkWell(
-        onTap: () => _onItemTap(context, title), // ← whole tile tappable
-        borderRadius: BorderRadius.circular(16), // match AppCard radius
-        child: Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            children: [
-              PlatformIcon(platformName: title, size: 48),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      title,
-                      style: theme.textTheme.bodyLarge?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        color: theme.colorScheme.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      children: [
-                        Text(
-                          subtitle,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: theme.colorScheme.onSurfaceVariant,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Container(
-                          width: 6,
-                          height: 6,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: is2FA
-                                ? theme.colorScheme.secondary
-                                : theme.colorScheme.outlineVariant,
-                            boxShadow: is2FA
-                                ? [
-                                    BoxShadow(
-                                      color: theme.colorScheme.secondary
-                                          .withValues(alpha: 0.5),
-                                      blurRadius: 8,
-                                    ),
-                                  ]
-                                : null,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-              ),
-
-              // Copy button — stops tap propagation so it doesn't trigger auth
-              GestureDetector(
-                onTap: () => _onCopyTap(context, subtitle),
-                behavior: HitTestBehavior.opaque,
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Icon(
-                    Icons.copy,
-                    size: 20,
-                    color: theme.colorScheme.onSurfaceVariant,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 4),
-              Icon(
-                Icons.chevron_right,
-                size: 24,
-                color: theme.colorScheme.onSurfaceVariant,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
 }

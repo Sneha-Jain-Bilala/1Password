@@ -3,6 +3,8 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'vault_item.dart';
 import 'vault_repository.dart';
 import 'in_memory_vault_repository.dart';
+import 'activity_item.dart';
+import 'activity_notifier.dart';
 
 part 'vault_notifier.g.dart';
 
@@ -25,6 +27,18 @@ class VaultNotifier extends _$VaultNotifier {
   Future<VaultItem> addItem(VaultItem item) async {
     final saved = await _repo.save(item);
     state = _repo.getAll();
+
+    // Log activity
+    final activityType = _getActivityTypeForAdd(item.type);
+    await ref
+        .read(activityNotifierProvider.notifier)
+        .logActivity(
+          type: activityType,
+          itemName: item.serviceName,
+          itemType: item.type.browseLabel,
+          isHighlighted: true,
+        );
+
     return saved;
   }
 
@@ -32,12 +46,37 @@ class VaultNotifier extends _$VaultNotifier {
   Future<void> updateItem(VaultItem item) async {
     await _repo.update(item);
     state = _repo.getAll();
+
+    // Log activity
+    final activityType = _getActivityTypeForUpdate(item.type);
+    await ref
+        .read(activityNotifierProvider.notifier)
+        .logActivity(
+          type: activityType,
+          itemName: item.serviceName,
+          itemType: item.type.browseLabel,
+          isHighlighted: true,
+        );
   }
 
   /// Move to trash and refresh state.
   Future<void> trashItem(String id) async {
+    // Get the item before trashing to access its serviceName
+    final item = state.firstWhere((i) => i.id == id);
+
     await _repo.trash(id);
     state = _repo.getAll();
+
+    // Log activity
+    final activityType = _getActivityTypeForDelete(item.type);
+    await ref
+        .read(activityNotifierProvider.notifier)
+        .logActivity(
+          type: activityType,
+          itemName: item.serviceName,
+          itemType: item.type.browseLabel,
+          isHighlighted: true,
+        );
   }
 
   // ── Derived counts (Browse screen reads these) ──────────────────
@@ -50,4 +89,56 @@ class VaultNotifier extends _$VaultNotifier {
   /// The 5 most recently added/updated items for the Dashboard.
   List<VaultItem> get recent =>
       [...state]..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+
+  // ── Activity type mapping helpers ────────────────────────────────
+  ActivityType _getActivityTypeForAdd(VaultItemType type) {
+    switch (type) {
+      case VaultItemType.login:
+        return ActivityType.passwordAdded;
+      case VaultItemType.secureNote:
+        return ActivityType.noteAdded;
+      case VaultItemType.card:
+        return ActivityType.cardAdded;
+      case VaultItemType.contact:
+        return ActivityType.contactAdded;
+      case VaultItemType.document:
+        return ActivityType.documentAdded;
+      case VaultItemType.address:
+        return ActivityType.addressAdded;
+    }
+  }
+
+  ActivityType _getActivityTypeForUpdate(VaultItemType type) {
+    switch (type) {
+      case VaultItemType.login:
+        return ActivityType.passwordUpdated;
+      case VaultItemType.secureNote:
+        return ActivityType.noteUpdated;
+      case VaultItemType.card:
+        return ActivityType.cardUpdated;
+      case VaultItemType.contact:
+        return ActivityType.contactUpdated;
+      case VaultItemType.document:
+        return ActivityType.documentUpdated;
+      case VaultItemType.address:
+        return ActivityType.addressUpdated;
+    }
+  }
+
+  ActivityType _getActivityTypeForDelete(VaultItemType type) {
+    switch (type) {
+      case VaultItemType.login:
+        return ActivityType.passwordDeleted;
+      case VaultItemType.secureNote:
+        return ActivityType.noteDeleted;
+      case VaultItemType.card:
+        return ActivityType.cardDeleted;
+      case VaultItemType.contact:
+        return ActivityType.contactDeleted;
+      case VaultItemType.document:
+        return ActivityType.documentDeleted;
+      case VaultItemType.address:
+        return ActivityType.addressDeleted;
+    }
+  }
 }

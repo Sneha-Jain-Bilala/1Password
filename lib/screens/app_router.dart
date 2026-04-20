@@ -23,6 +23,7 @@ import 'tools_screen.dart';
 import 'password_generator_screen.dart';
 import 'password_health_screen.dart';
 import 'item_detail_screen.dart';
+import 'view_all_activities_screen.dart';
 
 import 'add_password_screen.dart';
 import 'browse_screen.dart';
@@ -132,6 +133,10 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/autofill',
         builder: (c, s) => const AutofillPromptScreen(),
+      ),
+      GoRoute(
+        path: '/activities',
+        builder: (c, s) => const ViewAllActivitiesScreen(),
       ),
 
       // ── SETTINGS EXTRA ───────────────────────
