@@ -36,6 +36,8 @@ class InMemoryVaultRepository implements VaultRepository {
             customFields: item.customFields,
             createdAt: DateTime.now(),
             updatedAt: DateTime.now(),
+            isWebsite: item.isWebsite,
+            isFavourite: item.isFavourite,
           )
         : item;
     _items.add(saved);

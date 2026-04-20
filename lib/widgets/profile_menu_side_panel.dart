@@ -5,70 +5,50 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../backend/auth_controller.dart';
 
-/// Shows a left-side slide-in profile menu panel
+/// Shows a compact left-side profile popover near the app bar avatar.
 void showProfileMenu(BuildContext context) {
-  showGeneralDialog(
+  final topInset = MediaQuery.of(context).padding.top;
+
+  showDialog<void>(
     context: context,
     barrierDismissible: true,
-    barrierColor: Colors.black.withValues(alpha: 0.3),
-    transitionDuration: const Duration(milliseconds: 300),
-    pageBuilder: (context, animation, secondaryAnimation) {
-      return const SizedBox.expand(child: _ProfileMenuPanel());
-    },
-    transitionBuilder: (context, animation, secondaryAnimation, child) {
-      return SlideTransition(
-        position: Tween<Offset>(begin: const Offset(-1, 0), end: Offset.zero)
-            .animate(
-              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+    barrierColor: Colors.black.withValues(alpha: 0.12),
+    builder: (dialogContext) {
+      return Material(
+        type: MaterialType.transparency,
+        child: Stack(
+          children: [
+            Positioned.fill(
+              child: GestureDetector(
+                onTap: () => Navigator.of(dialogContext).pop(),
+                child: const SizedBox.expand(),
+              ),
             ),
-        child: child,
+            Positioned(
+              left: 12,
+              top: topInset + kToolbarHeight + 6,
+              child: const _ProfileMenuCard(),
+            ),
+          ],
+        ),
       );
     },
   );
 }
 
-/// Left-side profile menu panel
-class _ProfileMenuPanel extends ConsumerWidget {
-  const _ProfileMenuPanel();
+class _ProfileMenuCard extends ConsumerWidget {
+  const _ProfileMenuCard();
 
-  void _showLogoutConfirmation(BuildContext context, WidgetRef ref) {
-    final theme = Theme.of(context);
-
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Logout', style: theme.textTheme.titleMedium),
-        content: const Text(
-          'Exit your vault? You\'ll need to re-enter your master password to login again.',
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('Cancel'),
-          ),
-          TextButton(
-            onPressed: () async {
-              Navigator.pop(context); // Close dialog
-              Navigator.pop(context); // Close panel
-              await ref.read(authControllerProvider.notifier).signOut();
-            },
-            child: Text(
-              'Logout',
-              style: TextStyle(color: theme.colorScheme.error),
-            ),
-          ),
-        ],
-      ),
-    );
+  Future<void> _signOut(BuildContext context, WidgetRef ref) async {
+    Navigator.of(context).pop();
+    await ref.read(authControllerProvider.notifier).signOut();
   }
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
-    final supabase = Supabase.instance.client;
-    final user = supabase.auth.currentUser;
+    final user = Supabase.instance.client.auth.currentUser;
 
-    // Get user name and email
     final userName =
         user?.userMetadata?['name'] ??
         user?.userMetadata?['full_name'] ??
@@ -76,226 +56,162 @@ class _ProfileMenuPanel extends ConsumerWidget {
         'User';
     final userEmail = user?.email ?? 'No email';
 
-    return GestureDetector(
-      onTap: () => Navigator.pop(context), // Close on outside tap
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 230),
       child: Material(
-        color: Colors.black.withValues(alpha: 0),
-        child: GestureDetector(
-          onTap: () {}, // Prevent closing
-          child: Container(
-            width: 280,
-            height: double.infinity,
-            decoration: BoxDecoration(
-              color: theme.colorScheme.surface,
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withValues(alpha: 0.2),
-                  blurRadius: 16,
-                  offset: const Offset(2, 0),
-                ),
-              ],
-            ),
-            child: SafeArea(
-              right: false,
-              child: Column(
+        color: theme.colorScheme.surfaceContainerHigh,
+        elevation: 0,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+          side: BorderSide(
+            color: theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
+          ),
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Row(
                 children: [
-                  // ── Close Button ──
-                  Align(
-                    alignment: Alignment.topRight,
-                    child: IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close_rounded),
-                      iconSize: 20,
-                      padding: const EdgeInsets.all(8),
-                      constraints: const BoxConstraints(
-                        minWidth: 44,
-                        minHeight: 44,
+                  Container(
+                    width: 34,
+                    height: 34,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: theme.colorScheme.primaryContainer,
+                    ),
+                    child: Center(
+                      child: Text(
+                        userName.toString().isNotEmpty
+                            ? userName.toString()[0].toUpperCase()
+                            : 'U',
+                        style: theme.textTheme.labelLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: theme.colorScheme.onPrimaryContainer,
+                        ),
                       ),
                     ),
                   ),
-
-                  // ── User Header (Compact) ──
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
-                    ),
+                  const SizedBox(width: 8),
+                  Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Row(
-                          children: [
-                            Container(
-                              width: 40,
-                              height: 40,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                gradient: LinearGradient(
-                                  colors: [
-                                    theme.colorScheme.primary,
-                                    theme.colorScheme.secondary,
-                                  ],
-                                ),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  userName.toString().isNotEmpty
-                                      ? userName.toString()[0].toUpperCase()
-                                      : 'U',
-                                  style: TextStyle(
-                                    color: theme.colorScheme.onPrimary,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w700,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    userName.toString(),
-                                    style: theme.textTheme.labelLarge?.copyWith(
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  Text(
-                                    userEmail,
-                                    style: theme.textTheme.labelSmall?.copyWith(
-                                      color: theme.colorScheme.onSurfaceVariant,
-                                      fontSize: 10,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ],
+                        Text(
+                          userName.toString(),
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.w700,
+                            color: theme.colorScheme.onSurface,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        Text(
+                          userEmail,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: theme.colorScheme.onSurfaceVariant,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ],
                     ),
                   ),
-
-                  Divider(
-                    height: 16,
-                    indent: 16,
-                    endIndent: 16,
-                    color: theme.colorScheme.outlineVariant.withValues(
-                      alpha: 0.3,
-                    ),
-                  ),
-
-                  // ── Menu Items (Scrollable) ──
-                  Expanded(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 8,
-                        vertical: 4,
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          // Help & Support
-                          _CompactMenuTile(
-                            icon: Icons.help_outline_rounded,
-                            label: 'Help & Support',
-                            onTap: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-
-                          // Account Recovery
-                          _CompactMenuTile(
-                            icon: Icons.verified_user_rounded,
-                            label: 'Account Recovery',
-                            onTap: () {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text(
-                                    'Recovery codes coming soon',
-                                  ),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  margin: const EdgeInsets.all(12),
-                                ),
-                              );
-                            },
-                          ),
-
-                          // Device Activity
-                          _CompactMenuTile(
-                            icon: Icons.devices_rounded,
-                            label: 'Device Activity',
-                            onTap: () {
-                              Navigator.pop(context);
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: const Text(
-                                    'Device activity coming soon',
-                                  ),
-                                  behavior: SnackBarBehavior.floating,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  margin: const EdgeInsets.all(12),
-                                ),
-                              );
-                            },
-                          ),
-
-                          // Settings
-                          _CompactMenuTile(
-                            icon: Icons.settings_rounded,
-                            label: 'Settings',
-                            onTap: () {
-                              Navigator.pop(context);
-                              context.push('/settings');
-                            },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-
-                  // ── Logout Button ──
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
-                    child: SizedBox(
-                      width: double.infinity,
-                      height: 40,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _showLogoutConfirmation(context, ref),
-                        icon: const Icon(Icons.logout_rounded, size: 16),
-                        label: const Text('Logout'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.colorScheme.error.withValues(
-                            alpha: 0.9,
-                          ),
-                          foregroundColor: theme.colorScheme.onError,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          textStyle: theme.textTheme.labelMedium?.copyWith(
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
                 ],
               ),
-            ),
+              const SizedBox(height: 8),
+              Divider(
+                height: 1,
+                color: theme.colorScheme.outlineVariant.withValues(alpha: 0.35),
+              ),
+              const SizedBox(height: 8),
+              Align(
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  'ABOUT USER',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: theme.colorScheme.onSurfaceVariant,
+                    letterSpacing: 1,
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              _CompactMenuItem(
+                icon: Icons.person_outline,
+                label: 'Profile Details',
+                onTap: () {
+                  Navigator.of(context).pop();
+                  context.push('/profile');
+                },
+              ),
+              _CompactMenuItem(
+                icon: Icons.security_rounded,
+                label: 'Recovery Center',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Recovery Center coming soon'),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _CompactMenuItem(
+                icon: Icons.history_rounded,
+                label: 'Login History',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Login history coming soon'),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _CompactMenuItem(
+                icon: Icons.devices_rounded,
+                label: 'Active Sessions',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Active sessions coming soon'),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              _CompactMenuItem(
+                icon: Icons.tune_rounded,
+                label: 'Personalization',
+                onTap: () {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(
+                      content: const Text('Personalization coming soon'),
+                      behavior: SnackBarBehavior.floating,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                  );
+                },
+              ),
+              const SizedBox(height: 4),
+              _CompactMenuItem(
+                icon: Icons.logout_rounded,
+                label: 'Logout',
+                onTap: () => _signOut(context, ref),
+              ),
+            ],
           ),
         ),
       ),
@@ -303,17 +219,16 @@ class _ProfileMenuPanel extends ConsumerWidget {
   }
 }
 
-/// Compact menu item tile
-class _CompactMenuTile extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final VoidCallback onTap;
-
-  const _CompactMenuTile({
+class _CompactMenuItem extends StatelessWidget {
+  const _CompactMenuItem({
     required this.icon,
     required this.label,
     required this.onTap,
   });
+
+  final IconData icon;
+  final String label;
+  final VoidCallback onTap;
 
   @override
   Widget build(BuildContext context) {
@@ -322,36 +237,28 @@ class _CompactMenuTile extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
+        borderRadius: BorderRadius.circular(10),
         onTap: onTap,
-        borderRadius: BorderRadius.circular(8),
+        hoverColor: theme.colorScheme.surfaceContainerHighest,
+        splashColor: theme.colorScheme.primary.withValues(alpha: 0.08),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
           child: Row(
             children: [
-              Container(
-                width: 32,
-                height: 32,
-                decoration: BoxDecoration(
-                  color: theme.colorScheme.primaryContainer.withValues(
-                    alpha: 0.5,
-                  ),
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Icon(icon, color: theme.colorScheme.primary, size: 16),
-              ),
-              const SizedBox(width: 12),
+              Icon(icon, size: 16, color: theme.colorScheme.onSurface),
+              const SizedBox(width: 8),
               Expanded(
                 child: Text(
                   label,
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 12,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: theme.colorScheme.onSurface,
                   ),
                 ),
               ),
               Icon(
-                Icons.arrow_forward_ios_rounded,
-                size: 12,
+                Icons.chevron_right,
+                size: 14,
                 color: theme.colorScheme.onSurfaceVariant,
               ),
             ],

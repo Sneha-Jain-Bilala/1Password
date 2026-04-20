@@ -104,8 +104,9 @@ class SupabaseVaultRepository implements VaultRepository {
       notes: row['notes'] as String?,
       folderName: row['folder_name'] as String?,
       customFields: Map<String, String>.from(
-        (row['custom_fields'] as Map<String, dynamic>? ?? {})
-            .map((k, v) => MapEntry(k, v.toString())),
+        (row['custom_fields'] as Map<String, dynamic>? ?? {}).map(
+          (k, v) => MapEntry(k, v.toString()),
+        ),
       ),
       isWebsite: row['is_website'] as bool?,
       createdAt: DateTime.parse(row['created_at'] as String),
@@ -123,7 +124,9 @@ class SupabaseVaultRepository implements VaultRepository {
         .eq('is_trashed', false)
         .order('updated_at', ascending: false);
 
-    _cache = (rows as List).map((r) => _fromRow(r as Map<String, dynamic>)).toList();
+    _cache = (rows as List)
+        .map((r) => _fromRow(r as Map<String, dynamic>))
+        .toList();
   }
 
   // ── VaultRepository interface ─────────────────────────────────────────────
@@ -144,7 +147,7 @@ class SupabaseVaultRepository implements VaultRepository {
         .select()
         .single();
 
-    final saved = _fromRow(response as Map<String, dynamic>);
+    final saved = _fromRow(response);
     await _refreshCache();
     return saved;
   }

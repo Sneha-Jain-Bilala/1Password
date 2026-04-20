@@ -23,7 +23,7 @@ final vaultRepositoryProvider = AutoDisposeProvider<VaultRepository>.internal(
 @Deprecated('Will be removed in 3.0. Use Ref instead')
 // ignore: unused_element
 typedef VaultRepositoryRef = AutoDisposeProviderRef<VaultRepository>;
-String _$vaultNotifierHash() => r'47987ce216c522488ac38092be2b79c609ab2a76';
+String _$vaultNotifierHash() => r'339b979a19667dd5df0582113d096d479f552441';
 
 /// See also [VaultNotifier].
 @ProviderFor(VaultNotifier)
