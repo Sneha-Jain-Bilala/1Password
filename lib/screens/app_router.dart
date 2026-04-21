@@ -33,6 +33,7 @@ import 'add_card_screen.dart';
 import 'add_address_screen.dart';
 
 import 'profile_screen.dart';
+import 'active_sessions_screen.dart';
 import 'change_password_screen.dart';
 import 'privacy_policy_screen.dart';
 
@@ -141,6 +142,10 @@ GoRouter appRouter(Ref ref) {
 
       // ── SETTINGS EXTRA ───────────────────────
       GoRoute(path: '/profile', builder: (c, s) => const ProfileScreen()),
+      GoRoute(
+        path: '/active_sessions',
+        builder: (c, s) => const ActiveSessionsScreen(),
+      ),
       GoRoute(
         path: '/change_password',
         builder: (c, s) => const ChangePasswordScreen(),

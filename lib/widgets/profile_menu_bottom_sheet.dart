@@ -166,60 +166,13 @@ class ProfileMenuBottomSheet extends ConsumerWidget {
               padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               child: Column(
                 children: [
-                  // Help & Support
-                  _MenuItemTile(
-                    icon: Icons.help_outline_rounded,
-                    label: 'Help & Support',
-                    onTap: () {
-                      Navigator.pop(context);
-                      // Can navigate to help screen or open external URL
-                      // context.push('/help');
-                    },
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Account Recovery
-                  _MenuItemTile(
-                    icon: Icons.verified_user_rounded,
-                    label: 'Account Recovery',
-                    onTap: () {
-                      Navigator.pop(context);
-                      // Navigate to recovery codes screen
-                      // context.push('/recovery');
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'Recovery codes feature coming soon',
-                          ),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          margin: const EdgeInsets.all(16),
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 8),
-
-                  // Device Activity
+                  // Active Sessions
                   _MenuItemTile(
                     icon: Icons.devices_rounded,
-                    label: 'Device Activity',
+                    label: 'Active Sessions',
                     onTap: () {
                       Navigator.pop(context);
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(
-                          content: const Text(
-                            'Device activity feature coming soon',
-                          ),
-                          behavior: SnackBarBehavior.floating,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          margin: const EdgeInsets.all(16),
-                        ),
-                      );
+                      context.push('/active_sessions');
                     },
                   ),
                   const SizedBox(height: 8),

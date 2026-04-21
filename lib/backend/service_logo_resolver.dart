@@ -7,32 +7,65 @@ class ServiceLogoData {
   final IconData icon;
   final Color color;
   final String? assetPath;
+  final String? monogram;
 
   const ServiceLogoData({
     required this.icon,
     required this.color,
     this.assetPath,
+    this.monogram,
   });
 
   Widget buildWidget({required double size, Color? fallbackColor}) {
+    if (monogram != null && monogram!.isNotEmpty) {
+      return Text(
+        monogram!,
+        maxLines: 1,
+        overflow: TextOverflow.fade,
+        softWrap: false,
+        style: TextStyle(
+          color: fallbackColor ?? color,
+          fontWeight: FontWeight.w800,
+          fontSize: size * 0.58,
+          letterSpacing: 0.2,
+        ),
+      );
+    }
+
     if (assetPath == null) {
       return Icon(icon, color: fallbackColor ?? color, size: size);
     }
 
-    return Image.asset(
-      assetPath!,
+    return SizedBox(
       width: size,
       height: size,
-      fit: BoxFit.contain,
-      errorBuilder: (_, __, ___) {
-        return Icon(icon, color: fallbackColor ?? color, size: size);
-      },
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(size * 0.22),
+        child: Image.asset(
+          assetPath!,
+          fit: BoxFit.cover,
+          filterQuality: FilterQuality.high,
+          errorBuilder: (_, __, ___) {
+            return Icon(icon, color: fallbackColor ?? color, size: size);
+          },
+        ),
+      ),
     );
   }
 }
 
 class ServiceLogoResolver {
   static const Color _defaultBrandColor = Color(0xFF6C63FF);
+  static const List<Color> _fallbackPalette = [
+    Color(0xFF5A67D8),
+    Color(0xFF0EA5E9),
+    Color(0xFF10B981),
+    Color(0xFFF59E0B),
+    Color(0xFFEC4899),
+    Color(0xFF8B5CF6),
+    Color(0xFF14B8A6),
+    Color(0xFFEF4444),
+  ];
 
   static final Map<String, ServiceLogoData> _knownByKeyword = {
     'gmail': const ServiceLogoData(
@@ -40,15 +73,15 @@ class ServiceLogoResolver {
       color: Color(0xFFEA4335),
       assetPath: 'assets/logos/brands/gmail.png',
     ),
-    'google maps': const ServiceLogoData(
-      icon: FontAwesomeIcons.mapLocationDot,
-      color: Color(0xFF34A853),
-      assetPath: 'assets/logos/brands/google_maps.png',
-    ),
     'google': const ServiceLogoData(
       icon: FontAwesomeIcons.google,
       color: Color(0xFF4285F4),
       assetPath: 'assets/logos/brands/google.png',
+    ),
+    'google maps': const ServiceLogoData(
+      icon: FontAwesomeIcons.mapLocationDot,
+      color: Color(0xFF34A853),
+      assetPath: 'assets/logos/brands/google_maps.png',
     ),
     'maps': const ServiceLogoData(
       icon: FontAwesomeIcons.mapLocationDot,
@@ -206,38 +239,72 @@ class ServiceLogoResolver {
     }
 
     final type = itemType ?? VaultItemType.login;
+    final seededColor = fallbackColor ?? _seededFallbackColor(normalized);
+    final initials = _initialsFromServiceName(serviceName);
+
     switch (type) {
       case VaultItemType.login:
         return ServiceLogoData(
           icon: Icons.lock_outline,
-          color: fallbackColor ?? _defaultBrandColor,
+          color: seededColor,
+          monogram: initials,
         );
       case VaultItemType.secureNote:
         return ServiceLogoData(
-          icon: FontAwesomeIcons.noteSticky,
-          color: fallbackColor ?? const Color(0xFF006B55),
+          icon: Icons.sticky_note_2_rounded,
+          color: const Color(0xFF2DD4BF),
         );
       case VaultItemType.card:
         return ServiceLogoData(
           icon: FontAwesomeIcons.indianRupeeSign,
-          color: fallbackColor ?? const Color(0xFF1A73E8),
+          color: seededColor,
+          monogram: initials,
         );
       case VaultItemType.contact:
         return ServiceLogoData(
           icon: Icons.contacts_outlined,
-          color: fallbackColor ?? const Color(0xFF0A66C2),
+          color: seededColor,
+          monogram: initials,
         );
       case VaultItemType.document:
         return ServiceLogoData(
           icon: Icons.description_outlined,
-          color: fallbackColor ?? const Color(0xFF546E7A),
+          color: seededColor,
+          monogram: initials,
         );
       case VaultItemType.address:
         return ServiceLogoData(
           icon: FontAwesomeIcons.mapLocationDot,
-          color: fallbackColor ?? const Color(0xFF34A853),
+          color: const Color(0xFF34A853),
+          assetPath: 'assets/logos/brands/google_maps.png',
         );
     }
+  }
+
+  static Color _seededFallbackColor(String normalizedName) {
+    if (normalizedName.isEmpty) return _defaultBrandColor;
+    final idx = normalizedName.hashCode.abs() % _fallbackPalette.length;
+    return _fallbackPalette[idx];
+  }
+
+  static String _initialsFromServiceName(String serviceName) {
+    final parts = serviceName
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((part) => part.isNotEmpty)
+        .toList();
+
+    if (parts.isEmpty) {
+      return '?';
+    }
+
+    if (parts.length == 1) {
+      final single = parts.first;
+      if (single.length == 1) return single.toUpperCase();
+      return single.substring(0, 2).toUpperCase();
+    }
+
+    return '${parts[0][0]}${parts[1][0]}'.toUpperCase();
   }
 
   static VaultItemType fromActivityItemType(String? itemType) {
