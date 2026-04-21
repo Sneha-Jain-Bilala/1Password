@@ -1,5 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
+import 'package:supabase_flutter/supabase_flutter.dart'
+    show AuthChangeEvent, AuthException;
 import 'auth_controller.dart';
 import 'vault_item.dart';
 import 'vault_repository.dart';
@@ -20,13 +22,38 @@ VaultRepository vaultRepository(Ref ref) {
 class VaultNotifier extends _$VaultNotifier {
   @override
   List<VaultItem> build() {
-    // Load from Supabase on first build (fire-and-forget; UI rebuilds when done)
-    Future.microtask(() async {
-      final repo = ref.read(vaultRepositoryProvider) as SupabaseVaultRepository;
+    // Load once initially.
+    Future.microtask(_reloadFromSupabase);
+
+    // Reload when auth/session changes (for app restarts/session restore).
+    ref.listen(authStateChangesProvider, (_, next) {
+      next.whenData((authState) {
+        if (authState.event == AuthChangeEvent.signedOut) {
+          state = [];
+          return;
+        }
+
+        Future.microtask(_reloadFromSupabase);
+      });
+    });
+
+    return [];
+  }
+
+  Future<void> _reloadFromSupabase() async {
+    final repo = ref.read(vaultRepositoryProvider);
+    if (repo is! SupabaseVaultRepository) {
+      state = repo.getAll();
+      return;
+    }
+
+    try {
       await repo.loadAll();
       state = repo.getAll();
-    });
-    return [];
+    } on AuthException {
+      // Session can be briefly unavailable during startup/signout transitions.
+      state = [];
+    }
   }
 
   VaultRepository get _repo => ref.read(vaultRepositoryProvider);

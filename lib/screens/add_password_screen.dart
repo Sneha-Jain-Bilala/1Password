@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import '../backend/service_logo_resolver.dart';
 import '../backend/vault_item.dart';
 import '../backend/vault_notifier.dart';
 
@@ -660,7 +661,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                 children: [
                   ..._kQuickPicks.map(
                     (s) => _buildQuickPick(
-                      label: s.initials,
+                      logo: ServiceLogoResolver.fromServiceName(s.name),
                       title: s.name,
                       color: s.color,
                       isDark: isDark,
@@ -811,14 +812,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                 borderRadius: BorderRadius.circular(10),
               ),
               child: Center(
-                child: Text(
-                  s.initials,
-                  style: TextStyle(
-                    color: s.color,
-                    fontWeight: FontWeight.w800,
-                    fontSize: 14,
-                  ),
-                ),
+                child: ServiceLogoResolver.fromServiceName(
+                  s.name,
+                ).buildWidget(size: 18, fallbackColor: s.color),
               ),
             ),
             const SizedBox(width: 12),
@@ -862,7 +858,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   }
 
   Widget _buildQuickPick({
-    required String label,
+    required ServiceLogoData logo,
     required String title,
     required Color color,
     required bool isDark,
@@ -880,14 +876,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
               borderRadius: BorderRadius.circular(14),
             ),
             child: Center(
-              child: Text(
-                label,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 15,
-                ),
-              ),
+              child: logo.buildWidget(size: 20, fallbackColor: color),
             ),
           ),
           const SizedBox(height: 6),
@@ -944,12 +933,12 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   Widget _buildServiceHeader(BuildContext context, bool isDark) {
     final isCustom = _state == _ServiceState.custom;
     final name = isCustom ? _customName : _selected!.name;
-    final initials = isCustom
-        ? (name.length >= 2
-              ? name.substring(0, 2).toUpperCase()
-              : name.toUpperCase())
-        : _selected!.initials;
     final color = isCustom ? _kViolet : _selected!.color;
+    final logo = ServiceLogoResolver.fromServiceName(
+      name,
+      itemType: VaultItemType.login,
+      fallbackColor: color,
+    );
     final cardBg = isDark ? const Color(0xFF1C1A24) : Colors.white;
 
     return Container(
@@ -990,14 +979,9 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
                   : null,
             ),
             child: Center(
-              child: Text(
-                initials,
-                style: TextStyle(
-                  color: color,
-                  fontWeight: FontWeight.w800,
-                  fontSize: 17,
-                ),
-              ),
+              child: isCustom
+                  ? Icon(Icons.apps, color: color, size: 22)
+                  : logo.buildWidget(size: 22, fallbackColor: logo.color),
             ),
           ),
           const SizedBox(width: 14),

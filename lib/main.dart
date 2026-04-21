@@ -7,6 +7,7 @@ import 'screens/app_router.dart';
 import 'backend/app_theme.dart';
 import 'backend/theme_provider.dart';
 import 'backend/biometric_pref_provider.dart';
+import 'backend/activity_notifier.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,14 +37,15 @@ class MyApp extends ConsumerWidget {
     // trigger this once (Notifier.init() is idempotent).
     ref.read(themeProvider.notifier).init();
     ref.read(biometricPrefProvider.notifier).init();
+    ref.read(activityNotifierProvider.notifier).init();
 
-    final themeMode = ref.watch(themeProvider);  // ← drives dark/light mode
+    final themeMode = ref.watch(themeProvider); // ← drives dark/light mode
 
     return MaterialApp.router(
       title: 'VaultKey',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode,             // ← was ThemeMode.system (hardcoded)
+      themeMode: themeMode, // ← was ThemeMode.system (hardcoded)
       routerConfig: router,
       debugShowCheckedModeBanner: false,
     );

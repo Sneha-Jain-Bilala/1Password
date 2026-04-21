@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import '../backend/user_display_provider.dart';
 import '../backend/activity_notifier.dart';
 import '../backend/activity_item.dart';
+import '../backend/service_logo_resolver.dart';
 import '../backend/vault_item.dart';
 import '../backend/vault_notifier.dart';
 import '../widgets/app_card.dart';
@@ -19,42 +20,12 @@ import '../widgets/profile_menu_side_panel.dart';
 class DashboardScreen extends ConsumerWidget {
   const DashboardScreen({super.key});
 
-  /// Get color for activity type
-  Color? _getActivityColor(ActivityType activityType, ThemeData theme) {
-    final typeString = activityType.toString();
-
-    // Green for additions
-    if (typeString.contains('Added') ||
-        typeString.contains('Favoured') ||
-        typeString.contains('Completed')) {
-      return theme.colorScheme.secondary;
-    }
-
-    // Blue for updates
-    if (typeString.contains('Updated')) {
-      return theme.colorScheme.primary;
-    }
-
-    // Red for deletions/errors
-    if (typeString.contains('Deleted') || typeString.contains('Failed')) {
-      return theme.colorScheme.error;
-    }
-
-    return null;
-  }
-
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
     final greeting = dynamicGreeting();
     final userNameAsync = ref.watch(userDisplayNameProvider);
-    final favouriteItems =
-        ref
-            .watch(vaultNotifierProvider)
-            .where((item) => item.isFavourite)
-            .toList()
-          ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -310,7 +281,7 @@ class DashboardScreen extends ConsumerWidget {
                     Icons.star,
                     'Favourites',
                     false,
-                    onTap: () => _showFavouritesSheet(context, favouriteItems),
+                    onTap: () => _showFavouritesSheet(context),
                   ),
                   const SizedBox(width: 12),
                   _buildQuickAccessPill(
@@ -413,7 +384,10 @@ class DashboardScreen extends ConsumerWidget {
     ActivityItem activity,
     ThemeData theme,
   ) {
-    final acColor = _getActivityColor(activity.type, theme);
+    final logo = ServiceLogoResolver.fromServiceName(
+      activity.itemName,
+      itemType: ServiceLogoResolver.fromActivityItemType(activity.itemType),
+    );
     final timeAgo = activity.getTimeAgo();
 
     return AppCard(
@@ -431,15 +405,9 @@ class DashboardScreen extends ConsumerWidget {
                 height: 48,
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
-                  color:
-                      acColor?.withValues(alpha: 0.15) ??
-                      theme.colorScheme.surfaceContainerHigh,
+                  color: logo.color.withValues(alpha: 0.16),
                 ),
-                child: Icon(
-                  activity.type.icon,
-                  size: 20,
-                  color: acColor ?? theme.colorScheme.onSurfaceVariant,
-                ),
+                child: Center(child: logo.buildWidget(size: 20)),
               ),
               const SizedBox(width: 12),
 
@@ -550,138 +518,131 @@ class DashboardScreen extends ConsumerWidget {
     );
   }
 
-  Future<void> _showFavouritesSheet(
-    BuildContext context,
-    List<VaultItem> favourites,
-  ) async {
+  Future<void> _showFavouritesSheet(BuildContext context) async {
     await showModalBottomSheet<void>(
       context: context,
       showDragHandle: true,
       isScrollControlled: true,
       builder: (sheetContext) {
-        final theme = Theme.of(sheetContext);
+        return Consumer(
+          builder: (context, ref, _) {
+            final theme = Theme.of(context);
+            final favourites = ref.watch(
+              vaultNotifierProvider.select((items) {
+                final sorted = items.where((item) => item.isFavourite).toList()
+                  ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
+                return sorted;
+              }),
+            );
 
-        if (favourites.isEmpty) {
-          return SafeArea(
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(
-                    Icons.star_border,
-                    size: 40,
-                    color: theme.colorScheme.onSurfaceVariant,
+            if (favourites.isEmpty) {
+              return SafeArea(
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(24, 12, 24, 32),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.star_border,
+                        size: 40,
+                        color: theme.colorScheme.onSurfaceVariant,
+                      ),
+                      const SizedBox(height: 12),
+                      Text(
+                        'No favourites yet',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        'Mark an item as Favourite while adding it to see it here.',
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                    ],
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    'No favourites yet',
-                    style: theme.textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    'Mark an item as Favourite while adding it to see it here.',
-                    textAlign: TextAlign.center,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          );
-        }
+                ),
+              );
+            }
 
-        return SafeArea(
-          child: Padding(
-            padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
-            child: ConstrainedBox(
-              constraints: BoxConstraints(
-                maxHeight: MediaQuery.of(sheetContext).size.height * 0.72,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Favourites',
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w700,
-                    ),
+            return SafeArea(
+              child: Padding(
+                padding: const EdgeInsets.fromLTRB(20, 8, 20, 20),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    maxHeight: MediaQuery.of(sheetContext).size.height * 0.72,
                   ),
-                  const SizedBox(height: 4),
-                  Text(
-                    '${favourites.length} saved item${favourites.length == 1 ? '' : 's'}',
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: theme.colorScheme.onSurfaceVariant,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Expanded(
-                    child: ListView.separated(
-                      itemCount: favourites.length,
-                      separatorBuilder: (_, __) => const Divider(height: 1),
-                      itemBuilder: (context, index) {
-                        final item = favourites[index];
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Favourites',
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '${favourites.length} saved item${favourites.length == 1 ? '' : 's'}',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: theme.colorScheme.onSurfaceVariant,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      Expanded(
+                        child: ListView.separated(
+                          itemCount: favourites.length,
+                          separatorBuilder: (_, __) => const Divider(height: 1),
+                          itemBuilder: (context, index) {
+                            final item = favourites[index];
+                            final logo = ServiceLogoResolver.fromServiceName(
+                              item.serviceName,
+                              itemType: item.type,
+                              fallbackColor: item.serviceColor,
+                            );
 
-                        return ListTile(
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 4,
-                            vertical: 2,
-                          ),
-                          leading: CircleAvatar(
-                            radius: 18,
-                            backgroundColor: theme.colorScheme.primary
-                                .withValues(alpha: 0.12),
-                            child: Icon(
-                              _iconForVaultItemType(item.type),
-                              size: 18,
-                              color: theme.colorScheme.primary,
-                            ),
-                          ),
-                          title: Text(
-                            item.serviceName,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                          subtitle: Text(item.type.browseLabel),
-                          trailing: Icon(
-                            Icons.star,
-                            size: 18,
-                            color: theme.colorScheme.secondary,
-                          ),
-                        );
-                      },
-                    ),
+                            return ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                horizontal: 4,
+                                vertical: 2,
+                              ),
+                              leading: CircleAvatar(
+                                radius: 18,
+                                backgroundColor: logo.color.withValues(
+                                  alpha: 0.12,
+                                ),
+                                child: logo.buildWidget(size: 18),
+                              ),
+                              title: Text(
+                                item.serviceName,
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              subtitle: Text(item.type.browseLabel),
+                              trailing: Icon(
+                                Icons.star,
+                                size: 18,
+                                color: theme.colorScheme.secondary,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                ],
+                ),
               ),
-            ),
-          ),
+            );
+          },
         );
       },
     );
-  }
-
-  IconData _iconForVaultItemType(VaultItemType type) {
-    switch (type) {
-      case VaultItemType.login:
-        return Icons.lock_outline;
-      case VaultItemType.secureNote:
-        return Icons.note_outlined;
-      case VaultItemType.card:
-        return Icons.credit_card;
-      case VaultItemType.contact:
-        return Icons.contacts_outlined;
-      case VaultItemType.document:
-        return Icons.description_outlined;
-      case VaultItemType.address:
-        return Icons.home_outlined;
-    }
   }
 
   Widget _buildQuickAccessPill(
