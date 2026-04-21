@@ -378,7 +378,8 @@ String _monthShort(int m) {
     'Nov',
     'Dec',
   ];
-  return names[m.clamp(1, 12)];
+  final monthIndex = m.clamp(1, 12).toInt();
+  return names[monthIndex];
 }
 
 Widget _statPill(
