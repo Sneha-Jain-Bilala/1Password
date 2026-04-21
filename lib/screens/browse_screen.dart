@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import '../backend/service_logo_resolver.dart';
 import '../backend/vault_item.dart';
 import '../backend/vault_notifier.dart';
 
@@ -388,8 +389,11 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
   }
 
   Widget _buildPasswordItem(BuildContext context, VaultItem item, bool isDark) {
-    final color = item.serviceColor ?? const Color(0xFF6C63FF);
-    final initials = item.initials;
+    final logo = ServiceLogoResolver.fromServiceName(
+      item.serviceName,
+      itemType: item.type,
+      fallbackColor: item.serviceColor,
+    );
     final cardBg = isDark ? const Color(0xFF1C1A24) : Colors.white;
 
     return Container(
@@ -416,19 +420,10 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
           width: 46,
           height: 46,
           decoration: BoxDecoration(
-            color: color.withValues(alpha: isDark ? 0.18 : 0.1),
+            color: logo.color.withValues(alpha: isDark ? 0.18 : 0.1),
             borderRadius: BorderRadius.circular(13),
           ),
-          child: Center(
-            child: Text(
-              initials,
-              style: TextStyle(
-                color: color,
-                fontWeight: FontWeight.w800,
-                fontSize: 14,
-              ),
-            ),
-          ),
+          child: Center(child: logo.buildWidget(size: 20)),
         ),
         title: Row(
           children: [

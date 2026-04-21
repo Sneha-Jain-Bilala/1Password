@@ -7,6 +7,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.light,
+      fontFamily: AppTextStyles.textTheme.bodyMedium?.fontFamily,
       colorScheme: const ColorScheme.light(
         primary: AppColors.lightPrimary,
         primaryContainer: AppColors.lightPrimaryContainer,
@@ -87,6 +88,7 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       brightness: Brightness.dark,
+      fontFamily: AppTextStyles.textTheme.bodyMedium?.fontFamily,
       colorScheme: const ColorScheme.dark(
         primary: AppColors.darkPrimary,
         primaryContainer: AppColors.darkPrimaryContainer,

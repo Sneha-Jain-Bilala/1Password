@@ -22,7 +22,7 @@ import 'vault_repository.dart';
 ///   notes           → VaultItem.notes
 ///   folder_name     → VaultItem.folderName
 ///   is_website      → VaultItem.isWebsite
-///   is_favourite    → stored via separate update call
+///   is_favourite    → VaultItem.isFavourite
 ///   is_trashed      → VaultItem soft-delete flag
 ///   custom_fields   → VaultItem.customFields  (jsonb)
 ///   created_at      → VaultItem.createdAt
@@ -84,7 +84,7 @@ class SupabaseVaultRepository implements VaultRepository {
       'notes': item.notes,
       'folder_name': item.folderName,
       'is_website': item.isWebsite,
-      'is_favourite': false, // toggled separately if you add that feature
+      'is_favourite': item.isFavourite,
       'is_trashed': false,
       'custom_fields': item.customFields,
     };
@@ -109,6 +109,7 @@ class SupabaseVaultRepository implements VaultRepository {
         ),
       ),
       isWebsite: row['is_website'] as bool?,
+      isFavourite: row['is_favourite'] as bool? ?? false,
       createdAt: DateTime.parse(row['created_at'] as String),
       updatedAt: DateTime.parse(row['updated_at'] as String),
     );
