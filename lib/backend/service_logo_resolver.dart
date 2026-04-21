@@ -40,15 +40,15 @@ class ServiceLogoResolver {
       color: Color(0xFFEA4335),
       assetPath: 'assets/logos/brands/gmail.png',
     ),
-    'google': const ServiceLogoData(
-      icon: FontAwesomeIcons.google,
-      color: Color(0xFF4285F4),
-      assetPath: 'assets/logos/brands/google.png',
-    ),
     'google maps': const ServiceLogoData(
       icon: FontAwesomeIcons.mapLocationDot,
       color: Color(0xFF34A853),
       assetPath: 'assets/logos/brands/google_maps.png',
+    ),
+    'google': const ServiceLogoData(
+      icon: FontAwesomeIcons.google,
+      color: Color(0xFF4285F4),
+      assetPath: 'assets/logos/brands/google.png',
     ),
     'maps': const ServiceLogoData(
       icon: FontAwesomeIcons.mapLocationDot,
