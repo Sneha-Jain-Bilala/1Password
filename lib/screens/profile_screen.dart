@@ -52,7 +52,7 @@ class ProfileScreen extends ConsumerWidget {
               height: 220,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: theme.colorScheme.primary.withOpacity(0.08),
+                color: theme.colorScheme.primary.withValues(alpha: 0.08),
               ),
             ),
           ),
@@ -64,7 +64,7 @@ class ProfileScreen extends ConsumerWidget {
               height: 200,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: theme.colorScheme.secondary.withOpacity(0.06),
+                color: theme.colorScheme.secondary.withValues(alpha: 0.06),
               ),
             ),
           ),
@@ -84,12 +84,14 @@ class ProfileScreen extends ConsumerWidget {
                       shape: BoxShape.circle,
                       gradient: LinearGradient(
                         colors: [
-                          theme.colorScheme.primary.withOpacity(0.34),
-                          theme.colorScheme.primary.withOpacity(0.12),
+                          theme.colorScheme.primary.withValues(alpha: 0.34),
+                          theme.colorScheme.primary.withValues(alpha: 0.12),
                         ],
                       ),
                       border: Border.all(
-                        color: theme.colorScheme.primary.withOpacity(0.36),
+                        color: theme.colorScheme.primary.withValues(
+                          alpha: 0.36,
+                        ),
                         width: 2.5,
                       ),
                     ),
@@ -136,7 +138,7 @@ class ProfileScreen extends ConsumerWidget {
                           (isVerified
                                   ? theme.colorScheme.secondary
                                   : theme.colorScheme.error)
-                              .withOpacity(0.12),
+                              .withValues(alpha: 0.12),
                       borderRadius: BorderRadius.circular(999),
                     ),
                     child: Row(
@@ -392,9 +394,11 @@ Widget _statPill(
   return Container(
     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 10),
     decoration: BoxDecoration(
-      color: theme.colorScheme.surface.withOpacity(0.65),
+      color: theme.colorScheme.surface.withValues(alpha: 0.65),
       borderRadius: BorderRadius.circular(14),
-      border: Border.all(color: theme.colorScheme.onSurface.withOpacity(0.08)),
+      border: Border.all(
+        color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+      ),
     ),
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -439,7 +443,7 @@ Widget _infoTile(
         color: theme.colorScheme.surfaceContainerHigh,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: theme.colorScheme.onSurface.withOpacity(0.06),
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.06),
         ),
       ),
       child: Row(
@@ -448,7 +452,7 @@ Widget _infoTile(
             width: 34,
             height: 34,
             decoration: BoxDecoration(
-              color: theme.colorScheme.primary.withOpacity(0.14),
+              color: theme.colorScheme.primary.withValues(alpha: 0.14),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Icon(icon, size: 18, color: theme.colorScheme.primary),

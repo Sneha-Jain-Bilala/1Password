@@ -19,7 +19,6 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
   final _titleCtrl = TextEditingController();
   final _contentCtrl = TextEditingController();
   final _folderCtrl = TextEditingController();
-  bool _isPinned = false;
   bool _isFavourite = false;
 
   @override
@@ -104,119 +103,6 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
             ),
           ),
           centerTitle: true,
-          actions: [
-            // Favourite button
-            Padding(
-              padding: const EdgeInsets.only(right: 8),
-              child: _isFavourite
-                  ? ElevatedButton.icon(
-                      onPressed: () =>
-                          setState(() => _isFavourite = !_isFavourite),
-                      icon: Icon(Icons.favorite, size: 16, color: Colors.white),
-                      label: const Text(
-                        'Favourite',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                        ),
-                      ),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: iconColor,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        elevation: 0,
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    )
-                  : OutlinedButton.icon(
-                      onPressed: () =>
-                          setState(() => _isFavourite = !_isFavourite),
-                      icon: Icon(
-                        Icons.favorite_border,
-                        size: 16,
-                        color: iconColor,
-                      ),
-                      label: Text(
-                        'Favourite',
-                        style: TextStyle(
-                          fontWeight: FontWeight.w700,
-                          fontSize: 14,
-                          color: iconColor,
-                        ),
-                      ),
-                      style: OutlinedButton.styleFrom(
-                        side: BorderSide(color: iconColor),
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 8,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        minimumSize: Size.zero,
-                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                      ),
-                    ),
-            ),
-
-            // Save button
-            Padding(
-              padding: const EdgeInsets.only(right: 12),
-              child: Opacity(
-                opacity: _canSave ? 1.0 : 0.4,
-                child: ElevatedButton(
-                  onPressed: _canSave ? _save : null,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: iconColor,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 20,
-                      vertical: 8,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    minimumSize: Size.zero,
-                    tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                    elevation: 0,
-                  ),
-                  child: const Text(
-                    'Save',
-                    style: TextStyle(fontWeight: FontWeight.w700, fontSize: 14),
-                  ),
-                ),
-              ),
-            ),
-
-            // Pin toggle
-            GestureDetector(
-              onTap: () => setState(() => _isPinned = !_isPinned),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: _isPinned
-                      ? iconColor.withValues(alpha: 0.15)
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Icon(
-                  _isPinned ? Icons.push_pin : Icons.push_pin_outlined,
-                  color: _isPinned
-                      ? iconColor
-                      : iconColor.withValues(alpha: 0.4),
-                  size: 20,
-                ),
-              ),
-            ),
-          ],
         ),
         body: ListView(
           padding: const EdgeInsets.fromLTRB(20, 8, 20, 100),
