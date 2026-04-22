@@ -400,15 +400,7 @@ class DashboardScreen extends ConsumerWidget {
           child: Row(
             children: [
               // Activity icon
-              Container(
-                width: 48,
-                height: 48,
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: logo.color.withValues(alpha: 0.16),
-                ),
-                child: Center(child: logo.buildWidget(size: 20)),
-              ),
+              _buildLogoBadge(theme, logo, badgeSize: 48, logoSize: 22),
               const SizedBox(width: 12),
 
               // Activity details
@@ -417,7 +409,7 @@ class DashboardScreen extends ConsumerWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      activity.type.label,
+                      activity.itemName,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                         color: theme.colorScheme.onSurface,
@@ -425,7 +417,7 @@ class DashboardScreen extends ConsumerWidget {
                     ),
                     const SizedBox(height: 2),
                     Text(
-                      activity.itemName,
+                      activity.type.label,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: theme.colorScheme.onSurfaceVariant,
                       ),
@@ -609,12 +601,11 @@ class DashboardScreen extends ConsumerWidget {
                                 horizontal: 4,
                                 vertical: 2,
                               ),
-                              leading: CircleAvatar(
-                                radius: 18,
-                                backgroundColor: logo.color.withValues(
-                                  alpha: 0.12,
-                                ),
-                                child: logo.buildWidget(size: 18),
+                              leading: _buildLogoBadge(
+                                theme,
+                                logo,
+                                badgeSize: 40,
+                                logoSize: 22,
                               ),
                               title: Text(
                                 item.serviceName,
@@ -694,6 +685,32 @@ class DashboardScreen extends ConsumerWidget {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildLogoBadge(
+    ThemeData theme,
+    ServiceLogoData logo, {
+    double badgeSize = 44,
+    double logoSize = 20,
+  }) {
+    final isDark = theme.brightness == Brightness.dark;
+    final bgColor = isDark
+        ? const Color(0xFF121322)
+        : theme.colorScheme.surfaceContainerHighest;
+
+    return Container(
+      width: badgeSize,
+      height: badgeSize,
+      padding: EdgeInsets.all(badgeSize * 0.18),
+      decoration: BoxDecoration(
+        color: bgColor,
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: theme.colorScheme.onSurface.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Center(child: logo.buildWidget(size: logoSize)),
     );
   }
 

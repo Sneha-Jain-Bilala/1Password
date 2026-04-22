@@ -146,63 +146,11 @@ class _ProfileMenuCard extends ConsumerWidget {
                 },
               ),
               _CompactMenuItem(
-                icon: Icons.security_rounded,
-                label: 'Recovery Center',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Recovery Center coming soon'),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              _CompactMenuItem(
-                icon: Icons.history_rounded,
-                label: 'Login History',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Login history coming soon'),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              _CompactMenuItem(
                 icon: Icons.devices_rounded,
                 label: 'Active Sessions',
                 onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Active sessions coming soon'),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
-                },
-              ),
-              _CompactMenuItem(
-                icon: Icons.tune_rounded,
-                label: 'Personalization',
-                onTap: () {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Personalization coming soon'),
-                      behavior: SnackBarBehavior.floating,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                    ),
-                  );
+                  Navigator.of(context).pop();
+                  context.push('/active_sessions');
                 },
               ),
               const SizedBox(height: 4),
