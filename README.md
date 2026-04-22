@@ -1,16 +1,23 @@
-# passmanager
+# 1Password 🔐
 
-A new Flutter project.
+A password manager app built with Flutter.
+You can store passwords, notes, cards, and addresses in one place.
 
-## Getting Started
+## What it does
 
-This project is a starting point for a Flutter application.
+* Save and manage passwords
+* Store secure notes
+* Keep card & address details
+* Shows weak passwords
+* Syncs data using Supabase
 
-A few resources to get you started if this is your first Flutter project:
+## Tech used
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+Flutter + Riverpod + GoRouter + Supabase
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+## Run it
+
+```bash
+flutter pub get
+flutter run
+```
