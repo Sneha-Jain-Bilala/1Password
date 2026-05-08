@@ -9,6 +9,7 @@ import 'package:go_router/go_router.dart';
 import '../backend/theme_provider.dart';
 import '../backend/biometric_pref_provider.dart';
 import '../backend/auth_controller.dart';
+import '../backend/encryption_key_provider.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -74,6 +75,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     setState(() => _isSigningOut = true);
 
     try {
+      // Wipe the encryption key from both RAM and secure storage before
+      // signing out so a different user on the same device cannot access it.
+      await EncryptionKeyService.wipe(ref);
       await ref.read(authControllerProvider.notifier).signOut();
       if (!mounted) return;
       // GoRouter's auth redirect will handle navigation to /sign_in

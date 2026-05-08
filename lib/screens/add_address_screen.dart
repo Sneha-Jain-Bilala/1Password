@@ -72,6 +72,8 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
     final label = _labelCtrl.text.trim().isEmpty
         ? '${_fullNameCtrl.text.trim()}, ${_cityCtrl.text.trim()}'
         : _labelCtrl.text.trim();
+
+    // Formatted string for display (notes column — encrypted)
     final notes = [
       _fullNameCtrl.text.trim(),
       _streetCtrl.text.trim(),
@@ -79,11 +81,24 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           .trim(),
       _country,
     ].join('\n');
+
+    // Structured fields stored in customFields (encrypted as a JSON blob)
+    final customFields = <String, String>{
+      'full_name': _fullNameCtrl.text.trim(),
+      'street': _streetCtrl.text.trim(),
+      'city': _cityCtrl.text.trim(),
+      if (_stateCtrl.text.trim().isNotEmpty) 'state': _stateCtrl.text.trim(),
+      if (_postalCtrl.text.trim().isNotEmpty)
+        'postal_code': _postalCtrl.text.trim(),
+      'country': _country,
+    };
+
     final item = VaultItem(
       id: '',
       type: VaultItemType.address,
       serviceName: label,
       notes: notes,
+      customFields: customFields,
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       isFavourite: _isFavourite,

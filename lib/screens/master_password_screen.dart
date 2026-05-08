@@ -5,6 +5,8 @@ import 'package:go_router/go_router.dart';
 import '../backend/app_theme.dart';
 import '../backend/app_colors.dart';
 import '../backend/auth_controller.dart';
+import '../backend/encryption_service.dart';
+import '../backend/encryption_key_provider.dart';
 
 class MasterPasswordScreen extends ConsumerStatefulWidget {
   const MasterPasswordScreen({super.key});
@@ -119,6 +121,17 @@ class _MasterPasswordScreenState extends ConsumerState<MasterPasswordScreen>
         }
       } else {
         await authController.createMasterPassword(password);
+      }
+
+      // ── Derive & persist the AES encryption key ───────────────────────────
+      // The key is derived from the master password + user's UID (as salt).
+      // It is stored in flutter_secure_storage so biometric sessions can
+      // also access it without requiring the master password again.
+      final userId =
+          ref.read(supabaseClientProvider).auth.currentUser?.id ?? '';
+      if (userId.isNotEmpty) {
+        final key = EncryptionService.deriveKey(password, userId);
+        await EncryptionKeyService.persist(ref, key);
       }
 
       if (!mounted) {

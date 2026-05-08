@@ -1,34 +1,45 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-/// Reactive provider that updates whenever auth state changes
-final userDisplayNameProvider = StreamProvider<String>((ref) {
+/// Extracts a display name from a Supabase [User], or returns 'User'.
+String _nameFromUser(User? user) {
+  if (user == null) return 'User';
+
+  // Check metadata first
+  final meta = user.userMetadata;
+  if (meta != null) {
+    final name = meta['full_name'] ?? meta['name'] ?? meta['username'];
+    if (name != null && name.toString().isNotEmpty) {
+      return name.toString().split(' ').first;
+    }
+  }
+
+  // Fallback: derive from email prefix
+  final email = user.email ?? '';
+  final prefix = email.split('@').first;
+  if (prefix.isNotEmpty) {
+    final cleaned = prefix.replaceAll(RegExp(r'[._\-]'), ' ');
+    return cleaned.split(' ').first.capitalize();
+  }
+
+  return 'User';
+}
+
+/// Reactive provider that:
+/// 1. Immediately resolves to the current user's name (no loading spinner on
+///    cold start / session restore).
+/// 2. Updates whenever the Supabase auth state changes.
+final userDisplayNameProvider = StreamProvider<String>((ref) async* {
   final supabase = Supabase.instance.client;
 
-  return supabase.auth.onAuthStateChange.map((event) {
-    final user = event.session?.user;
+  // Emit the current user's name synchronously so the UI never shows '...'
+  // after a session has already been restored.
+  yield _nameFromUser(supabase.auth.currentUser);
 
-    if (user == null) return 'User';
-
-    // Check metadata
-    final meta = user.userMetadata;
-    if (meta != null) {
-      final name = meta['name'] ?? meta['full_name'] ?? meta['username'];
-      if (name != null && name.toString().isNotEmpty) {
-        return name.toString().split(' ').first;
-      }
-    }
-
-    // fallback from email
-    final email = user.email ?? '';
-    final prefix = email.split('@').first;
-    if (prefix.isNotEmpty) {
-      final cleaned = prefix.replaceAll(RegExp(r'[._\\-]'), ' ');
-      return cleaned.split(' ').first.capitalize();
-    }
-
-    return 'User';
-  });
+  // Continue emitting on every subsequent auth event.
+  await for (final event in supabase.auth.onAuthStateChange) {
+    yield _nameFromUser(event.session?.user);
+  }
 });
 
 /// Greeting function

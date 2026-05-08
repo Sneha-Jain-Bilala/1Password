@@ -11,6 +11,7 @@ import 'package:go_router/go_router.dart';
 import '../backend/user_display_provider.dart';
 import '../backend/activity_notifier.dart';
 import '../backend/activity_item.dart';
+import '../backend/password_health_provider.dart';
 import '../backend/service_logo_resolver.dart';
 import '../backend/vault_item.dart';
 import '../backend/vault_notifier.dart';
@@ -26,6 +27,7 @@ class DashboardScreen extends ConsumerWidget {
     final isDark = theme.brightness == Brightness.dark;
     final greeting = dynamicGreeting();
     final userNameAsync = ref.watch(userDisplayNameProvider);
+    final health = ref.watch(passwordHealthProvider);
 
     return Scaffold(
       extendBodyBehindAppBar: true,
@@ -144,7 +146,15 @@ class DashboardScreen extends ConsumerWidget {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Your security is exceptional this month.',
+                                    health.totalPasswords == 0
+                                        ? 'Add passwords to see your health score.'
+                                        : health.score >= 90
+                                            ? 'Your security is exceptional!'
+                                            : health.score >= 75
+                                                ? 'Your security is looking good.'
+                                                : health.score >= 50
+                                                    ? 'Some passwords need attention.'
+                                                    : 'Several passwords are at risk.',
                                     style: theme.textTheme.bodySmall?.copyWith(
                                       color: theme.colorScheme.onPrimary
                                           .withValues(alpha: 0.7),
@@ -164,7 +174,7 @@ class DashboardScreen extends ConsumerWidget {
                                       width: 100,
                                       height: 100,
                                       child: CircularProgressIndicator(
-                                        value: 0.92,
+                                        value: health.progress,
                                         strokeWidth: 8,
                                         color: Colors.white,
                                         backgroundColor: Colors.white
@@ -176,16 +186,18 @@ class DashboardScreen extends ConsumerWidget {
                                     child: Column(
                                       mainAxisSize: MainAxisSize.min,
                                       children: [
-                                        const Text(
-                                          '92',
-                                          style: TextStyle(
+                                        Text(
+                                          health.totalPasswords == 0
+                                              ? '--'
+                                              : '${health.score}',
+                                          style: const TextStyle(
                                             fontSize: 32,
                                             fontWeight: FontWeight.w900,
                                             color: Colors.white,
                                           ),
                                         ),
                                         Text(
-                                          'SOLID',
+                                          health.scoreLabel.toUpperCase(),
                                           style: TextStyle(
                                             fontSize: 10,
                                             fontWeight: FontWeight.bold,
@@ -219,7 +231,9 @@ class DashboardScreen extends ConsumerWidget {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      '248 Passwords Encrypted',
+                                      health.totalPasswords == 0
+                                          ? 'No passwords saved yet'
+                                          : '${health.totalPasswords} Password${health.totalPasswords == 1 ? '' : 's'} Encrypted',
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
                                       style: theme.textTheme.bodySmall
@@ -246,7 +260,7 @@ class DashboardScreen extends ConsumerWidget {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                               ),
-                              onPressed: () {},
+                              onPressed: () => context.push('/password_health'),
                               child: const Text('Details'),
                             ),
                           ],
