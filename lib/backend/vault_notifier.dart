@@ -3,6 +3,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'
     show AuthChangeEvent, AuthException;
 import 'auth_controller.dart';
+import 'encryption_key_provider.dart';
 import 'vault_item.dart';
 import 'vault_repository.dart';
 import 'activity_item.dart';
@@ -14,7 +15,8 @@ part 'vault_notifier.g.dart';
 // ─── Repository provider (injectable / swappable) ───────────────────
 @riverpod
 VaultRepository vaultRepository(Ref ref) {
-  return SupabaseVaultRepository(ref.read(supabaseClientProvider));
+  final key = ref.watch(encryptionKeyProvider);
+  return SupabaseVaultRepository(ref.read(supabaseClientProvider), key);
 }
 
 // ─── Notifier — the single source of truth for vault items ──────────
@@ -35,6 +37,16 @@ class VaultNotifier extends _$VaultNotifier {
 
         Future.microtask(_reloadFromSupabase);
       });
+    });
+
+    // Reload when the encryption key is set (master password unlocked).
+    // This ensures vault items are decrypted and displayed immediately
+    // after the user enters their master password.
+    ref.listen(encryptionKeyProvider, (previous, next) {
+      if (next != null && previous == null) {
+        // Key just became available — reload with decryption
+        Future.microtask(_reloadFromSupabase);
+      }
     });
 
     return [];

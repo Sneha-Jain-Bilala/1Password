@@ -165,9 +165,16 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
       serviceName: _labelCtrl.text.trim().isEmpty
           ? _cardType.label
           : _labelCtrl.text.trim(),
-      username: _nameCtrl.text.trim(),
-      password: _numberCtrl.text.trim(),
-      notes: 'Expiry: ${_expiryCtrl.text}',
+      username: _nameCtrl.text.trim(),   // cardholder name
+      password: _numberCtrl.text.trim(), // card number → password_enc (encrypted)
+      // ── Store expiry & CVV as structured fields so they can be read back ──
+      // card_expiry column: plain text (not sensitive)
+      // CVV goes through customFields → encrypted as part of the JSON blob
+      customFields: {
+        'expiry': _expiryCtrl.text.trim(),
+        if (_cvvCtrl.text.trim().isNotEmpty) 'cvv': _cvvCtrl.text.trim(),
+      },
+      notes: null, // no free-text notes for cards
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       isFavourite: _isFavourite,

@@ -15,6 +15,8 @@ class AppBottomNav extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final isDark = theme.brightness == Brightness.dark;
+    // Extra height needed to sit above the system home-bar / gesture nav area
+    final bottomInset = MediaQuery.paddingOf(context).bottom;
 
     // Background color mapping for glassmorphism
     final bgColor = isDark
@@ -26,7 +28,8 @@ class AppBottomNav extends StatelessWidget {
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
         child: Container(
-          height: 88,
+          // Base height + bottom safe-area inset so content is never clipped
+          height: 88 + bottomInset,
           decoration: BoxDecoration(
             color: bgColor,
             boxShadow: [
@@ -39,12 +42,13 @@ class AppBottomNav extends StatelessWidget {
               ),
             ],
           ),
-          padding: const EdgeInsets.only(
-            bottom: 12,
+          padding: EdgeInsets.only(
+            bottom: 12 + bottomInset,
             left: 16,
             right: 16,
             top: 12,
           ),
+
           child: Row(
             children: [
               Expanded(

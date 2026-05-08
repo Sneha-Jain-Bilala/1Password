@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
-import 'package:uuid/uuid.dart';
 import '../backend/vault_item.dart';
 import '../backend/vault_notifier.dart';
 
@@ -36,7 +35,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
 
     try {
       final item = VaultItem(
-        id: const Uuid().v4(),
+        id: '', // Supabase assigns the UUID server-side
         type: VaultItemType.secureNote,
         serviceName: _titleCtrl.text.trim(),
         notes: _contentCtrl.text.trim(),

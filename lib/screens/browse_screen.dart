@@ -300,10 +300,11 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
           ),
           itemBuilder: (context, i) {
             final cat = _categories[i];
+            // Watch the STATE (the list itself) so this rebuilds whenever
+            // an item is added, updated, or deleted.
+            final allItems = ref.watch(vaultNotifierProvider);
             final count = cat.itemType != null
-                ? ref
-                      .watch(vaultNotifierProvider.notifier)
-                      .countByType(cat.itemType!)
+                ? allItems.where((item) => item.type == cat.itemType).length
                 : 0;
             return _buildCategoryCard(context, cat, isDark, count);
           },

@@ -271,6 +271,12 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
       serviceColor: color,
       username: _emailCtrl.text.trim(),
       password: _passCtrl.text,
+      // ── More Options fields (previously silently dropped) ──────────────
+      notes: _notesCtrl.text.trim().isEmpty ? null : _notesCtrl.text.trim(),
+      folderName: _folderCtrl.text.trim().isEmpty
+          ? null
+          : _folderCtrl.text.trim(),
+      // ──────────────────────────────────────────────────────────────────
       createdAt: DateTime.now(),
       updatedAt: DateTime.now(),
       isWebsite: _isWebsite,
