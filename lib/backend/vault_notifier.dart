@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'
@@ -21,51 +20,46 @@ VaultRepository vaultRepository(Ref ref) {
 // ─── Notifier — the single source of truth for vault items ──────────
 @riverpod
 class VaultNotifier extends _$VaultNotifier {
-  StreamSubscription<List<VaultItem>>? _subscription;
-
   @override
   List<VaultItem> build() {
-    ref.onDispose(() {
-      _subscription?.cancel();
-    });
-
-    // Listen to Auth State changes to start/stop the stream.
+    // Reload when auth state changes (sign-in / sign-out).
     ref.listen(authStateChangesProvider, (_, next) {
       next.whenData((authState) {
         if (authState.event == AuthChangeEvent.signedOut) {
-          _subscription?.cancel();
-          _subscription = null;
           state = [];
           return;
         }
-        Future.microtask(_startStream);
+        Future.microtask(_loadFromDb);
       });
     });
 
-    Future.microtask(_startStream);
+    Future.microtask(_loadFromDb);
     return [];
   }
 
-  void _startStream() {
-    final repo = ref.read(vaultRepositoryProvider);
-    _subscription?.cancel();
-    _subscription = repo.watchAll().listen(
-      (items) {
-        state = [...items];
-      },
-      onError: (err) {
-        // Do not wipe out the UI state if the stream temporarily disconnects or errors.
-        // Maintain the last known good state.
-      },
-    );
+  /// Fetches all vault items directly from the database and updates state.
+  /// This is the single, reliable way to sync state — no Realtime dependency.
+  Future<void> _loadFromDb() async {
+    try {
+      await _repo.refresh();
+      state = [..._repo.getAll()];
+    } on AuthException {
+      state = [];
+    } catch (_) {
+      // Keep last known good state on transient errors.
+    }
   }
+
+  /// Public method so screens can manually trigger a reload (e.g. pull-to-refresh).
+  Future<void> reload() => _loadFromDb();
+
 
   VaultRepository get _repo => ref.read(vaultRepositoryProvider);
 
-  /// Save a new entry and refresh state.
+  /// Save a new entry, reload from DB, and update state.
   Future<VaultItem> addItem(VaultItem item) async {
     final saved = await _repo.save(item);
-    state = [..._repo.getAll()];
+    await _loadFromDb(); // Guaranteed DB fetch — no Realtime dependency
 
     // Log activity
     final activityType = _getActivityTypeForAdd(item.type);
@@ -81,10 +75,10 @@ class VaultNotifier extends _$VaultNotifier {
     return saved;
   }
 
-  /// Update an existing entry and refresh state.
+  /// Update an existing entry, reload from DB, and update state.
   Future<void> updateItem(VaultItem item) async {
     await _repo.update(item);
-    state = [..._repo.getAll()];
+    await _loadFromDb();
 
     // Log activity
     final activityType = _getActivityTypeForUpdate(item.type);
@@ -98,13 +92,12 @@ class VaultNotifier extends _$VaultNotifier {
         );
   }
 
-  /// Move to trash and refresh state.
+  /// Move to trash, reload from DB, and update state.
   Future<void> trashItem(String id) async {
-    // Get the item before trashing to access its serviceName
     final item = state.firstWhere((i) => i.id == id);
 
     await _repo.trash(id);
-    state = [..._repo.getAll()];
+    await _loadFromDb();
 
     // Log activity
     final activityType = _getActivityTypeForDelete(item.type);
@@ -144,7 +137,8 @@ class VaultNotifier extends _$VaultNotifier {
 
     final updated = current.copyWith(isFavourite: isFavourite);
     await _repo.update(updated);
-    state = _repo.getAll();
+    await _repo.refresh();
+    state = [..._repo.getAll()];
 
     await ref
         .read(activityNotifierProvider.notifier)

@@ -28,6 +28,12 @@ class InMemoryVaultRepository implements VaultRepository {
   }
 
   @override
+  Future<void> refresh() async {
+    // In-memory: nothing to reload from an external source; just re-notify.
+    _notify();
+  }
+
+  @override
   List<VaultItem> getByType(VaultItemType type) =>
       _items.where((i) => i.type == type).toList();
 
