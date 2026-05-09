@@ -350,6 +350,7 @@ class DashboardScreen extends ConsumerWidget {
     ThemeData theme,
   ) {
     final activities = ref.watch(activityNotifierProvider);
+    final vaultItems  = ref.watch(vaultNotifierProvider);
     final top5 = activities.take(5).toList();
 
     if (top5.isEmpty) {
@@ -385,7 +386,7 @@ class DashboardScreen extends ConsumerWidget {
     return Column(
       children: [
         for (int i = 0; i < top5.length; i++) ...[
-          _buildActivityItemCard(context, top5[i], theme),
+          _buildActivityItemCard(context, top5[i], theme, vaultItems),
           if (i < top5.length - 1) const SizedBox(height: 12),
         ],
       ],
@@ -393,10 +394,12 @@ class DashboardScreen extends ConsumerWidget {
   }
 
   /// Build a single activity card.
+  /// Tapping navigates to the detail screen for navigable items.
   Widget _buildActivityItemCard(
     BuildContext context,
     ActivityItem activity,
     ThemeData theme,
+    List<VaultItem> vaultItems,
   ) {
     final logo = ServiceLogoResolver.fromServiceName(
       activity.itemName,
@@ -404,11 +407,19 @@ class DashboardScreen extends ConsumerWidget {
     );
     final timeAgo = activity.getTimeAgo();
 
+    // Find the matching vault item (case-insensitive name match).
+    final matchedItem = vaultItems
+        .where((v) =>
+            v.serviceName.toLowerCase() == activity.itemName.toLowerCase())
+        .firstOrNull;
+
     return AppCard(
       padding: EdgeInsets.zero,
       child: InkWell(
-        onTap: () {},
         borderRadius: BorderRadius.circular(16),
+        onTap: matchedItem != null
+            ? () => context.push('/item_detail', extra: matchedItem)
+            : null, // non-tappable for deleted/system entries
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Row(
@@ -440,14 +451,27 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
 
-              // Time ago
-              Text(
-                timeAgo,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.7,
+              // Time ago + chevron when tappable
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    timeAgo,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.7),
+                    ),
                   ),
-                ),
+                  if (matchedItem != null) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.chevron_right_rounded,
+                      size: 18,
+                      color: theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.45),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),
@@ -635,6 +659,10 @@ class DashboardScreen extends ConsumerWidget {
                                 size: 18,
                                 color: theme.colorScheme.secondary,
                               ),
+                              onTap: () {
+                                Navigator.of(sheetContext).pop();
+                                context.push('/item_detail', extra: item);
+                              },
                             );
                           },
                         ),
