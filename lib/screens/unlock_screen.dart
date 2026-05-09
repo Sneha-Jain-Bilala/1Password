@@ -10,7 +10,6 @@ import 'package:go_router/go_router.dart';
 import '../backend/app_theme.dart';
 import '../backend/auth_controller.dart';
 import '../backend/biometric_pref_provider.dart';
-import '../backend/encryption_key_provider.dart';
 import '../services/biometric_auth_service.dart';
 
 class UnlockScreen extends ConsumerStatefulWidget {
@@ -43,24 +42,6 @@ class _UnlockScreenState extends ConsumerState<UnlockScreen> {
 
     switch (result) {
       case BiometricResult.success:
-        // ── Load the encryption key from secure storage ────────────────
-        // The key was saved to flutter_secure_storage when the user first
-        // created/verified their master password. Load it now so that all
-        // vault reads and writes happen in encrypted form.
-        // If the key is not found (edge-case: cleared app data), redirect
-        // to master_password so the user can re-derive it.
-        if (!EncryptionKeyService.isLoaded(ref)) {
-          final loaded = await EncryptionKeyService.loadFromStorage(ref);
-          if (!mounted) return;
-          if (!loaded) {
-            // No key in storage — must re-enter master password
-            _showSnackBar(
-              'Vault locked. Please enter your master password to continue.',
-            );
-            context.go('/master_password');
-            return;
-          }
-        }
         context.go('/dashboard');
         break;
       case BiometricResult.cancelled:
