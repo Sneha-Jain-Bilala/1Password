@@ -184,9 +184,15 @@ class SupabaseVaultRepository implements VaultRepository {
         .eq('is_trashed', false)
         .order('updated_at', ascending: false);
 
-    _cache = (rows as List)
-        .map((r) => _fromRow(r as Map<String, dynamic>))
-        .toList();
+    final parsed = <VaultItem>[];
+    for (final r in rows as List) {
+      try {
+        parsed.add(_fromRow(r as Map<String, dynamic>));
+      } catch (_) {
+        // Skip malformed rows rather than aborting the whole refresh
+      }
+    }
+    _cache = parsed;
   }
 
   // ── VaultRepository interface ─────────────────────────────────────────────
@@ -285,4 +291,7 @@ class SupabaseVaultRepository implements VaultRepository {
 
   /// Call once after sign-in to pre-populate the cache.
   Future<void> loadAll() => _refreshCache();
+
+  @override
+  Future<void> refresh() => _refreshCache();
 }

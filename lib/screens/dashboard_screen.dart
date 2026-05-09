@@ -350,6 +350,7 @@ class DashboardScreen extends ConsumerWidget {
     ThemeData theme,
   ) {
     final activities = ref.watch(activityNotifierProvider);
+    final vaultItems = ref.watch(vaultNotifierProvider);
     final top5 = activities.take(5).toList();
 
     if (top5.isEmpty) {
@@ -385,18 +386,20 @@ class DashboardScreen extends ConsumerWidget {
     return Column(
       children: [
         for (int i = 0; i < top5.length; i++) ...[
-          _buildActivityItemCard(context, top5[i], theme),
+          _buildActivityItemCard(context, ref, top5[i], theme, vaultItems),
           if (i < top5.length - 1) const SizedBox(height: 12),
         ],
       ],
     );
   }
 
-  /// Build a single activity card.
+  /// Build a single activity card — tapping navigates to the item detail.
   Widget _buildActivityItemCard(
     BuildContext context,
+    WidgetRef ref,
     ActivityItem activity,
     ThemeData theme,
+    List<VaultItem> vaultItems,
   ) {
     final logo = ServiceLogoResolver.fromServiceName(
       activity.itemName,
@@ -404,10 +407,36 @@ class DashboardScreen extends ConsumerWidget {
     );
     final timeAgo = activity.getTimeAgo();
 
+    // Resolve the matching VaultItem by name (case-insensitive).
+    final matchingItem = vaultItems.where((v) {
+      return v.serviceName.toLowerCase() ==
+          activity.itemName.toLowerCase();
+    }).firstOrNull;
+
+    // Deleted / system activities have no navigable target.
+    final isNavigable = matchingItem != null;
+
     return AppCard(
       padding: EdgeInsets.zero,
       child: InkWell(
-        onTap: () {},
+        onTap: isNavigable
+            ? () => context.push('/item_detail', extra: matchingItem)
+            : () {
+                // Graceful feedback for trashed/system entries
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text(
+                      '"${activity.itemName}" is no longer in your vault.',
+                    ),
+                    behavior: SnackBarBehavior.floating,
+                    duration: const Duration(seconds: 2),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+                  ),
+                );
+              },
         borderRadius: BorderRadius.circular(16),
         child: Padding(
           padding: const EdgeInsets.all(16),
@@ -440,14 +469,28 @@ class DashboardScreen extends ConsumerWidget {
                 ),
               ),
 
-              // Time ago
-              Text(
-                timeAgo,
-                style: theme.textTheme.labelSmall?.copyWith(
-                  color: theme.colorScheme.onSurfaceVariant.withValues(
-                    alpha: 0.7,
+              // Time ago + chevron indicator
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    timeAgo,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: theme.colorScheme.onSurfaceVariant.withValues(
+                        alpha: 0.7,
+                      ),
+                    ),
                   ),
-                ),
+                  if (isNavigable) ...[
+                    const SizedBox(width: 4),
+                    Icon(
+                      Icons.chevron_right,
+                      size: 16,
+                      color: theme.colorScheme.onSurfaceVariant
+                          .withValues(alpha: 0.4),
+                    ),
+                  ],
+                ],
               ),
             ],
           ),

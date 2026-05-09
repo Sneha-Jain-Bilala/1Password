@@ -9,6 +9,9 @@ abstract class VaultRepository {
   /// Returns a real-time stream of all items in the vault.
   Stream<List<VaultItem>> watchAll();
 
+  /// Force-reloads all items from the source of truth into the cache.
+  Future<void> refresh();
+
   /// Returns items filtered by type (Browse category).
   List<VaultItem> getByType(VaultItemType type);
 
