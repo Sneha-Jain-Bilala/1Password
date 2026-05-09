@@ -108,6 +108,38 @@ class ActivityNotifier extends _$ActivityNotifier {
     await _persist();
   }
 
+  /// Removes activity entries whose vault item no longer exists.
+  ///
+  /// Call this after the vault is loaded so the Recent Activity list never
+  /// shows entries for items the user has permanently deleted from Supabase.
+  Future<void> pruneForDeletedItems(Set<String> liveItemNames) async {
+    await init();
+    // Keep entries that are system events (unlock, sync, copy) or whose
+    // itemName matches an existing vault item.
+    const systemTypes = {
+      ActivityType.biometricUnlock,
+      ActivityType.masterPasswordUnlock,
+      ActivityType.syncStarted,
+      ActivityType.syncCompleted,
+      ActivityType.syncFailed,
+    };
+
+    final before = state.length;
+    final pruned = state.where((a) {
+      if (systemTypes.contains(a.type)) return true;
+      return liveItemNames.contains(a.itemName.toLowerCase());
+    }).toList();
+
+    if (pruned.length == before) return; // nothing changed
+
+    await _repo.clearAll();
+    for (final a in pruned) {
+      await _repo.save(a);
+    }
+    state = pruned;
+    await _persist();
+  }
+
   /// Get top N activities (most recent first).
   List<ActivityItem> getTop(int count) => state.take(count).toList();
 

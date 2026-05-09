@@ -46,7 +46,16 @@ class VaultNotifier extends _$VaultNotifier {
   Future<void> _loadFromDb() async {
     try {
       await _repository.refresh();
-      state = [..._repository.getAll()];
+      final items = [..._repository.getAll()];
+      state = items;
+
+      // Prune activity log entries that refer to items no longer in the vault.
+      final liveNames = items
+          .map((i) => i.serviceName.toLowerCase())
+          .toSet();
+      await ref
+          .read(activityNotifierProvider.notifier)
+          .pruneForDeletedItems(liveNames);
     } on AuthException {
       state = [];
     } catch (e, st) {
