@@ -20,8 +20,25 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
   final _folderCtrl = TextEditingController();
   bool _isFavourite = false;
 
+  void _syncForm() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _titleCtrl.addListener(_syncForm);
+    _contentCtrl.addListener(_syncForm);
+    _folderCtrl.addListener(_syncForm);
+  }
+
   @override
   void dispose() {
+    _titleCtrl.removeListener(_syncForm);
+    _contentCtrl.removeListener(_syncForm);
+    _folderCtrl.removeListener(_syncForm);
     _titleCtrl.dispose();
     _contentCtrl.dispose();
     _folderCtrl.dispose();
@@ -47,7 +64,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
         isFavourite: _isFavourite,
       );
 
-      await ref.read(vaultNotifierProvider.notifier).addItem(item);
+      await ref.read(vaultProvider.notifier).addItem(item);
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

@@ -76,13 +76,13 @@ class SupabaseVaultRepository implements VaultRepository {
     return value; // legacy plaintext row — pass through as-is
   }
 
-  /// Encrypts a Map<String,String> as an encrypted JSON string.
+  /// Encrypts a `Map<String, String>` as an encrypted JSON string.
   static String? _encMap(Map<String, String> map) {
     if (map.isEmpty) return null;
     return EncryptionService.encrypt(jsonEncode(map));
   }
 
-  /// Decrypts a raw DB value back to Map<String,String>.
+  /// Decrypts a raw DB value back to `Map<String, String>`.
   /// Handles three cases: encrypted string, legacy JSONB object, null.
   static Map<String, String> _decMap(dynamic raw) {
     if (raw == null) return {};
@@ -143,7 +143,7 @@ class SupabaseVaultRepository implements VaultRepository {
       'notes': _enc(item.notes),
       'custom_fields': encCustomFields,
       // ── card-specific columns ──────────────────────────────────────────
-      if (cardExpiry != null) 'card_expiry': cardExpiry, // not sensitive
+      'card_expiry': ?cardExpiry, // not sensitive
       if (cardCvvRaw != null) 'card_cvv_enc': _enc(cardCvvRaw),
       // ──────────────────────────────────────────────────────────────────
       'folder_name': item.folderName,

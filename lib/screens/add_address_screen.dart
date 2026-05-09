@@ -39,8 +39,31 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
   final _labelCtrl = TextEditingController();
   bool _isFavourite = false;
 
+  void _syncForm() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _fullNameCtrl.addListener(_syncForm);
+    _streetCtrl.addListener(_syncForm);
+    _cityCtrl.addListener(_syncForm);
+    _stateCtrl.addListener(_syncForm);
+    _postalCtrl.addListener(_syncForm);
+    _labelCtrl.addListener(_syncForm);
+  }
+
   @override
   void dispose() {
+    _fullNameCtrl.removeListener(_syncForm);
+    _streetCtrl.removeListener(_syncForm);
+    _cityCtrl.removeListener(_syncForm);
+    _stateCtrl.removeListener(_syncForm);
+    _postalCtrl.removeListener(_syncForm);
+    _labelCtrl.removeListener(_syncForm);
     _fullNameCtrl.dispose();
     _streetCtrl.dispose();
     _cityCtrl.dispose();
@@ -103,7 +126,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
       updatedAt: DateTime.now(),
       isFavourite: _isFavourite,
     );
-    await ref.read(vaultNotifierProvider.notifier).addItem(item);
+    await ref.read(vaultProvider.notifier).addItem(item);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

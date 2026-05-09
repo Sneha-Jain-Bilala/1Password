@@ -6,38 +6,99 @@ part of 'vault_notifier.dart';
 // RiverpodGenerator
 // **************************************************************************
 
-String _$vaultRepositoryHash() => r'1294445df6e203e9dd1c1c83b20c07a4e59a14e3';
+// GENERATED CODE - DO NOT MODIFY BY HAND
+// ignore_for_file: type=lint, type=warning
 
-/// See also [vaultRepository].
 @ProviderFor(vaultRepository)
-final vaultRepositoryProvider = AutoDisposeProvider<VaultRepository>.internal(
-  vaultRepository,
-  name: r'vaultRepositoryProvider',
-  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-      ? null
-      : _$vaultRepositoryHash,
-  dependencies: null,
-  allTransitiveDependencies: null,
-);
+final vaultRepositoryProvider = VaultRepositoryProvider._();
 
-@Deprecated('Will be removed in 3.0. Use Ref instead')
-// ignore: unused_element
-typedef VaultRepositoryRef = AutoDisposeProviderRef<VaultRepository>;
-String _$vaultNotifierHash() => r'339b979a19667dd5df0582113d096d479f552441';
+final class VaultRepositoryProvider
+    extends
+        $FunctionalProvider<VaultRepository, VaultRepository, VaultRepository>
+    with $Provider<VaultRepository> {
+  VaultRepositoryProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'vaultRepositoryProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
 
-/// See also [VaultNotifier].
-@ProviderFor(VaultNotifier)
-final vaultNotifierProvider =
-    AutoDisposeNotifierProvider<VaultNotifier, List<VaultItem>>.internal(
-      VaultNotifier.new,
-      name: r'vaultNotifierProvider',
-      debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
-          ? null
-          : _$vaultNotifierHash,
-      dependencies: null,
-      allTransitiveDependencies: null,
+  @override
+  String debugGetCreateSourceHash() => _$vaultRepositoryHash();
+
+  @$internal
+  @override
+  $ProviderElement<VaultRepository> $createElement($ProviderPointer pointer) =>
+      $ProviderElement(pointer);
+
+  @override
+  VaultRepository create(Ref ref) {
+    return vaultRepository(ref);
+  }
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(VaultRepository value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<VaultRepository>(value),
     );
+  }
+}
 
-typedef _$VaultNotifier = AutoDisposeNotifier<List<VaultItem>>;
-// ignore_for_file: type=lint
-// ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member, deprecated_member_use_from_same_package
+String _$vaultRepositoryHash() => r'019041c87e0322703d0d0fe7d562836b0af32b62';
+
+@ProviderFor(VaultNotifier)
+final vaultProvider = VaultNotifierProvider._();
+
+final class VaultNotifierProvider
+    extends $NotifierProvider<VaultNotifier, List<VaultItem>> {
+  VaultNotifierProvider._()
+    : super(
+        from: null,
+        argument: null,
+        retry: null,
+        name: r'vaultProvider',
+        isAutoDispose: true,
+        dependencies: null,
+        $allTransitiveDependencies: null,
+      );
+
+  @override
+  String debugGetCreateSourceHash() => _$vaultNotifierHash();
+
+  @$internal
+  @override
+  VaultNotifier create() => VaultNotifier();
+
+  /// {@macro riverpod.override_with_value}
+  Override overrideWithValue(List<VaultItem> value) {
+    return $ProviderOverride(
+      origin: this,
+      providerOverride: $SyncValueProvider<List<VaultItem>>(value),
+    );
+  }
+}
+
+String _$vaultNotifierHash() => r'6e1e8aec32c79761180daf814c5e9bd403342148';
+
+abstract class _$VaultNotifier extends $Notifier<List<VaultItem>> {
+  List<VaultItem> build();
+  @$mustCallSuper
+  @override
+  void runBuild() {
+    final ref = this.ref as $Ref<List<VaultItem>, List<VaultItem>>;
+    final element =
+        ref.element
+            as $ClassProviderElement<
+              AnyNotifier<List<VaultItem>, List<VaultItem>>,
+              List<VaultItem>,
+              Object?,
+              Object?
+            >;
+    element.handleCreate(ref, build);
+  }
+}

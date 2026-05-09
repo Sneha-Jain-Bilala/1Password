@@ -96,7 +96,7 @@ class PlatformIcon extends StatelessWidget {
                 url,
                 fit: BoxFit.contain,
                 // Graceful fallback if network image fails
-                errorBuilder: (_, __, ___) => _fallbackIcon(theme),
+                errorBuilder: (_, _, _) => _fallbackIcon(theme),
                 // Show fallback while loading
                 loadingBuilder: (_, child, loadingProgress) {
                   if (loadingProgress == null) return child;

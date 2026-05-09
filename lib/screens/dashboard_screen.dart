@@ -64,7 +64,7 @@ class DashboardScreen extends ConsumerWidget {
                   ),
                   loading: () =>
                       Text('...', style: theme.textTheme.titleMedium),
-                  error: (_, __) =>
+                    error: (error, _) =>
                       Text('User 👋', style: theme.textTheme.titleMedium),
                 ),
               ],
@@ -349,7 +349,7 @@ class DashboardScreen extends ConsumerWidget {
     WidgetRef ref,
     ThemeData theme,
   ) {
-    final activities = ref.watch(activityNotifierProvider);
+    final activities = ref.watch(activityProvider);
     final top5 = activities.take(5).toList();
 
     if (top5.isEmpty) {
@@ -534,7 +534,7 @@ class DashboardScreen extends ConsumerWidget {
           builder: (context, ref, _) {
             final theme = Theme.of(context);
             final favourites = ref.watch(
-              vaultNotifierProvider.select((items) {
+              vaultProvider.select((items) {
                 final sorted = items.where((item) => item.isFavourite).toList()
                   ..sort((a, b) => b.updatedAt.compareTo(a.updatedAt));
                 return sorted;
@@ -601,7 +601,8 @@ class DashboardScreen extends ConsumerWidget {
                       Expanded(
                         child: ListView.separated(
                           itemCount: favourites.length,
-                          separatorBuilder: (_, __) => const Divider(height: 1),
+                            separatorBuilder: (context, _) =>
+                              const Divider(height: 1),
                           itemBuilder: (context, index) {
                             final item = favourites[index];
                             final logo = ServiceLogoResolver.fromServiceName(

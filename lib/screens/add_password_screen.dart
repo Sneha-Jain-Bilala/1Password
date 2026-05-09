@@ -91,6 +91,12 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   bool _searchActive = false; // true while search field has text
   List<_Service> _searchResults = [];
 
+  void _syncSearchFocus() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   // credentials form
   final _emailCtrl = TextEditingController();
   final _passCtrl = TextEditingController();
@@ -106,7 +112,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   void initState() {
     super.initState();
     _searchCtrl.addListener(_onSearchChanged);
-    _searchFocus.addListener(() => setState(() {}));
+    _searchFocus.addListener(_syncSearchFocus);
   }
 
   void _onSearchChanged() {
@@ -120,6 +126,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
   @override
   void dispose() {
     _searchCtrl.removeListener(_onSearchChanged);
+    _searchFocus.removeListener(_syncSearchFocus);
     _searchCtrl.dispose();
     _searchFocus.dispose();
     _emailCtrl.dispose();
@@ -252,7 +259,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           });
         },
       ),
-    );
+    ).whenComplete(nameCtrl.dispose);
   }
 
   bool get _canSave =>
@@ -283,7 +290,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
       isFavourite: _isFavourite,
     );
 
-    await ref.read(vaultNotifierProvider.notifier).addItem(item);
+    await ref.read(vaultProvider.notifier).addItem(item);
 
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -1555,10 +1562,23 @@ class _CustomServiceSheet extends StatefulWidget {
 }
 
 class _CustomServiceSheetState extends State<_CustomServiceSheet> {
+  late final VoidCallback _nameListener;
+
   @override
   void initState() {
     super.initState();
-    widget.nameCtrl.addListener(() => setState(() {}));
+    _nameListener = () {
+      if (mounted) {
+        setState(() {});
+      }
+    };
+    widget.nameCtrl.addListener(_nameListener);
+  }
+
+  @override
+  void dispose() {
+    widget.nameCtrl.removeListener(_nameListener);
+    super.dispose();
   }
 
   @override

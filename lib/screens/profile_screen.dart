@@ -17,11 +17,12 @@ class ProfileScreen extends ConsumerWidget {
     final theme = Theme.of(context);
     final user = Supabase.instance.client.auth.currentUser;
     final displayName = ref.watch(userDisplayNameProvider).value ?? 'User';
-    final vaultItems = ref.watch(vaultNotifierProvider);
+    final vaultItems = ref.watch(vaultProvider);
 
     final email = user?.email ?? '';
-    final memberSince = user?.createdAt != null
-        ? _formatDate(DateTime.parse(user!.createdAt))
+    final createdAt = user?.createdAt;
+    final memberSince = createdAt != null
+      ? _formatDate(DateTime.parse(createdAt))
         : '—';
     final lastLogin = _formatNullableDate(user?.lastSignInAt);
     final isVerified = user?.emailConfirmedAt != null;
@@ -480,7 +481,7 @@ Widget _infoTile(
               ],
             ),
           ),
-          if (trailing != null) trailing,
+          trailing ?? const SizedBox.shrink(),
         ],
       ),
     ),

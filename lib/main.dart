@@ -37,7 +37,7 @@ class MyApp extends ConsumerWidget {
     // trigger this once (Notifier.init() is idempotent).
     ref.read(themeProvider.notifier).init();
     ref.read(biometricPrefProvider.notifier).init();
-    ref.read(activityNotifierProvider.notifier).init();
+    ref.read(activityProvider.notifier).init();
 
     final themeMode = ref.watch(themeProvider); // ← drives dark/light mode
 
