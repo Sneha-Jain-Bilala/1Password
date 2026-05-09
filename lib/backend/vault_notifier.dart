@@ -20,8 +20,13 @@ VaultRepository vaultRepository(Ref ref) {
 // ─── Notifier — the single source of truth for vault items ──────────
 @riverpod
 class VaultNotifier extends _$VaultNotifier {
+  late VaultRepository _repository;
+
   @override
   List<VaultItem> build() {
+    // Pin the repository instance for the lifetime of this notifier.
+    _repository = ref.watch(vaultRepositoryProvider);
+
     // Reload when auth state changes (sign-in / sign-out).
     ref.listen(authStateChangesProvider, (_, next) {
       next.whenData((authState) {
@@ -38,23 +43,24 @@ class VaultNotifier extends _$VaultNotifier {
   }
 
   /// Fetches all vault items directly from the database and updates state.
-  /// This is the single, reliable way to sync state — no Realtime dependency.
   Future<void> _loadFromDb() async {
     try {
-      await _repo.refresh();
-      state = [..._repo.getAll()];
+      await _repository.refresh();
+      state = [..._repository.getAll()];
     } on AuthException {
       state = [];
-    } catch (_) {
-      // Keep last known good state on transient errors.
+    } catch (e, st) {
+      // Print so it's visible in the Flutter console during development.
+      // Do NOT wipe state — keep the last known good list visible.
+      // ignore: avoid_print
+      print('[VaultNotifier] _loadFromDb error: $e\n$st');
     }
   }
 
   /// Public method so screens can manually trigger a reload (e.g. pull-to-refresh).
   Future<void> reload() => _loadFromDb();
 
-
-  VaultRepository get _repo => ref.read(vaultRepositoryProvider);
+  VaultRepository get _repo => _repository;
 
   /// Save a new entry, reload from DB, and update state.
   Future<VaultItem> addItem(VaultItem item) async {

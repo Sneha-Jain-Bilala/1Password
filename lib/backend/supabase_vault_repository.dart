@@ -169,8 +169,12 @@ class SupabaseVaultRepository implements VaultRepository {
       customFields: _decMap(row['custom_fields']),
       isWebsite: row['is_website'] as bool?,
       isFavourite: row['is_favourite'] as bool? ?? false,
-      createdAt: DateTime.parse(row['created_at'] as String),
-      updatedAt: DateTime.parse(row['updated_at'] as String),
+      createdAt: row['created_at'] != null
+          ? DateTime.tryParse(row['created_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
+      updatedAt: row['updated_at'] != null
+          ? DateTime.tryParse(row['updated_at'].toString()) ?? DateTime.now()
+          : DateTime.now(),
     );
   }
 
@@ -188,10 +192,13 @@ class SupabaseVaultRepository implements VaultRepository {
     for (final r in rows as List) {
       try {
         parsed.add(_fromRow(r as Map<String, dynamic>));
-      } catch (_) {
-        // Skip malformed rows rather than aborting the whole refresh
+      } catch (e) {
+        // ignore: avoid_print
+        print('[SupabaseVaultRepository] _fromRow failed for row ${r['id']}: $e');
       }
     }
+    // ignore: avoid_print
+    print('[SupabaseVaultRepository] _refreshCache loaded ${parsed.length} items (${rows.length} raw rows)');
     _cache = parsed;
   }
 
