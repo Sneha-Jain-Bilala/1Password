@@ -195,6 +195,39 @@ class SupabaseVaultRepository implements VaultRepository {
   List<VaultItem> getAll() => List.unmodifiable(_cache);
 
   @override
+  Stream<List<VaultItem>> watchAll() {
+    return _client
+        .from('vault_items')
+        .stream(primaryKey: ['id'])
+        .eq('user_id', _uid()) // Supabase Realtime streams only support 1 filter natively
+        .map((rows) {
+          // 1. Sort client-side (descending) safely
+          final sortedRows = List<Map<String, dynamic>>.from(rows)
+            ..sort((a, b) {
+              final dateA = DateTime.tryParse(a['updated_at']?.toString() ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+              final dateB = DateTime.tryParse(b['updated_at']?.toString() ?? '') ?? DateTime.fromMillisecondsSinceEpoch(0);
+              return dateB.compareTo(dateA); 
+            });
+
+          // 2. Filter out trashed items client-side safely
+          final items = sortedRows
+              .where((r) => r['is_trashed'] != true)
+              .map((r) {
+                try {
+                  return _fromRow(r);
+                } catch (e) {
+                  return null;
+                }
+              })
+              .whereType<VaultItem>()
+              .toList();
+              
+          _cache = items;
+          return items;
+        });
+  }
+
+  @override
   List<VaultItem> getByType(VaultItemType type) =>
       _cache.where((i) => i.type == type).toList();
 
@@ -208,21 +241,24 @@ class SupabaseVaultRepository implements VaultRepository {
         .single();
 
     final saved = _fromRow(response);
-    await _refreshCache();
+    _cache = [saved, ..._cache];
     return saved;
   }
 
   @override
   Future<VaultItem> update(VaultItem item) async {
     final row = _toRow(item)..remove('user_id'); // can't update user_id
-    await _client
+    final response = await _client
         .from('vault_items')
         .update(row)
         .eq('id', item.id)
-        .eq('user_id', _uid());
+        .eq('user_id', _uid())
+        .select()
+        .single();
 
-    await _refreshCache();
-    return _cache.firstWhere((i) => i.id == item.id);
+    final updated = _fromRow(response);
+    _cache = _cache.map((i) => i.id == item.id ? updated : i).toList();
+    return updated;
   }
 
   @override

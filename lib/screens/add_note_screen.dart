@@ -58,6 +58,7 @@ class _AddNoteScreenState extends ConsumerState<AddNoteScreen> {
             duration: const Duration(seconds: 2),
           ),
         );
+        context.pop();
       }
     } catch (e) {
       if (mounted) {

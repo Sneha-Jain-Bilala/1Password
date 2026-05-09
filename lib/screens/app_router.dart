@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../backend/auth_controller.dart';
+import '../backend/vault_item.dart';
 
 import 'splash_screen.dart';
 import 'onboarding_screen.dart';
@@ -117,8 +118,8 @@ GoRouter appRouter(Ref ref) {
       GoRoute(
         path: '/item_detail',
         builder: (context, state) {
-          final platformName = state.extra as String?;
-          return ItemDetailScreen(platformName: platformName ?? '');
+          final item = state.extra as VaultItem;
+          return ItemDetailScreen(item: item);
         },
       ),
 
