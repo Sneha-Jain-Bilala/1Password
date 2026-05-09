@@ -4,7 +4,7 @@ import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'vault_item.dart';
 
 class ServiceLogoData {
-  final IconData icon;
+  final Object icon;
   final Color color;
   final String? assetPath;
   final String? monogram;
@@ -32,8 +32,15 @@ class ServiceLogoData {
       );
     }
 
+    Widget buildIcon() {
+      if (icon is FaIconData) {
+        return FaIcon(icon as FaIconData, color: fallbackColor ?? color, size: size);
+      }
+      return Icon(icon as IconData, color: fallbackColor ?? color, size: size);
+    }
+
     if (assetPath == null) {
-      return Icon(icon, color: fallbackColor ?? color, size: size);
+      return buildIcon();
     }
 
     return SizedBox(
@@ -45,8 +52,8 @@ class ServiceLogoData {
           assetPath!,
           fit: BoxFit.cover,
           filterQuality: FilterQuality.high,
-          errorBuilder: (_, __, ___) {
-            return Icon(icon, color: fallbackColor ?? color, size: size);
+          errorBuilder: (_, _, _) {
+            return buildIcon();
           },
         ),
       ),

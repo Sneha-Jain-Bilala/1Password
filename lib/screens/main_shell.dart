@@ -140,7 +140,7 @@ class _MainShellState extends State<MainShell>
         if (_isOpen)
           AnimatedBuilder(
             animation: _scrimAnim,
-            builder: (_, __) => GestureDetector(
+            builder: (_, _) => GestureDetector(
               behavior: HitTestBehavior.opaque,
               onTap: _close,
               child: Container(
@@ -194,7 +194,7 @@ class _MainShellState extends State<MainShell>
             onTap: _toggle,
             child: AnimatedBuilder(
               animation: _animController,
-              builder: (_, __) {
+              builder: (_, _) {
                 final angle =
                     _animController.value * 0.625 * 2 * 3.14159;
                 return Transform.rotate(

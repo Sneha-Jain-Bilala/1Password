@@ -61,10 +61,20 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
   bool _isFavourite = false;
   _CardType _cardType = _CardType.other;
 
+  void _syncForm() {
+    if (mounted) {
+      setState(() {});
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     _numberCtrl.addListener(_detectCardType);
+    _nameCtrl.addListener(_syncForm);
+    _expiryCtrl.addListener(_syncForm);
+    _cvvCtrl.addListener(_syncForm);
+    _labelCtrl.addListener(_syncForm);
   }
 
   void _detectCardType() {
@@ -87,6 +97,11 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
 
   @override
   void dispose() {
+    _nameCtrl.removeListener(_syncForm);
+    _expiryCtrl.removeListener(_syncForm);
+    _cvvCtrl.removeListener(_syncForm);
+    _labelCtrl.removeListener(_syncForm);
+    _numberCtrl.removeListener(_detectCardType);
     _nameCtrl.dispose();
     _numberCtrl.dispose();
     _expiryCtrl.dispose();
@@ -179,7 +194,7 @@ class _AddCardScreenState extends ConsumerState<AddCardScreen> {
       updatedAt: DateTime.now(),
       isFavourite: _isFavourite,
     );
-    await ref.read(vaultNotifierProvider.notifier).addItem(item);
+    await ref.read(vaultProvider.notifier).addItem(item);
     if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(

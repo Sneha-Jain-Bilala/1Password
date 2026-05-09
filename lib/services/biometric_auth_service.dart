@@ -5,7 +5,6 @@
 
 import 'package:flutter/services.dart';
 import 'package:local_auth/local_auth.dart';
-import 'package:local_auth/error_codes.dart' as auth_error;
 
 enum BiometricResult {
   success,
@@ -52,32 +51,39 @@ class BiometricAuthService {
 
       final success = await _auth.authenticate(
         localizedReason: reason,
-        options: const AuthenticationOptions(
-          biometricOnly: false, // Allow PIN/pattern as fallback
-          stickyAuth: true, // Don't cancel when app goes to background
-          sensitiveTransaction: true,
-        ),
+        biometricOnly: false, // Allow PIN/pattern as fallback
+        persistAcrossBackgrounding: true,
+        sensitiveTransaction: true,
       );
 
       return success ? BiometricResult.success : BiometricResult.failure;
-    } on PlatformException catch (e) {
+    } on LocalAuthException catch (e) {
       switch (e.code) {
-        case auth_error.notAvailable:
+        case LocalAuthExceptionCode.noBiometricHardware:
+        case LocalAuthExceptionCode.biometricHardwareTemporarilyUnavailable:
           return BiometricResult.notAvailable;
-        case auth_error.notEnrolled:
+        case LocalAuthExceptionCode.noBiometricsEnrolled:
+        case LocalAuthExceptionCode.noCredentialsSet:
           return BiometricResult.notEnrolled;
-        case auth_error.lockedOut:
-        case auth_error.permanentlyLockedOut:
+        case LocalAuthExceptionCode.temporaryLockout:
+        case LocalAuthExceptionCode.biometricLockout:
           return BiometricResult.lockout;
-        case auth_error.passcodeNotSet:
-          return BiometricResult.notEnrolled;
-        default:
-          // User cancelled returns a platform exception on some devices
-          if (e.code == 'UserCancel' || e.message?.contains('cancel') == true) {
-            return BiometricResult.cancelled;
-          }
+        case LocalAuthExceptionCode.userCanceled:
+        case LocalAuthExceptionCode.userRequestedFallback:
+          return BiometricResult.cancelled;
+        case LocalAuthExceptionCode.deviceError:
+        case LocalAuthExceptionCode.authInProgress:
+        case LocalAuthExceptionCode.uiUnavailable:
+        case LocalAuthExceptionCode.timeout:
+        case LocalAuthExceptionCode.systemCanceled:
+        case LocalAuthExceptionCode.unknownError:
           return BiometricResult.error;
       }
+    } on PlatformException catch (e) {
+      if (e.code == 'UserCancel' || e.message?.contains('cancel') == true) {
+        return BiometricResult.cancelled;
+      }
+      return BiometricResult.error;
     } catch (_) {
       return BiometricResult.error;
     }

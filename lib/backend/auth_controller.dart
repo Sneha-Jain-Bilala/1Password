@@ -3,7 +3,10 @@ import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+
+part 'auth_controller.g.dart';
 
 final supabaseClientProvider = Provider<SupabaseClient>((ref) {
   return Supabase.instance.client;
@@ -19,17 +22,15 @@ final currentUserProvider = Provider<User?>((ref) {
   return ref.watch(supabaseClientProvider).auth.currentUser;
 });
 
-final authControllerProvider =
-    StateNotifierProvider<AuthController, AsyncValue<void>>((ref) {
-      return AuthController(ref);
-    });
+@riverpod
+class AuthController extends _$AuthController {
+  @override
+  AsyncValue<void> build() {
+    ref.keepAlive();
+    return const AsyncData(null);
+  }
 
-class AuthController extends StateNotifier<AsyncValue<void>> {
-  AuthController(this._ref) : super(const AsyncData(null));
-
-  final Ref _ref;
-
-  SupabaseClient get _client => _ref.read(supabaseClientProvider);
+  SupabaseClient get _client => ref.read(supabaseClientProvider);
 
   Future<bool> hasMasterPassword() async {
     try {

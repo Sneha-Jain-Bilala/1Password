@@ -229,7 +229,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
 
   // ── Grid view (default browse) ─────────────────────────────────
   Widget _buildGridView(BuildContext context, bool isDark) {
-    final allItems = ref.watch(vaultNotifierProvider);
+    final allItems = ref.watch(vaultProvider);
 
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
@@ -336,7 +336,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
     VaultItemType type,
   ) {
     final items = ref
-        .watch(vaultNotifierProvider)
+        .watch(vaultProvider)
         .where((item) => item.type == type)
         .toList();
 
@@ -381,7 +381,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 110),
       itemCount: items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 10),
+      separatorBuilder: (context, _) => const SizedBox(height: 10),
       itemBuilder: (context, index) {
         final item = items[index];
         return _buildPasswordItem(context, item, isDark);

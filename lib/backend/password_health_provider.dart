@@ -66,7 +66,7 @@ PasswordStrength _classify(String password) {
 
 /// Reactive provider — recomputes whenever the vault changes.
 final passwordHealthProvider = Provider<PasswordHealthData>((ref) {
-  final allItems = ref.watch(vaultNotifierProvider);
+  final allItems = ref.watch(vaultProvider);
 
   // Only analyse login items that actually have a password stored.
   final loginItems = allItems

@@ -1,4 +1,5 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:async';
+
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'
     show AuthChangeEvent, AuthException;
@@ -21,41 +22,42 @@ VaultRepository vaultRepository(Ref ref) {
 @riverpod
 class VaultNotifier extends _$VaultNotifier {
   late VaultRepository _repository;
+  StreamSubscription<List<VaultItem>>? _realtimeSubscription;
+  String? _realtimeUserId;
 
   @override
   List<VaultItem> build() {
+    ref.keepAlive();
+
     // Pin the repository instance for the lifetime of this notifier.
     _repository = ref.watch(vaultRepositoryProvider);
+    ref.onDispose(_disposeRealtimeSubscription);
 
     // Reload when auth state changes (sign-in / sign-out).
     ref.listen(authStateChangesProvider, (_, next) {
       next.whenData((authState) {
         if (authState.event == AuthChangeEvent.signedOut) {
+          _disposeRealtimeSubscription();
           state = [];
           return;
         }
+
+        _ensureRealtimeSubscription();
         Future.microtask(_loadFromDb);
       });
     });
 
+    final cachedItems = _repository.getAll();
+    _ensureRealtimeSubscription();
     Future.microtask(_loadFromDb);
-    return [];
+    return cachedItems;
   }
 
   /// Fetches all vault items directly from the database and updates state.
   Future<void> _loadFromDb() async {
     try {
       await _repository.refresh();
-      final items = [..._repository.getAll()];
-      state = items;
-
-      // Prune activity log entries that refer to items no longer in the vault.
-      final liveNames = items
-          .map((i) => i.serviceName.toLowerCase())
-          .toSet();
-      await ref
-          .read(activityNotifierProvider.notifier)
-          .pruneForDeletedItems(liveNames);
+      _publishItems([..._repository.getAll()]);
     } on AuthException {
       state = [];
     } catch (e, st) {
@@ -69,6 +71,48 @@ class VaultNotifier extends _$VaultNotifier {
   /// Public method so screens can manually trigger a reload (e.g. pull-to-refresh).
   Future<void> reload() => _loadFromDb();
 
+  void _ensureRealtimeSubscription() {
+    final client = ref.read(supabaseClientProvider);
+    final userId = client.auth.currentUser?.id;
+
+    if (userId == null) {
+      _disposeRealtimeSubscription();
+      return;
+    }
+
+    if (_realtimeSubscription != null && _realtimeUserId == userId) {
+      return;
+    }
+
+    _disposeRealtimeSubscription();
+    _realtimeUserId = userId;
+    _realtimeSubscription = _repository.watchAll().listen(
+      _publishItems,
+      onError: (error, stackTrace) {
+        // ignore: avoid_print
+        print('[VaultNotifier] realtime stream error: $error\n$stackTrace');
+      },
+    );
+  }
+
+  void _publishItems(List<VaultItem> items) {
+    state = items;
+
+    // Prune activity log entries that refer to items no longer in the vault.
+    final liveNames = items.map((i) => i.serviceName.toLowerCase()).toSet();
+    unawaited(
+      ref.read(activityProvider.notifier).pruneForDeletedItems(
+            liveNames,
+          ),
+    );
+  }
+
+  void _disposeRealtimeSubscription() {
+    _realtimeSubscription?.cancel();
+    _realtimeSubscription = null;
+    _realtimeUserId = null;
+  }
+
   VaultRepository get _repo => _repository;
 
   /// Save a new entry, reload from DB, and update state.
@@ -79,7 +123,7 @@ class VaultNotifier extends _$VaultNotifier {
     // Log activity
     final activityType = _getActivityTypeForAdd(item.type);
     await ref
-        .read(activityNotifierProvider.notifier)
+        .read(activityProvider.notifier)
         .logActivity(
           type: activityType,
           itemName: item.serviceName,
@@ -98,7 +142,7 @@ class VaultNotifier extends _$VaultNotifier {
     // Log activity
     final activityType = _getActivityTypeForUpdate(item.type);
     await ref
-        .read(activityNotifierProvider.notifier)
+        .read(activityProvider.notifier)
         .logActivity(
           type: activityType,
           itemName: item.serviceName,
@@ -117,7 +161,7 @@ class VaultNotifier extends _$VaultNotifier {
     // Log activity
     final activityType = _getActivityTypeForDelete(item.type);
     await ref
-        .read(activityNotifierProvider.notifier)
+        .read(activityProvider.notifier)
         .logActivity(
           type: activityType,
           itemName: item.serviceName,
@@ -156,7 +200,7 @@ class VaultNotifier extends _$VaultNotifier {
     state = [..._repo.getAll()];
 
     await ref
-        .read(activityNotifierProvider.notifier)
+        .read(activityProvider.notifier)
         .logActivity(
           type: isFavourite
               ? ActivityType.itemFavourited
