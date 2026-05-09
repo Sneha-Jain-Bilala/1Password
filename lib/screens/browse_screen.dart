@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:go_router/go_router.dart';
 import '../backend/service_logo_resolver.dart';
 import '../backend/vault_item.dart';
 import '../backend/vault_notifier.dart';
@@ -228,6 +229,8 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
 
   // ── Grid view (default browse) ─────────────────────────────────
   Widget _buildGridView(BuildContext context, bool isDark) {
+    final allItems = ref.watch(vaultNotifierProvider);
+
     return ListView(
       padding: const EdgeInsets.fromLTRB(20, 8, 20, 110),
       children: [
@@ -300,9 +303,6 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
           ),
           itemBuilder: (context, i) {
             final cat = _categories[i];
-            // Watch the STATE (the list itself) so this rebuilds whenever
-            // an item is added, updated, or deleted.
-            final allItems = ref.watch(vaultNotifierProvider);
             final count = cat.itemType != null
                 ? allItems.where((item) => item.type == cat.itemType).length
                 : 0;
@@ -480,7 +480,7 @@ class _BrowseScreenState extends ConsumerState<BrowseScreen> {
             ),
           ],
         ),
-        onTap: () {},
+        onTap: () => context.push('/item_detail', extra: item),
       ),
     );
   }

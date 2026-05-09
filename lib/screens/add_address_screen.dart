@@ -112,6 +112,7 @@ class _AddAddressScreenState extends ConsumerState<AddAddressScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+      context.pop();
     }
   }
 

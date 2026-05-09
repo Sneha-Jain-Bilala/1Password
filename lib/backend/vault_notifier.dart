@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:supabase_flutter/supabase_flutter.dart'
@@ -20,39 +21,43 @@ VaultRepository vaultRepository(Ref ref) {
 // ─── Notifier — the single source of truth for vault items ──────────
 @riverpod
 class VaultNotifier extends _$VaultNotifier {
+  StreamSubscription<List<VaultItem>>? _subscription;
+
   @override
   List<VaultItem> build() {
-    // Load once initially.
-    Future.microtask(_reloadFromSupabase);
+    ref.onDispose(() {
+      _subscription?.cancel();
+    });
 
-    // Reload when auth/session changes (app restarts, sign-in, sign-out).
+    // Listen to Auth State changes to start/stop the stream.
     ref.listen(authStateChangesProvider, (_, next) {
       next.whenData((authState) {
         if (authState.event == AuthChangeEvent.signedOut) {
+          _subscription?.cancel();
+          _subscription = null;
           state = [];
           return;
         }
-        Future.microtask(_reloadFromSupabase);
+        Future.microtask(_startStream);
       });
     });
 
+    Future.microtask(_startStream);
     return [];
   }
 
-  Future<void> _reloadFromSupabase() async {
+  void _startStream() {
     final repo = ref.read(vaultRepositoryProvider);
-    if (repo is! SupabaseVaultRepository) {
-      state = repo.getAll();
-      return;
-    }
-
-    try {
-      await repo.loadAll();
-      state = repo.getAll();
-    } on AuthException {
-      // Session can be briefly unavailable during startup/signout transitions.
-      state = [];
-    }
+    _subscription?.cancel();
+    _subscription = repo.watchAll().listen(
+      (items) {
+        state = [...items];
+      },
+      onError: (err) {
+        // Do not wipe out the UI state if the stream temporarily disconnects or errors.
+        // Maintain the last known good state.
+      },
+    );
   }
 
   VaultRepository get _repo => ref.read(vaultRepositoryProvider);
@@ -60,7 +65,7 @@ class VaultNotifier extends _$VaultNotifier {
   /// Save a new entry and refresh state.
   Future<VaultItem> addItem(VaultItem item) async {
     final saved = await _repo.save(item);
-    state = _repo.getAll();
+    state = [..._repo.getAll()];
 
     // Log activity
     final activityType = _getActivityTypeForAdd(item.type);
@@ -79,7 +84,7 @@ class VaultNotifier extends _$VaultNotifier {
   /// Update an existing entry and refresh state.
   Future<void> updateItem(VaultItem item) async {
     await _repo.update(item);
-    state = _repo.getAll();
+    state = [..._repo.getAll()];
 
     // Log activity
     final activityType = _getActivityTypeForUpdate(item.type);
@@ -99,7 +104,7 @@ class VaultNotifier extends _$VaultNotifier {
     final item = state.firstWhere((i) => i.id == id);
 
     await _repo.trash(id);
-    state = _repo.getAll();
+    state = [..._repo.getAll()];
 
     // Log activity
     final activityType = _getActivityTypeForDelete(item.type);

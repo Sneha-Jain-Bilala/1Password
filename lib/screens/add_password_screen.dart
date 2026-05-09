@@ -293,6 +293,7 @@ class _AddPasswordScreenState extends ConsumerState<AddPasswordScreen> {
           behavior: SnackBarBehavior.floating,
         ),
       );
+      context.pop();
     }
   }
 

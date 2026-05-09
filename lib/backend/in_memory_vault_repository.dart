@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:math';
 import 'vault_item.dart';
 import 'vault_repository.dart';
@@ -7,12 +8,24 @@ import 'vault_repository.dart';
 class InMemoryVaultRepository implements VaultRepository {
   final List<VaultItem> _items = [];
   final _random = Random();
+  final _controller = StreamController<List<VaultItem>>.broadcast();
 
   String _newId() =>
       '${DateTime.now().millisecondsSinceEpoch}_${_random.nextInt(99999)}';
 
+  void _notify() {
+    _controller.add(List.unmodifiable(_items));
+  }
+
   @override
   List<VaultItem> getAll() => List.unmodifiable(_items);
+
+  @override
+  Stream<List<VaultItem>> watchAll() {
+    // Emit initial state immediately, then stream updates
+    Future.microtask(_notify);
+    return _controller.stream;
+  }
 
   @override
   List<VaultItem> getByType(VaultItemType type) =>
@@ -41,6 +54,7 @@ class InMemoryVaultRepository implements VaultRepository {
           )
         : item;
     _items.add(saved);
+    _notify();
     return saved;
   }
 
@@ -49,6 +63,7 @@ class InMemoryVaultRepository implements VaultRepository {
     final idx = _items.indexWhere((i) => i.id == item.id);
     if (idx == -1) throw StateError('Item ${item.id} not found');
     _items[idx] = item.copyWith();
+    _notify();
     return _items[idx];
   }
 
@@ -56,10 +71,16 @@ class InMemoryVaultRepository implements VaultRepository {
   Future<void> trash(String id) async {
     // In a real impl, add a `trashedAt` timestamp. For now: remove from list.
     _items.removeWhere((i) => i.id == id);
+    _notify();
   }
 
   @override
   Future<void> delete(String id) async {
     _items.removeWhere((i) => i.id == id);
+    _notify();
+  }
+
+  void dispose() {
+    _controller.close();
   }
 }

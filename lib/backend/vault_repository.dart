@@ -6,6 +6,9 @@ abstract class VaultRepository {
   /// Returns all items in the vault.
   List<VaultItem> getAll();
 
+  /// Returns a real-time stream of all items in the vault.
+  Stream<List<VaultItem>> watchAll();
+
   /// Returns items filtered by type (Browse category).
   List<VaultItem> getByType(VaultItemType type);
 
