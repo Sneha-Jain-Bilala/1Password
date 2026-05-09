@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -7,37 +6,32 @@ import 'encryption_service.dart';
 import 'vault_item.dart';
 import 'vault_repository.dart';
 
-/// Maps [VaultItem] ↔ the live `vault_items` table.
+/// Maps [VaultItem] ↔ the live `vault_items` Supabase table.
 ///
-/// Sensitive fields are encrypted with AES-256-GCM before writing to Supabase
-/// and decrypted after reading, using the in-memory [_key] derived from the
-/// user's master password.
+/// All sensitive fields are **always** encrypted with AES-256-GCM before being
+/// written to Supabase, and decrypted when read back.
 ///
 /// Encrypted columns: `password_enc`, `totp_secret_enc`, `notes`,
 ///   `custom_fields` (JSON-serialised then encrypted), `card_cvv_enc`.
 ///
-/// If [_key] is null (vault is locked), data is written/read as plaintext
-/// for backward compatibility — this should only happen during onboarding
-/// before the master password is set.
+/// Plaintext columns (needed for search/browse): `username`, `service_name`,
+///   `domain`, `card_expiry`.
 class SupabaseVaultRepository implements VaultRepository {
-  SupabaseVaultRepository(this._client, this._key);
+  SupabaseVaultRepository(this._client);
 
   final SupabaseClient _client;
-
-  /// AES-256-GCM key (32 bytes), null when the vault is locked.
-  final Uint8List? _key;
 
   // ── In-memory cache (kept in sync after every mutating call) ──────────────
   List<VaultItem> _cache = [];
 
-  // ── Auth helper ──────────────────────────────────────────────────────────
+  // ── Auth helper ───────────────────────────────────────────────────────────
   String _uid() {
     final user = _client.auth.currentUser;
     if (user == null) throw const AuthException('Not signed in.');
     return user.id;
   }
 
-  // ── Colour helpers ───────────────────────────────────────────────────────
+  // ── Colour helpers ────────────────────────────────────────────────────────
 
   static String? _colorToHex(Color? color) {
     if (color == null) return null;
@@ -53,7 +47,7 @@ class SupabaseVaultRepository implements VaultRepository {
     return null;
   }
 
-  // ── Type helpers ─────────────────────────────────────────────────────────
+  // ── Type helpers ──────────────────────────────────────────────────────────
 
   static String _typeToDb(VaultItemType t) => t.name;
 
@@ -64,46 +58,53 @@ class SupabaseVaultRepository implements VaultRepository {
     );
   }
 
-  // ── Encryption helpers ───────────────────────────────────────────────────
+  // ── Encryption helpers ────────────────────────────────────────────────────
 
-  /// Encrypts [value] if a key is available; otherwise returns [value] as-is.
-  String? _enc(String? value) {
-    if (value == null || value.isEmpty || _key == null) return value;
-    return EncryptionService.encrypt(value, _key!);
+  /// Encrypts [value]; returns null if value is null or empty.
+  static String? _enc(String? value) {
+    if (value == null || value.isEmpty) return null;
+    return EncryptionService.encrypt(value);
   }
 
-  /// Decrypts [value] if it looks encrypted; falls back to plaintext gracefully.
-  String? _dec(String? value) {
+  /// Decrypts [value] if it is in encrypted format; returns plaintext otherwise
+  /// (graceful handling of legacy unencrypted rows).
+  static String? _dec(String? value) {
     if (value == null || value.isEmpty) return value;
-    if (_key == null) return value; // locked — return as-is
     if (EncryptionService.isEncrypted(value)) {
-      try {
-        return EncryptionService.decrypt(value, _key!);
-      } catch (_) {
-        // Wrong key or corrupted data — return null rather than crash
-        return null;
-      }
+      return EncryptionService.decrypt(value); // null on corrupted data
     }
-    return value; // legacy plaintext row
+    return value; // legacy plaintext row — pass through as-is
   }
 
-  /// Encrypts a Map<String,String> as a JSON string.
-  String? _encMap(Map<String, String> map) {
+  /// Encrypts a Map<String,String> as an encrypted JSON string.
+  static String? _encMap(Map<String, String> map) {
     if (map.isEmpty) return null;
-    final json = jsonEncode(map);
-    return _enc(json);
+    return EncryptionService.encrypt(jsonEncode(map));
   }
 
-  /// Decrypts an encrypted JSON string back to Map<String,String>.
-  Map<String, String> _decMap(dynamic raw) {
+  /// Decrypts a raw DB value back to Map<String,String>.
+  /// Handles three cases: encrypted string, legacy JSONB object, null.
+  static Map<String, String> _decMap(dynamic raw) {
     if (raw == null) return {};
     if (raw is Map) {
-      // Legacy un-encrypted jsonb object
+      // Check for our encrypted-envelope format: {"_enc": "<iv:ct>"}
+      if (raw.containsKey('_enc')) {
+        final decrypted = _dec(raw['_enc'] as String?);
+        if (decrypted == null) return {};
+        try {
+          final decoded = jsonDecode(decrypted) as Map<String, dynamic>;
+          return decoded.map((k, v) => MapEntry(k, v.toString()));
+        } catch (_) {
+          return {};
+        }
+      }
+      // Legacy unencrypted JSONB object
       return Map<String, String>.from(
         raw.map((k, v) => MapEntry(k.toString(), v.toString())),
       );
     }
     if (raw is String) {
+      // Encrypted string (older format without the _enc envelope)
       final decrypted = _dec(raw);
       if (decrypted == null) return {};
       try {
@@ -116,19 +117,18 @@ class SupabaseVaultRepository implements VaultRepository {
     return {};
   }
 
-  // ── Row serialisation ────────────────────────────────────────────────────
+  // ── Row serialisation ─────────────────────────────────────────────────────
 
   Map<String, dynamic> _toRow(VaultItem item) {
-    // Serialise custom_fields: encrypt the JSON string so it is stored as TEXT
-    // when encryption is active, or as a JSON object when locked (no key).
-    final customFieldsEncrypted = _key != null && item.customFields.isNotEmpty
-        ? _encMap(item.customFields)
-        : null;
-
-    // For card items, extract expiry and CVV to their dedicated columns too.
+    // Card-specific structured fields
     final isCard = item.type == VaultItemType.card;
     final cardExpiry = isCard ? item.customFields['expiry'] : null;
     final cardCvvRaw = isCard ? item.customFields['cvv'] : null;
+
+    // Encrypt custom_fields as a JSON blob wrapped in an _enc envelope
+    final encCustomFields = item.customFields.isNotEmpty
+        ? {'_enc': _encMap(item.customFields)}
+        : <String, dynamic>{};
 
     return {
       'user_id': _uid(),
@@ -136,40 +136,25 @@ class SupabaseVaultRepository implements VaultRepository {
       'service_name': item.serviceName,
       'domain': item.domain,
       'service_color': _colorToHex(item.serviceColor),
-      'username': item.username, // intentionally plaintext for search
-      // ── encrypted fields ──────────────────────────────────────────
+      'username': item.username, // intentionally plaintext for search/display
+      // ── always-encrypted fields ─────────────────────────────────────────
       'password_enc': _enc(item.password),
       'totp_secret_enc': _enc(item.totpSecret),
       'notes': _enc(item.notes),
-      // Store encrypted custom_fields as a JSON string in the text-compatible
-      // "encrypted" format, or fall back to the JSONB object when no key.
-      'custom_fields': customFieldsEncrypted != null
-          ? {'_enc': customFieldsEncrypted}
-          : item.customFields,
-      // ── card-specific columns (card_expiry is not sensitive, CVV is) ──
-      if (cardExpiry != null) 'card_expiry': cardExpiry,
+      'custom_fields': encCustomFields,
+      // ── card-specific columns ──────────────────────────────────────────
+      if (cardExpiry != null) 'card_expiry': cardExpiry, // not sensitive
       if (cardCvvRaw != null) 'card_cvv_enc': _enc(cardCvvRaw),
-      // ─────────────────────────────────────────────────────────────
+      // ──────────────────────────────────────────────────────────────────
       'folder_name': item.folderName,
       'is_website': item.isWebsite,
       'is_favourite': item.isFavourite,
       'is_trashed': false,
-      'is_encrypted': _key != null,
+      'is_encrypted': true, // always encrypted now
     };
   }
 
   VaultItem _fromRow(Map<String, dynamic> row) {
-    // Decrypt custom_fields: detect whether it was stored encrypted.
-    Map<String, String> customFields;
-    final rawCustomFields = row['custom_fields'];
-    if (rawCustomFields is Map && rawCustomFields.containsKey('_enc')) {
-      // Encrypted format: {"_enc": "<iv:ciphertext>"}
-      customFields = _decMap(rawCustomFields['_enc'] as String?);
-    } else {
-      // Legacy JSONB object (unencrypted)
-      customFields = _decMap(rawCustomFields);
-    }
-
     return VaultItem(
       id: row['id'] as String,
       type: _typeFromDb(row['item_type'] as String),
@@ -181,7 +166,7 @@ class SupabaseVaultRepository implements VaultRepository {
       totpSecret: _dec(row['totp_secret_enc'] as String?),
       notes: _dec(row['notes'] as String?),
       folderName: row['folder_name'] as String?,
-      customFields: customFields,
+      customFields: _decMap(row['custom_fields']),
       isWebsite: row['is_website'] as bool?,
       isFavourite: row['is_favourite'] as bool? ?? false,
       createdAt: DateTime.parse(row['created_at'] as String),
@@ -189,7 +174,7 @@ class SupabaseVaultRepository implements VaultRepository {
     );
   }
 
-  // ── Cache refresh ────────────────────────────────────────────────────────
+  // ── Cache refresh ─────────────────────────────────────────────────────────
 
   Future<void> _refreshCache() async {
     final rows = await _client
